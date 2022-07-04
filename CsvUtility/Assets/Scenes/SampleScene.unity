@@ -250,5 +250,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testClass:
-    key: 0
-    value: 
+  - keys: 21000000dbe4010092300000
+    values:
+    - "\uC548\uB155"
+    - "\uC548\uB155 \uC138\uC0C1"
+    - "\uC544\uC9C1 \uC0B4\uB9CC\uD574"
+  - keys: 160000001e020000e9860000
+    values:
+    - "\uAD7F"
+    - "\u314E\u314E"
+    - "\u3139\u3147\u314B\u314B"
+  test:
+    keys: 0b0000005d1cb900
+    values:
+    - 11
+    - 111231
+  asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}

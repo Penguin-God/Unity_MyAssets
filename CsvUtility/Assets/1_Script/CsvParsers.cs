@@ -30,6 +30,7 @@ public abstract class CsvParsers
 {
     public static CsvParser GetParser(FieldInfo info)
     {
+        
         if (IsEnumerable(info.FieldType.Name))
             return new EnumerableTypeParser(info);
         else if (IsPair(info.FieldType.Name))
@@ -37,7 +38,8 @@ public abstract class CsvParsers
         else
             return new PrimitiveTypeParser();
 
-        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
+        // TODO : 기본 생성자로 할당 후 IEnumerable로 조건 확인하기
+        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }
@@ -90,6 +92,7 @@ class EnumerableTypeParser : CsvParser
         {
             if (typeName.Contains("[]")) return EnumerableType.Array;
             else if (typeName.Contains("List")) return EnumerableType.List;
+            else if (typeName.Contains("Dict")) return EnumerableType.Dictionary;
             return EnumerableType.Unknown;
         }
     }
@@ -101,6 +104,8 @@ class EnumerableTypeParser : CsvParser
             new CsvArrayParser().SetValue(obj, info, values, _elementTypeName);
         else if (_type == EnumerableType.List)
             new CsvListParser().SetValue(obj, info, values, _elementTypeName);
+        else if (_type == EnumerableType.Dictionary)
+            new CsvDictionaryParser(info).SetValue(obj, info, values);
     }
 }
 
@@ -160,6 +165,36 @@ public class CsvListParser
 
 public class CsvArrayParser
 {
+    public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
+    {
+        Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserType(), values.Length);
+        for (int i = 0; i < array.Length; i++)
+            array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserValue(values[i]), i);
+        info.SetValue(obj, array);
+    }
+}
+
+public class CsvDictionaryParser
+{
+    string keyTypeName;
+    string valueTypeName;
+    public CsvDictionaryParser(FieldInfo info)
+    {
+        string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
+        keyTypeName = elementTypeNames[0].Replace("System.", "");
+        valueTypeName = elementTypeNames[1].Replace("System.", "");
+    }
+
+    public void SetValue(object obj, FieldInfo info, string[] values)
+    {
+        MethodInfo methodInfo = info.FieldType.GetMethod("Add");
+        for (int i = 0; i < values.Length; i+=2)
+        {
+            methodInfo.Invoke(info.GetValue(obj), new object[] { PrimitiveTypeParser.GetPrimitiveParser(keyTypeName).GetParserValue(values[i]),
+                                                                 PrimitiveTypeParser.GetPrimitiveParser(valueTypeName).GetParserValue(values[i+1]) });
+        }
+    }
+
     public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
     {
         Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserType(), values.Length);

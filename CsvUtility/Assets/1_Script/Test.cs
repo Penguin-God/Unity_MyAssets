@@ -8,15 +8,18 @@ using System.Reflection;
 [Serializable]
 public class TestClass
 {
-    public KeyValuePair<int, string> pair;
+    public Dictionary<int, string> dict = new Dictionary<int, string>();
 
-    [SerializeField] int key;
-    [SerializeField] string value;
+    [SerializeField] List<int> keys = new List<int>();
+    [SerializeField] List<string> values = new List<string>();
 
     public void Setup()
     {
-        key = pair.Key;
-        value = pair.Value;
+        foreach (var item in dict)
+        {
+            keys.Add(item.Key);
+            values.Add(item.Value);
+        }
     }
 }
 
@@ -26,10 +29,15 @@ public class Test : MonoBehaviour
     [SerializeField] TestClass test;
     [SerializeField] TextAsset asset;
 
+    Dictionary<int, string> a = new Dictionary<int, string>();
     [ContextMenu("Test")]
     void PairTest()
     {
         testClass = CsvUtility.GetEnumerableFromCsv<TestClass>(asset.text).ToArray();
-        testClass.ToList().ForEach(x => x.Setup());
+        print(testClass[0].dict[33]);
+        foreach (var item in testClass)
+        {
+            item.Setup();
+        }
     }
 }
