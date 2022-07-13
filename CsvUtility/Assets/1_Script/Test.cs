@@ -8,20 +8,16 @@ using System.Reflection;
 [Serializable]
 public class TestClass
 {
-    [SerializeField] 
-    public Dictionary<int, string> dict = new Dictionary<int, string>();
+    [SerializeField] int TT;
+    [SerializeField] bool Ta;
+    [SerializeField] HasTestClass hasTestClass;
+}
 
-    [SerializeField] List<int> keys = new List<int>();
-    [SerializeField] List<string> values = new List<string>();
-
-    public void Setup()
-    {
-        foreach (var item in dict)
-        {
-            keys.Add(item.Key);
-            values.Add(item.Value);
-        }
-    }
+[Serializable]
+public class HasTestClass
+{
+    [SerializeField] int aaa;
+    [SerializeField] string AAA;
 }
 
 [Serializable]
@@ -122,29 +118,47 @@ public class Test : MonoBehaviour
         else print("Bad!!");
     }
 
+    [SerializeField] string aa;
     [SerializeField] TestClass[] testClass;
     [SerializeField] TestClass test;
-
-    bool CheckSame<T>(T parsingValue, T value) where T : IComparable
+    [SerializeField] TextAsset testCsv;
+    [ContextMenu("Test")]
+    void Testss()
     {
-        if (parsingValue.CompareTo(value) != 0)
+        string[] names = GetSerializedFields(test.GetType());
+
+        for (int i = 0; i < names.Length; i++)
         {
-            Debug.LogError("서로 달라요!!!!!!!!!");
-            return false;
-        }
-
-        return true;
-    }
-
-
-    //[ContextMenu("Test")]
-    void PairTest()
-    {
-        testClass = CsvUtility.GetEnumerableFromCsv<TestClass>(asset.text).ToArray();
-        print(testClass[0].dict[33]);
-        foreach (var item in testClass)
-        {
-            item.Setup();
+            print(names[i]);
         }
     }
+
+    string[] GetSerializedFields(Type type)
+    {
+        FieldInfo[] infos = type
+          .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+          .Where(x => CsvSerializedCondition(x)).ToArray();
+
+        return GetSerializedFieldNames(infos);
+    }
+
+    string[] GetSerializedFieldNames(FieldInfo[] infos)
+    {
+        List<string> names = new List<string>();
+        foreach (var info in infos)
+        {
+            names.Add(info.Name);
+            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+            {
+                names.Add(info.Name);
+                string[] aaa = GetSerializedFields(info.FieldType);
+                for (int i = 0; i < aaa.Length; i++)
+                    names.Add($"{info.Name}->{aaa[i]}");
+            }
+        }
+
+        return names.ToArray();
+    }
+
+    bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 }

@@ -373,7 +373,9 @@ MonoBehaviour:
   asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}
   testClass: []
   test:
-    keys: 0b0000005d1cb900
-    values:
-    - 11
-    - 111231
+    TT: 0
+    Ta: 0
+    hasTestClass:
+      aaa: 0
+      AAA: 0
+  testCsv: {fileID: 4900000, guid: 34d13703728c9264ab65b7f35d346504, type: 3}
