@@ -1,7 +1,7 @@
-﻿number,text,actualNumber,boolean,textNumberPair,textNumberPair,booleanActualNumberPair,booleanActualNumberPair,numberArray,numberArray,textArray,textArray,actualNumberArray,actualNumberArray,booleanArray,booleanArray
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
-123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,22222,341235,고타에,라헤야,4224.124512,1245.1231,TRUE,FALSE
+﻿number,text,actualNumber,boolean,textNumberPair,textNumberPair,booleanActualNumberPair,booleanActualNumberPair,numberArray,numberArray,textArray,textArray,actualNumberArray,actualNumberArray,booleanArray,booleanArray,numberList,numberList,textList,textList,actualNumberList,actualNumberList,booleanList,booleanList,numberByText,numberByText,numberByText,numberByText,actualNumberByBoolean,actualNumberByBoolean,actualNumberByBoolean,actualNumberByBoolean
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
+123,Hello World,23.123,TRUE,사무라이 하트,243,FALSE,22.411,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,341235,13123,고타에,라헤야,4224.12,1245.12,TRUE,FALSE,2,조찬자,12432,아 루즈 마이셀프,2134.22,TRUE,11.11,FALSE
