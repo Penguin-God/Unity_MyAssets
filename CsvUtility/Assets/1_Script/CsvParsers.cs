@@ -30,7 +30,6 @@ public abstract class CsvParsers
 {
     public static CsvParser GetParser(FieldInfo info)
     {
-        
         if (IsEnumerable(info.FieldType.Name))
             return new EnumerableTypeParser(info);
         else if (IsPair(info.FieldType.Name))
@@ -38,7 +37,6 @@ public abstract class CsvParsers
         else
             return new PrimitiveTypeParser();
 
-        // TODO : 기본 생성자로 할당 후 IEnumerable로 조건 확인하기
         bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
@@ -187,20 +185,14 @@ public class CsvDictionaryParser
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
+        if (values.Length % 2 != 0) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
+
         MethodInfo methodInfo = info.FieldType.GetMethod("Add");
         for (int i = 0; i < values.Length; i+=2)
         {
             methodInfo.Invoke(info.GetValue(obj), new object[] { PrimitiveTypeParser.GetPrimitiveParser(keyTypeName).GetParserValue(values[i]),
                                                                  PrimitiveTypeParser.GetPrimitiveParser(valueTypeName).GetParserValue(values[i+1]) });
         }
-    }
-
-    public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
-    {
-        Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserType(), values.Length);
-        for (int i = 0; i < array.Length; i++)
-            array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserValue(values[i]), i);
-        info.SetValue(obj, array);
     }
 }
 #endregion 열거형 파싱 End
@@ -218,6 +210,8 @@ public class CsvPairParser : CsvParser
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
+        if (values.Length != 2) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
+
         ConstructorInfo constructor = info.FieldType.GetConstructors()[0];
         info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(keyTypeName).GetParserValue(values[0]),
                                                              PrimitiveTypeParser.GetPrimitiveParser(valueTypeName).GetParserValue(values[1]) } ));

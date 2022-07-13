@@ -119,6 +119,7 @@ public class Test : MonoBehaviour
     {
         masterTests = CsvUtility.GetEnumerableFromCsv<MasterTest>(asset.text).ToArray();
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
+        else print("Bad!!");
     }
 
     [SerializeField] TestClass[] testClass;

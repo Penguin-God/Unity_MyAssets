@@ -249,20 +249,131 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de255b65784c0043a108ad4694162a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testClass:
-  - keys: 21000000dbe4010092300000
-    values:
-    - "\uC548\uB155"
-    - "\uC548\uB155 \uC138\uC0C1"
-    - "\uC544\uC9C1 \uC0B4\uB9CC\uD574"
-  - keys: 160000001e020000e9860000
-    values:
-    - "\uAD7F"
-    - "\u314E\u314E"
-    - "\u3139\u3147\u314B\u314B"
+  masterTests:
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+  asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}
+  testClass: []
   test:
     keys: 0b0000005d1cb900
     values:
     - 11
     - 111231
-  asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}
