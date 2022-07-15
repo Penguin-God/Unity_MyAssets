@@ -1,2 +1,5 @@
 ﻿TT,Ta,hasTestClass,aaa,AAA,hasTestClass,kkkk,sktt1
-22,TRUE,,123,AAAAA,,안녕 세상,우승!!
+22,TRUE,,123,A,,안녕 세상,우승!
+33,FALSE,,456,AA,,안녕 세상,우승!!
+44,TRUE,,789,AAA,,안녕 세상,우승!!!
+55,TRUE,,0,AAAA,,안녕 세상,우승!!!!

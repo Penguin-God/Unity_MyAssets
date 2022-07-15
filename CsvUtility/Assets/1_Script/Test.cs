@@ -127,55 +127,61 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void Testss()
     {
-        string[] fieldNames = testCsv.text.Split('\n')[0].Split(',').Select(x => x.Trim()).ToArray();
-        string[] values = testCsv.text.Split('\n')[1].Split(',').Select(x => x.Trim()).ToArray();
-
-        test = ClassParsing<TestClass>(GetIndexsByKey(test, fieldNames), values);
+        testClass = null;
+        testClass = CsvToList<TestClass>(testCsv.text);
     }
 
-    T ClassParsing<T>(Dictionary<string, int[]> dict, string[] cells) => (T)ClassParsing(dict, typeof(T), cells);
-
-    object ClassParsing(Dictionary<string, int[]> dict, Type type, string[] cells, string current = "")
+    T[] CsvToList<T>(string csv)
     {
-        object obj = Activator.CreateInstance(type);
+        string[] columns = csv.Substring(0, csv.Length - 1).Split('\n');
+        Dictionary<string, int[]> dict = GetIndexsByKey(Activator.CreateInstance<T>(), GetCells(columns[0]));
+        return columns.Skip(1)
+                      .Select(x => (T)ClassParsing(dict, typeof(T), GetCells(x)))
+                      .ToArray();
 
-        foreach (FieldInfo info in GetSerializedFields(obj))
+        object ClassParsing(Dictionary<string, int[]> dict, Type type, string[] cells, string current = "")
         {
-            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-                info.SetValue(obj, ClassParsing(dict, info.FieldType, cells, $"{current}{info.Name}->"));
-            else
-                CsvParsers.GetParser(info).SetValue(obj, info, new string[] { cells[dict[current + info.Name][0]] });
+            object obj = Activator.CreateInstance(type);
+
+            foreach (FieldInfo info in GetSerializedFields(obj))
+            {
+                if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+                    info.SetValue(obj, ClassParsing(dict, info.FieldType, cells, $"{current}{info.Name}->"));
+                else
+                    CsvParsers.GetParser(info).SetValue(obj, info, new string[] { cells[dict[current + info.Name][0]] });
+            }
+
+            return obj;
         }
 
-        return obj;
-    }
-
-    Dictionary<string, int[]> GetIndexsByKey(object obj, string[] fieldNames)
-    {
-        Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
-        indexsByKey.Clear();
-        Sett(obj, indexsByKey, "", 0, fieldNames);
-        return indexsByKey;
-    }
-
-    int Sett(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
-    {
-        foreach (var info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
+        Dictionary<string, int[]> GetIndexsByKey(object obj, string[] fieldNames)
         {
-            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+            Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+            indexsByKey.Clear();
+            SetDict(obj, indexsByKey, "", 0, fieldNames);
+            return indexsByKey;
+
+            int SetDict(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
             {
-                string className = fieldNames[currentIndex];
-                currentIndex++;
-                currentIndex = Sett(Activator.CreateInstance(info.FieldType), dict, $"{currentKey}{info.Name}->", currentIndex, fieldNames);
-                currentIndex++;
-            }
-            else
-            {
-                dict.Add(currentKey + info.Name, new int[] { currentIndex });
-                currentIndex++;
+                foreach (var info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
+                {
+                    if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+                    {
+                        string className = fieldNames[currentIndex];
+                        currentIndex++;
+                        currentIndex = SetDict(Activator.CreateInstance(info.FieldType), dict, $"{currentKey}{info.Name}->", currentIndex, fieldNames);
+                        currentIndex++;
+                    }
+                    else
+                    {
+                        dict.Add(currentKey + info.Name, new int[] { currentIndex });
+                        currentIndex++;
+                    }
+                }
+                return currentIndex;
             }
         }
-        return currentIndex;
+        string[] GetCells(string column) => column.Split(',').Select(x => x.Trim()).ToArray();
     }
 
     IEnumerable<FieldInfo> GetSerializedFields(object obj)
@@ -183,31 +189,4 @@ public class Test : MonoBehaviour
         .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
         .Where(x => CsvSerializedCondition(x));
     bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
-
-    string[] GetSerializedFields(Type type)
-    {
-        FieldInfo[] infos = type
-          .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-          .Where(x => CsvSerializedCondition(x)).ToArray();
-
-        return GetSerializedFieldNames(infos);
-    }
-
-    string[] GetSerializedFieldNames(FieldInfo[] infos)
-    {
-        List<string> names = new List<string>();
-        foreach (var info in infos)
-        {
-            names.Add(info.Name);
-            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-            {
-                names.Add(info.Name);
-                string[] aaa = GetSerializedFields(info.FieldType);
-                for (int i = 0; i < aaa.Length; i++)
-                    names.Add($"{info.Name}->{aaa[i]}");
-            }
-        }
-
-        return names.ToArray();
-    }
 }
