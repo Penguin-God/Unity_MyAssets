@@ -11,6 +11,8 @@ public class TestClass
     [SerializeField] int TT;
     [SerializeField] bool Ta;
     [SerializeField] HasTestClass hasTestClass;
+    [SerializeField] string kkkk;
+    [SerializeField] string sktt1;
 }
 
 [Serializable]
@@ -122,26 +124,98 @@ public class Test : MonoBehaviour
     [SerializeField] TestClass[] testClass;
     [SerializeField] TestClass test;
     [SerializeField] TextAsset testCsv;
+
+    [SerializeField] List<string> keys;
     [ContextMenu("Test")]
     void Testss()
     {
-        test = ClassParsing<TestClass>();
+        test = ClassParsing<TestClass>(testCsv.text);
+        string[] fieldNames = testCsv.text.Split('\n')[0].Split(',');
+
+        Dictionary<string, int[]> answer = new Dictionary<string, int[]>();
+        answer.Clear();
+        answer = GetIndexsByKey(test, fieldNames);
+        print($"키 카운트 : {answer.Count}");
+        foreach (var item in answer)
+        {
+            keys.Add(item.Key);
+        }
+
+        for (int i = 0; i < keys.Count; i++)
+        {
+            print($"{keys[i]}가 가르키는 Index : {answer[keys[i]][0]}");
+        }
     }
 
-    T ClassParsing<T>() => (T)ClassParsing(typeof(T));
+    T ClassParsing<T>(string csv) => (T)ClassParsing(typeof(T), csv);
 
-    object ClassParsing(Type type)
+    object ClassParsing(Type type, string csv)
     {
         object obj = Activator.CreateInstance(type);
         foreach (FieldInfo info in GetSerializedFields(obj))
         {
             if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-                info.SetValue(obj, ClassParsing(info.FieldType));
+                info.SetValue(obj, ClassParsing(info.FieldType, csv));
             else
                 CsvParsers.GetParser(info).SetValue(obj, info, new string[] { "712636812" });
         }
 
         return obj;
+    }
+
+    Dictionary<string, int[]> GetIndexsByKey(object obj, string[] fieldNames)
+    {
+        Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+        indexsByKey.Clear();
+        Sett(obj, indexsByKey, "", 0, fieldNames);
+        return indexsByKey;
+    }
+
+    //int GetIndexsByKey(Dictionary<string, int[]> dict, int current, string[] fieldNames, FieldInfo[] infos, string currentKey, object obj)
+    //{
+    //    if (current >= fieldNames.Length) return -1;
+
+    //    foreach (var info in GetSerializedFields(obj))
+    //    {
+
+    //    }
+
+    //    if (infos[current].FieldType.IsPrimitive == false && typeof(string) != infos[current].FieldType && infos[current].GetType().IsClass)
+    //    {
+    //        string className = fieldNames[current];
+    //        current++;
+    //        while(fieldNames[current] != className)
+    //        {
+    //            current = GetIndexsByKey(dict, current, fieldNames, infos, $"{current}->{infos[current].Name}");
+    //        }
+    //        current++;
+    //    }
+    //    else
+    //    {
+    //        dict.Add(currentKey + infos[current].Name, new int[] { current });
+    //        current++;
+    //    }
+    //    return current;
+    //}
+
+    int Sett(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
+    {
+        foreach (var info in GetSerializedFields(obj))
+        {
+            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+            {
+                string className = fieldNames[currentIndex];
+                currentIndex++;
+                currentIndex = Sett(Activator.CreateInstance(info.FieldType), dict, $"{currentKey}{info.Name}->", currentIndex, fieldNames);
+                currentIndex++;
+            }
+            else
+            {
+                dict.Add(currentKey + info.Name, new int[] { currentIndex });
+                currentIndex++;
+            }
+        }
+        return currentIndex;
     }
 
     IEnumerable<FieldInfo> GetSerializedFields(object obj)
