@@ -125,13 +125,30 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void Testss()
     {
-        string[] names = GetSerializedFields(test.GetType());
-
-        for (int i = 0; i < names.Length; i++)
-        {
-            print(names[i]);
-        }
+        test = ClassParsing<TestClass>();
     }
+
+    T ClassParsing<T>() => (T)ClassParsing(typeof(T));
+
+    object ClassParsing(Type type)
+    {
+        object obj = Activator.CreateInstance(type);
+        foreach (FieldInfo info in GetSerializedFields(obj))
+        {
+            if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
+                info.SetValue(obj, ClassParsing(info.FieldType));
+            else
+                CsvParsers.GetParser(info).SetValue(obj, info, new string[] { "712636812" });
+        }
+
+        return obj;
+    }
+
+    IEnumerable<FieldInfo> GetSerializedFields(object obj)
+    => obj.GetType()
+        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+        .Where(x => CsvSerializedCondition(x));
+    bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 
     string[] GetSerializedFields(Type type)
     {
@@ -159,6 +176,4 @@ public class Test : MonoBehaviour
 
         return names.ToArray();
     }
-
-    bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 }
