@@ -124,43 +124,27 @@ public class Test : MonoBehaviour
     [SerializeField] TestClass[] testClass;
     [SerializeField] TestClass test;
     [SerializeField] TextAsset testCsv;
-
-    [SerializeField] List<string> keys;
     [ContextMenu("Test")]
     void Testss()
     {
-        keys.Clear();
-        test = ClassParsing<TestClass>(testCsv.text);
         string[] fieldNames = testCsv.text.Split('\n')[0].Split(',').Select(x => x.Trim()).ToArray();
+        string[] values = testCsv.text.Split('\n')[1].Split(',').Select(x => x.Trim()).ToArray();
 
-        Dictionary<string, int[]> answer = new Dictionary<string, int[]>();
-        answer.Clear();
-        answer = GetIndexsByKey(test, fieldNames);
-        print(fieldNames.Contains("sktt1"));
-
-        print($"키 카운트 : {answer.Count}");
-        foreach (var item in answer)
-        {
-            keys.Add(item.Key);
-        }
-
-        for (int i = 0; i < keys.Count; i++)
-        {
-            print($"{keys[i]}가 가르키는 Index : {answer[keys[i]][0]}");
-        }
+        test = ClassParsing<TestClass>(GetIndexsByKey(test, fieldNames), values);
     }
 
-    T ClassParsing<T>(string csv) => (T)ClassParsing(typeof(T), csv);
+    T ClassParsing<T>(Dictionary<string, int[]> dict, string[] cells) => (T)ClassParsing(dict, typeof(T), cells);
 
-    object ClassParsing(Type type, string csv)
+    object ClassParsing(Dictionary<string, int[]> dict, Type type, string[] cells, string current = "")
     {
         object obj = Activator.CreateInstance(type);
+
         foreach (FieldInfo info in GetSerializedFields(obj))
         {
             if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-                info.SetValue(obj, ClassParsing(info.FieldType, csv));
+                info.SetValue(obj, ClassParsing(dict, info.FieldType, cells, $"{current}{info.Name}->"));
             else
-                CsvParsers.GetParser(info).SetValue(obj, info, new string[] { "712636812" });
+                CsvParsers.GetParser(info).SetValue(obj, info, new string[] { cells[dict[current + info.Name][0]] });
         }
 
         return obj;
@@ -173,33 +157,6 @@ public class Test : MonoBehaviour
         Sett(obj, indexsByKey, "", 0, fieldNames);
         return indexsByKey;
     }
-
-    //int GetIndexsByKey(Dictionary<string, int[]> dict, int current, string[] fieldNames, FieldInfo[] infos, string currentKey, object obj)
-    //{
-    //    if (current >= fieldNames.Length) return -1;
-
-    //    foreach (var info in GetSerializedFields(obj))
-    //    {
-
-    //    }
-
-    //    if (infos[current].FieldType.IsPrimitive == false && typeof(string) != infos[current].FieldType && infos[current].GetType().IsClass)
-    //    {
-    //        string className = fieldNames[current];
-    //        current++;
-    //        while(fieldNames[current] != className)
-    //        {
-    //            current = GetIndexsByKey(dict, current, fieldNames, infos, $"{current}->{infos[current].Name}");
-    //        }
-    //        current++;
-    //    }
-    //    else
-    //    {
-    //        dict.Add(currentKey + infos[current].Name, new int[] { current });
-    //        current++;
-    //    }
-    //    return current;
-    //}
 
     int Sett(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
     {
