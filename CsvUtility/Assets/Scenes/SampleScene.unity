@@ -379,4 +379,12 @@ MonoBehaviour:
     hasTestClass:
       aaa: 712636812
       AAA: 712636812
+    kkkk: 712636812
+    sktt1: 712636812
   testCsv: {fileID: 4900000, guid: 34d13703728c9264ab65b7f35d346504, type: 3}
+  keys:
+  - TT
+  - Ta
+  - hasTestClass->aaa
+  - hasTestClass->AAA
+  - sktt1

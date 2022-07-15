@@ -129,12 +129,15 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void Testss()
     {
+        keys.Clear();
         test = ClassParsing<TestClass>(testCsv.text);
-        string[] fieldNames = testCsv.text.Split('\n')[0].Split(',');
+        string[] fieldNames = testCsv.text.Split('\n')[0].Split(',').Select(x => x.Trim()).ToArray();
 
         Dictionary<string, int[]> answer = new Dictionary<string, int[]>();
         answer.Clear();
         answer = GetIndexsByKey(test, fieldNames);
+        print(fieldNames.Contains("sktt1"));
+
         print($"키 카운트 : {answer.Count}");
         foreach (var item in answer)
         {
@@ -200,7 +203,7 @@ public class Test : MonoBehaviour
 
     int Sett(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
     {
-        foreach (var info in GetSerializedFields(obj))
+        foreach (var info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
         {
             if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
             {
