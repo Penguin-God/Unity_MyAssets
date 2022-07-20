@@ -19,6 +19,7 @@ class InstanceIEnumerableGenerator<T>
     Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
 
     string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
+    string[] GetCells(string line, int start, int end) => line.Split(comma).Select(x => x.Trim()).ToList().GetRange(start, end).ToArray();
 
     public InstanceIEnumerableGenerator(string csv)
     {
@@ -82,8 +83,10 @@ class InstanceIEnumerableGenerator<T>
 
     bool InfoIsCustomClass(FieldInfo info)
     {
-        if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
-        return info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass;
+        string identifier = "System.";
+        if (info.FieldType.ToString().StartsWith(identifier)) return false;
+        // if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
+        return true;
 
         bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";

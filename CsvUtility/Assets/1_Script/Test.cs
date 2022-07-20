@@ -10,11 +10,9 @@ public class TestClass
 {
     [SerializeField] int TT;
     [SerializeField] bool Ta;
-    [SerializeField] HasTestClass hasTestClass;
+    [SerializeField] HasTestClass[] hasTestClass;
     [SerializeField] string kkkk;
     [SerializeField] string sktt1;
-    [SerializeField] int[] arrays;
-    [SerializeField] int a;
 }
 
 [Serializable]
@@ -127,12 +125,15 @@ public class Test : MonoBehaviour
         else print("Bad!!");
     }
 
-    [SerializeField] TestClass[] testClass;
+    [SerializeField] TestClass[] testClassArr;
+    List<TestClass> testClassList = new List<TestClass>();
+    [SerializeField] TestClass TestClass;
+
     [SerializeField] TextAsset testCsv;
     [ContextMenu("Test")]
 
     void Testss()
     {
-        testClass = CsvUtility.GetEnumerableFromCsv<TestClass>(testCsv.text).ToArray();
+        
     }
 }
