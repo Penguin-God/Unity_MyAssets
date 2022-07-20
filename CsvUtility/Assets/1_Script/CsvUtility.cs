@@ -9,6 +9,91 @@ using System.IO;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
+class InstanceIEnumerableGenerator<T>
+{
+    const char comma = ',';
+    const char lineBreak = '\n';
+
+    string _csv;
+    string[] fieldNames;
+    Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+
+    string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
+
+    public InstanceIEnumerableGenerator(string csv)
+    {
+        _csv = csv.Substring(0, csv.Length - 1); ;
+        fieldNames = GetCells(_csv.Split(lineBreak)[0]);
+
+        indexsByKey.Clear();
+        SetIndexsByKey(typeof(T));
+        
+        foreach (var item in indexsByKey)
+        {
+            Debug.Log($"{item.Key} : {item.Value.Length}개의 시작 : {item.Value[0]}, 끝 : {item.Value[item.Value.Length-1]}");
+        }
+
+        int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
+        {
+            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            {
+                if (InfoIsCustomClass(info))
+                {
+                    currentIndex++;
+                    currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}->", currentIndex);
+                    currentIndex++;
+                }
+                else
+                {
+                    indexsByKey.Add(currentKey + info.Name, GetIndexs());
+                    currentIndex++;
+                }
+            }
+            return currentIndex;
+
+            int[] GetIndexs()
+            {
+                List<int> indexs = new List<int>();
+                while (true)
+                {
+                    indexs.Add(currentIndex);
+
+                    if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
+                    currentIndex++;
+                }
+                return indexs.ToArray();
+            }
+        }
+    }
+
+    public IEnumerable<T> GetInstanceIEnumerable()
+    {
+        Activator.CreateInstance<T>();
+
+        return null;
+    }
+
+    T SetInstance(T instance, string[] values)
+    {
+        foreach (FieldInfo info in GetSerializedFields())
+            CsvParsers.GetParser(info).SetValue(instance, info, values);
+        return instance;
+
+        // 중첩 함수
+        IEnumerable<FieldInfo> GetSerializedFields() => CsvUtility.GetSerializedFields<T>().Where(x => indexsByKey.ContainsKey(x.Name));
+        string[] GetValues(FieldInfo info) => indexsByKey[info.Name].Select(x => values[x]).ToArray();
+    }
+
+    bool InfoIsCustomClass(FieldInfo info)
+    {
+        if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
+        return info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass;
+
+        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
+        bool IsPair(string typeName) => typeName == "KeyValuePair`2";
+    }
+}
+
 public static class CsvUtility
 {
     public static IEnumerable<T> GetEnumerableFromCsv<T>(string csv)
@@ -72,6 +157,17 @@ public static class CsvUtility
         => obj.GetType()
             .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
             .Where(x => CsvSerializedCondition(x));
+
+    public static IEnumerable<FieldInfo> GetSerializedFields<T>()
+    => typeof(T)
+        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+        .Where(x => CsvSerializedCondition(x));
+
+    public static IEnumerable<FieldInfo> GetSerializedFields(Type type)
+    => type
+        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+        .Where(x => CsvSerializedCondition(x));
+
     static bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 
     public static string EnumerableToCsv<T>(IEnumerable<T> datas)

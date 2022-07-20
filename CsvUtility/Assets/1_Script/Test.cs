@@ -13,6 +13,8 @@ public class TestClass
     [SerializeField] HasTestClass hasTestClass;
     [SerializeField] string kkkk;
     [SerializeField] string sktt1;
+    [SerializeField] int[] arrays;
+    [SerializeField] int a;
 }
 
 [Serializable]
@@ -125,10 +127,13 @@ public class Test : MonoBehaviour
     [SerializeField] TestClass test;
     [SerializeField] TextAsset testCsv;
     [ContextMenu("Test")]
+
     void Testss()
     {
-        testClass = null;
-        testClass = CsvToList<TestClass>(testCsv.text);
+        InstanceIEnumerableGenerator<TestClass> tests = new InstanceIEnumerableGenerator<TestClass>(testCsv.text);
+
+        //testClass = null;
+        //testClass = CsvToList<TestClass>(testCsv.text);
     }
 
     T[] CsvToList<T>(string csv)
@@ -142,7 +147,7 @@ public class Test : MonoBehaviour
         object ClassParsing(Dictionary<string, int[]> dict, Type type, string[] cells, string current = "")
         {
             object obj = Activator.CreateInstance(type);
-
+            
             foreach (FieldInfo info in GetSerializedFields(obj))
             {
                 if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
@@ -163,11 +168,12 @@ public class Test : MonoBehaviour
 
             int SetDict(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
             {
-                foreach (var info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
+                print(GetSerializedFields(obj).ToArray().Length);
+                print(fieldNames.Length);
+                foreach (FieldInfo info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
                 {
                     if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
                     {
-                        string className = fieldNames[currentIndex];
                         currentIndex++;
                         currentIndex = SetDict(Activator.CreateInstance(info.FieldType), dict, $"{currentKey}{info.Name}->", currentIndex, fieldNames);
                         currentIndex++;

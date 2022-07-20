@@ -1,5 +1,5 @@
-﻿TT,Ta,hasTestClass,aaa,AAA,hasTestClass,kkkk,sktt1
-22,TRUE,,123,A,,안녕 세상,우승!
-33,FALSE,,456,AA,,안녕 세상,우승!!
-44,TRUE,,789,AAA,,안녕 세상,우승!!!
-55,TRUE,,0,AAAA,,안녕 세상,우승!!!!
+﻿TT,Ta,hasTestClass,aaa,AAA,hasTestClass,kkkk,sktt1,arrays,arrays,arrays,a
+22,TRUE,,123,A,,안녕 세상,우승!,2,2,2,0
+33,FALSE,,456,AA,,안녕 세상,우승!!,2,2,2,2
+44,TRUE,,789,AAA,,안녕 세상,우승!!!,2,2,2,1
+55,TRUE,,0,AAAA,,안녕 세상,우승!!!!,2,2,2,2
