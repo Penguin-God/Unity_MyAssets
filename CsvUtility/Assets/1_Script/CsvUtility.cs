@@ -66,23 +66,24 @@ class InstanceIEnumerableGenerator<T>
         }
     }
 
-    public IEnumerable<T> GetInstanceIEnumerable()
-    {
-        Activator.CreateInstance<T>();
+    public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
 
-        return null;
+    object GetInstance(Type type, string[] cells, string current = "")
+    {
+        object obj = Activator.CreateInstance(type);
+
+        foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
+        {
+            if (InfoIsCustomClass(info))
+                info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}->"));
+            else
+                CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
+        }
+
+        return obj;
     }
 
-    T SetInstance(T instance, string[] values)
-    {
-        foreach (FieldInfo info in GetSerializedFields())
-            CsvParsers.GetParser(info).SetValue(instance, info, values);
-        return instance;
-
-        // 중첩 함수
-        IEnumerable<FieldInfo> GetSerializedFields() => CsvUtility.GetSerializedFields<T>().Where(x => indexsByKey.ContainsKey(x.Name));
-        string[] GetValues(FieldInfo info) => indexsByKey[info.Name].Select(x => values[x]).ToArray();
-    }
+    string[] GetFieldValues(string key, string[] cells) => indexsByKey[key].Select(x => cells[x]).ToArray();
 
     bool InfoIsCustomClass(FieldInfo info)
     {

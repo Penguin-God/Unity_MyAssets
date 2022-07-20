@@ -131,7 +131,7 @@ public class Test : MonoBehaviour
     void Testss()
     {
         InstanceIEnumerableGenerator<TestClass> tests = new InstanceIEnumerableGenerator<TestClass>(testCsv.text);
-
+        testClass = tests.GetInstanceIEnumerable().ToArray();
         //testClass = null;
         //testClass = CsvToList<TestClass>(testCsv.text);
     }

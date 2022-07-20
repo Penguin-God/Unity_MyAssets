@@ -373,6 +373,15 @@ MonoBehaviour:
   asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}
   aa: 
   testClass:
+  - TT: 0
+    Ta: 0
+    hasTestClass:
+      aaa: 0
+      AAA: AAA
+    kkkk: kkkk
+    sktt1: sktt1
+    arrays: 000000000000000000000000
+    a: 0
   - TT: 22
     Ta: 1
     hasTestClass:
@@ -380,7 +389,8 @@ MonoBehaviour:
       AAA: A
     kkkk: "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!"
-    arrays: 
+    arrays: 020000000200000002000000
+    a: 0
   - TT: 33
     Ta: 0
     hasTestClass:
@@ -388,7 +398,8 @@ MonoBehaviour:
       AAA: AA
     kkkk: "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!!"
-    arrays: 
+    arrays: 020000000200000002000000
+    a: 2
   - TT: 44
     Ta: 1
     hasTestClass:
@@ -396,7 +407,8 @@ MonoBehaviour:
       AAA: AAA
     kkkk: "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!!!"
-    arrays: 
+    arrays: 020000000200000002000000
+    a: 1
   - TT: 55
     Ta: 1
     hasTestClass:
@@ -404,7 +416,8 @@ MonoBehaviour:
       AAA: AAAA
     kkkk: "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!!!!"
-    arrays: 
+    arrays: 020000000200000002000000
+    a: 2
   test:
     TT: 22
     Ta: 1
@@ -414,4 +427,5 @@ MonoBehaviour:
     kkkk: "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!"
     arrays: 
+    a: 0
   testCsv: {fileID: 4900000, guid: 34d13703728c9264ab65b7f35d346504, type: 3}
