@@ -27,11 +27,6 @@ class InstanceIEnumerableGenerator<T>
 
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
-        
-        foreach (var item in indexsByKey)
-        {
-            Debug.Log($"{item.Key} : {item.Value.Length}개의 시작 : {item.Value[0]}, 끝 : {item.Value[item.Value.Length-1]}");
-        }
 
         int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
         {
@@ -99,47 +94,13 @@ public static class CsvUtility
 {
     public static IEnumerable<T> GetEnumerableFromCsv<T>(string csv)
     {
-        string[] columns = SubLastLine(csv).Split('\n');
-        CheckFieldNames<T>(GetFieldNames());
+        InstanceIEnumerableGenerator<T> generator = new InstanceIEnumerableGenerator<T>(csv);
+        //CheckFieldNames<T>();
 
-        return columns.Skip(1)
-                      .Select(x => (T)SetFiledValue(Activator.CreateInstance<T>(), GetCells(x)));
-
-        string[] GetCells(string column) => column.Split(',').Select(x => x.Trim()).ToArray();
-        string[] GetFieldNames() => GetCells(columns[0]);
-        object SetFiledValue(object obj, string[] values)
-        {
-            Dictionary<string, int[]> indexsByFieldName = GetIndexsByFieldName();
-            foreach (FieldInfo info in GetSerializedFields())
-                SetValue(obj, info, GetValues(info));
-            return obj;
-
-            // 중첩 함수
-            IEnumerable<FieldInfo> GetSerializedFields() => CsvUtility.GetSerializedFields(obj).Where(x => indexsByFieldName.ContainsKey(x.Name));
-            string[] GetValues(FieldInfo info) => indexsByFieldName[info.Name].Select(x => values[x]).ToArray();
-            Dictionary<string, int[]> GetIndexsByFieldName()
-            {
-                return GetFieldNames().Distinct().ToDictionary(x => x, x => GetIndexs(x));
-
-                int[] GetIndexs(string fieldName)
-                {
-                    int[] result = GetFieldNames().Where(cell => cell == fieldName)
-                                                  .Select(cell => Array.IndexOf(GetFieldNames(), cell)).ToArray();
-
-                    List<int> upValueIndexs = new List<int>();
-                    for (int i = 1; i < result.Length; i++)
-                    {
-                        if (result[i] == result[i - 1])
-                            upValueIndexs.Add(i);
-                    }
-                    upValueIndexs.ForEach(x => result[x] = result[x - 1] + 1);
-                    return result;
-                }
-            }
-        }
+        return generator.GetInstanceIEnumerable();
     }
 
-    [Conditional("UNITY_EDITOR")]
+    [Conditional("UNITY_EDITOR")] // TODO : InstanceIEnumerableGenerator 안에 넣기
     static void CheckFieldNames<T>(string[] fieldNames)
     {
         string[] fields = GetSerializedFields(Activator.CreateInstance<T>()).Select(x => x.Name).ToArray();
@@ -152,24 +113,16 @@ public static class CsvUtility
         }
     }
 
-    static void SetValue(object obj, FieldInfo info, string[] values) => CsvParsers.GetParser(info).SetValue(obj, info, values);
     static string SubLastLine(string text) => text.Substring(0, text.Length - 1);
-    static IEnumerable<FieldInfo> GetSerializedFields(object obj)
-        => obj.GetType()
-            .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-            .Where(x => CsvSerializedCondition(x));
-
-    public static IEnumerable<FieldInfo> GetSerializedFields<T>()
-    => typeof(T)
-        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-        .Where(x => CsvSerializedCondition(x));
-
+    static IEnumerable<FieldInfo> GetSerializedFields(object obj) => GetSerializedFields(obj.GetType());
     public static IEnumerable<FieldInfo> GetSerializedFields(Type type)
     => type
         .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
         .Where(x => CsvSerializedCondition(x));
 
     static bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
+
+
 
     public static string EnumerableToCsv<T>(IEnumerable<T> datas)
     {

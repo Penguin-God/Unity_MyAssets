@@ -20,8 +20,8 @@ public class TestClass
 [Serializable]
 public class HasTestClass
 {
-    [SerializeField] int aaa;
-    [SerializeField] string AAA;
+    [SerializeField] public int aaa;
+    [SerializeField] public string AAA;
 }
 
 [Serializable]
@@ -46,7 +46,9 @@ public class MasterTest
     
     [SerializeField] Dictionary<int, string> numberByText = new Dictionary<int, string>();
     [SerializeField] Dictionary<float, bool> actualNumberByBoolean = new Dictionary<float, bool>();
-    
+
+    [SerializeField] HasTestClass hasClass;
+
     public bool IsSuccess()
     {
         return CheckSame(number, 123) && CheckSame(text, "Hello World") && CheckSame(actualNumber, 23.123f) && CheckSame(boolean, true)
@@ -58,7 +60,8 @@ public class MasterTest
             && CheckListSame(booleanList, new List<bool>() { true, false }) && CheckDictionarySame(numberByText, new KeyValuePair<int, string>(2, "조찬자"))
             && CheckDictionarySame(numberByText, new KeyValuePair<int, string>(12432, "아 루즈 마이셀프"))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
-            && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false));
+            && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
+            && HasClassIsSame();
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -107,6 +110,8 @@ public class MasterTest
 
         return true;
     }
+
+    bool HasClassIsSame() => 777 == hasClass.aaa && "안녕하세요." == hasClass.AAA;
 }
 
 public class Test : MonoBehaviour
@@ -122,77 +127,12 @@ public class Test : MonoBehaviour
         else print("Bad!!");
     }
 
-    [SerializeField] string aa;
     [SerializeField] TestClass[] testClass;
-    [SerializeField] TestClass test;
     [SerializeField] TextAsset testCsv;
     [ContextMenu("Test")]
 
     void Testss()
     {
-        InstanceIEnumerableGenerator<TestClass> tests = new InstanceIEnumerableGenerator<TestClass>(testCsv.text);
-        testClass = tests.GetInstanceIEnumerable().ToArray();
-        //testClass = null;
-        //testClass = CsvToList<TestClass>(testCsv.text);
+        testClass = CsvUtility.GetEnumerableFromCsv<TestClass>(testCsv.text).ToArray();
     }
-
-    T[] CsvToList<T>(string csv)
-    {
-        string[] columns = csv.Substring(0, csv.Length - 1).Split('\n');
-        Dictionary<string, int[]> dict = GetIndexsByKey(Activator.CreateInstance<T>(), GetCells(columns[0]));
-        return columns.Skip(1)
-                      .Select(x => (T)ClassParsing(dict, typeof(T), GetCells(x)))
-                      .ToArray();
-
-        object ClassParsing(Dictionary<string, int[]> dict, Type type, string[] cells, string current = "")
-        {
-            object obj = Activator.CreateInstance(type);
-            
-            foreach (FieldInfo info in GetSerializedFields(obj))
-            {
-                if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-                    info.SetValue(obj, ClassParsing(dict, info.FieldType, cells, $"{current}{info.Name}->"));
-                else
-                    CsvParsers.GetParser(info).SetValue(obj, info, new string[] { cells[dict[current + info.Name][0]] });
-            }
-
-            return obj;
-        }
-
-        Dictionary<string, int[]> GetIndexsByKey(object obj, string[] fieldNames)
-        {
-            Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
-            indexsByKey.Clear();
-            SetDict(obj, indexsByKey, "", 0, fieldNames);
-            return indexsByKey;
-
-            int SetDict(object obj, Dictionary<string, int[]> dict, string currentKey, int currentIndex, string[] fieldNames)
-            {
-                print(GetSerializedFields(obj).ToArray().Length);
-                print(fieldNames.Length);
-                foreach (FieldInfo info in GetSerializedFields(obj).Where(x => fieldNames.Contains(x.Name)))
-                {
-                    if (info.FieldType.IsPrimitive == false && typeof(string) != info.FieldType && info.GetType().IsClass)
-                    {
-                        currentIndex++;
-                        currentIndex = SetDict(Activator.CreateInstance(info.FieldType), dict, $"{currentKey}{info.Name}->", currentIndex, fieldNames);
-                        currentIndex++;
-                    }
-                    else
-                    {
-                        dict.Add(currentKey + info.Name, new int[] { currentIndex });
-                        currentIndex++;
-                    }
-                }
-                return currentIndex;
-            }
-        }
-        string[] GetCells(string column) => column.Split(',').Select(x => x.Trim()).ToArray();
-    }
-
-    IEnumerable<FieldInfo> GetSerializedFields(object obj)
-    => obj.GetType()
-        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-        .Where(x => CsvSerializedCondition(x));
-    bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 }
