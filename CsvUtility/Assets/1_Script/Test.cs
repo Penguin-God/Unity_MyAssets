@@ -134,6 +134,112 @@ public class Test : MonoBehaviour
 
     void Testss()
     {
-        
+        // 커스텀 클래스 배열 파싱할 때는 관련 값들을 긁어오고 csv를 새로 만들어서 파싱할거임
+        __InstanceIEnumerableGenerator<TestClass> test = new __InstanceIEnumerableGenerator<TestClass>(testCsv.text);
+
+    }
+}
+
+
+class __InstanceIEnumerableGenerator<T>
+{
+    const char comma = ',';
+    const char lineBreak = '\n';
+    const char arraw = '>';
+
+    string _csv;
+    string[] fieldNames;
+    Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+
+    string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
+    string[] GetCells(string line, int start, int end) => line.Split(comma).Select(x => x.Trim()).ToList().GetRange(start, end).ToArray();
+
+    public __InstanceIEnumerableGenerator(string csv)
+    {
+        _csv = csv.Substring(0, csv.Length - 1); ;
+        fieldNames = GetCells(_csv.Split(lineBreak)[0]);
+
+        indexsByKey.Clear();
+        SetIndexsByKey(typeof(T));
+        foreach (var item in indexsByKey)
+        {
+            Debug.Log($"{item.Key}");
+            foreach (var item2 in item.Value)
+            {
+                Debug.Log(item2);
+            }
+        }
+
+        int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
+        {
+            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            {
+                if (InfoIsCustomClass(info))
+                {
+                    currentIndex++;
+                    currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
+                    currentIndex++;
+                }
+                else
+                {
+                    indexsByKey.Add(currentKey + info.Name, GetIndexs());
+                    currentIndex++;
+                }
+            }
+            return currentIndex;
+
+            int[] GetIndexs()
+            {
+                List<int> indexs = new List<int>();
+                while (true)
+                {
+                    indexs.Add(currentIndex);
+
+                    if(string.IsNullOrEmpty(currentKey) == false)
+                    {
+                        string currentClass = currentKey.Split(arraw)[currentKey.Split(arraw).Length - 1];
+                        if (fieldNames.Where(x => x == currentClass).Count() - 1 > indexs.Where(x => x == -1).Count())
+                        {
+                            indexs.Add(-1);
+                            currentIndex++;
+                            continue;
+                        }
+                    }
+                    if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
+                    currentIndex++;
+                }
+                return indexs.ToArray();
+            }
+        }
+    }
+
+    public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
+
+    object GetInstance(Type type, string[] cells, string current = "")
+    {
+        object obj = Activator.CreateInstance(type);
+
+        foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
+        {
+            if (InfoIsCustomClass(info))
+                info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
+            else
+                CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
+        }
+
+        return obj;
+    }
+
+    string[] GetFieldValues(string key, string[] cells) => indexsByKey[key].Select(x => cells[x]).ToArray();
+
+    bool InfoIsCustomClass(FieldInfo info)
+    {
+        string identifier = "System.";
+        if (info.FieldType.ToString().StartsWith(identifier)) return false;
+        // if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
+        return true;
+
+        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
+        bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }
