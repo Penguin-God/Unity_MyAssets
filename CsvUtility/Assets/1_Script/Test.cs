@@ -125,15 +125,15 @@ public class Test : MonoBehaviour
         else print("Bad!!");
     }
 
-    [SerializeField] TestClass[] testClassArr;
-    List<TestClass> testClassList = new List<TestClass>();
-    [SerializeField] TestClass TestClass;
+    [SerializeField] List<TestClass> testClassList = new List<TestClass>();
     [SerializeField] TextAsset testCsv;
     [ContextMenu("Test")]
     void Testss()
     {
         // 커스텀 클래스 배열 파싱할 때는 관련 값들을 긁어오고 csv를 새로 만들어서 파싱할거임
         __InstanceIEnumerableGenerator<TestClass> test = new __InstanceIEnumerableGenerator<TestClass>(testCsv.text);
+        testClassList = test.GetInstanceIEnumerable().ToList();
+        print("안녕");
     }
 }
 
@@ -159,14 +159,14 @@ class __InstanceIEnumerableGenerator<T>
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
 
-        foreach (var item in indexsByKey)
-        {
-            Debug.Log($"{item.Key}");
-            foreach (var item2 in item.Value)
-            {
-                Debug.Log(item2);
-            }
-        }
+        //foreach (var item in indexsByKey)
+        //{
+        //    Debug.Log($"{item.Key}");
+        //    foreach (var item2 in item.Value)
+        //    {
+        //        Debug.Log(item2);
+        //    }
+        //}
 
         int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
         {
@@ -207,8 +207,6 @@ class __InstanceIEnumerableGenerator<T>
             }
             return currentIndex;
 
-            bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
-
             void AddIndexs(string name)
             {
                 if (indexsByKey.TryGetValue(currentKey + name, out List<int> list))
@@ -246,6 +244,7 @@ class __InstanceIEnumerableGenerator<T>
     }
 
     public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
+    bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
 
     object GetInstance(Type type, string[] cells, string current = "")
     {
@@ -254,11 +253,27 @@ class __InstanceIEnumerableGenerator<T>
         foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
         {
             if (InfoIsCustomClass(info))
-                info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
+            {
+                if(IsEnumerable(info.FieldType.ToString()))
+                {
+                    int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+                    Array array = Array.CreateInstance(info.FieldType.GetElementType(), length);
+                    for (int i = 0; i < length; i++)
+                    {
+                        GetInstance(info.FieldType.GetElementType(), cells, $"{current}{info.Name}{arraw}");
+                    }
+                    info.SetValue(obj, array);
+                }
+                else
+                    info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
+            }
             else
+            {
                 CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
+                Debug.Log(info.Name);
+            }        
         }
-
+        Debug.Log("end");
         return obj;
     }
 
