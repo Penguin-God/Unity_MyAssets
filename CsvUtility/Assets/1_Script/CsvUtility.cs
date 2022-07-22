@@ -13,13 +13,13 @@ class InstanceIEnumerableGenerator<T>
 {
     const char comma = ',';
     const char lineBreak = '\n';
+    const char arraw = '>';
 
     string _csv;
     string[] fieldNames;
-    Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+    Dictionary<string, List<int>> indexsByKey = new Dictionary<string, List<int>>();
 
     string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
-    string[] GetCells(string line, int start, int end) => line.Split(comma).Select(x => x.Trim()).ToList().GetRange(start, end).ToArray();
 
     public InstanceIEnumerableGenerator(string csv)
     {
@@ -29,44 +29,58 @@ class InstanceIEnumerableGenerator<T>
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
 
-        foreach (var item in indexsByKey)
-        {
-            Debug.Log($"{item.Key}");
-            foreach (var item2 in item.Value)
-            {
-                Debug.Log(item2);
-            }
-        }
-
         int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
         {
             foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
                 if (InfoIsCustomClass(info))
                 {
-                    currentIndex++;
-                    currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}->", currentIndex);
-                    currentIndex++;
+                    if (IsEnumerable(info.FieldType.ToString()))
+                    {
+                        int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+
+                        for (int i = 0; i < length; i++)
+                        {
+                            currentIndex++;
+                            SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}{i}");
+                        }
+                        currentIndex++;
+                    }
+                    else
+                    {
+                        currentIndex++;
+                        currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
+                        currentIndex++;
+                    }
                 }
                 else
-                {
-                    indexsByKey.Add(currentKey + info.Name, GetIndexs());
-                    currentIndex++;
-                }
+                    AddIndexs(info.Name);
             }
             return currentIndex;
 
-            int[] GetIndexs()
+            void AddIndexs(string name)
+            {
+                Debug.Log(currentKey + name);
+                indexsByKey.Add(currentKey + name, GetIndexs());
+                currentIndex++;
+            }
+
+            List<int> GetIndexs()
             {
                 List<int> indexs = new List<int>();
                 while (true)
                 {
                     indexs.Add(currentIndex);
-
                     if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
                     currentIndex++;
                 }
-                return indexs.ToArray();
+                return indexs;
+            }
+
+            void SetCustomIEnumeralbe(string name, string key)
+            {
+                while (name != fieldNames[currentIndex])
+                    AddIndexs(key + fieldNames[currentIndex]);
             }
         }
     }
@@ -80,12 +94,46 @@ class InstanceIEnumerableGenerator<T>
         foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
         {
             if (InfoIsCustomClass(info))
-                info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}->"));
+            {
+                if (IsEnumerable(info.FieldType.ToString()))
+                    SetIEnumerableValue(obj, GetArray(cells, current, info), info);
+                else
+                    info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
+            }
             else
                 CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
         }
-
         return obj;
+
+        Array GetArray(string[] cells, string current, FieldInfo info)
+        {
+            int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+            Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+            Array array = Array.CreateInstance(elementType, length);
+
+            for (int i = 0; i < length; i++)
+                array.SetValue(GetInstance(elementType, cells, $"{current}{info.Name}{arraw}{i}"), i);
+            return array;
+
+
+
+        }
+
+        void SetIEnumerableValue(object obj, Array array, FieldInfo info)
+        {
+
+            if (IsList(info.FieldType.ToString()) == false)
+                info.SetValue(obj, array);
+            else
+                info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { ArrayToIEnumerable(array) }));
+
+            IEnumerable ArrayToIEnumerable(Array array)
+            {
+                IEnumerable vs;
+                vs = array;
+                return vs;
+            }
+        }
     }
 
     string[] GetFieldValues(string key, string[] cells) => indexsByKey[key].Select(x => cells[x]).ToArray();
@@ -93,13 +141,17 @@ class InstanceIEnumerableGenerator<T>
     bool InfoIsCustomClass(FieldInfo info)
     {
         string identifier = "System.";
-        if (info.FieldType.ToString().StartsWith(identifier)) return false;
-        // if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
-        return true;
+        if (IsList(info.FieldType.ToString()))
+        {
+            if (info.FieldType.GetGenericArguments()[0] != null && info.FieldType.GetGenericArguments()[0].ToString().StartsWith(identifier) == false)
+                return true;
+        }
 
-        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
-        bool IsPair(string typeName) => typeName == "KeyValuePair`2";
+        if (info.FieldType.ToString().StartsWith(identifier)) return false;
+        return true;
     }
+    bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
+    bool IsList(string typeName) => typeName.Contains("List");
 }
 
 public static class CsvUtility
