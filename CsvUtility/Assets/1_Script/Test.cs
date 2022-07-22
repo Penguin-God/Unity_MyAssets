@@ -131,9 +131,14 @@ public class Test : MonoBehaviour
     void Testss()
     {
         // 커스텀 클래스 배열 파싱할 때는 관련 값들을 긁어오고 csv를 새로 만들어서 파싱할거임
+        string aa = "asdoajifos";
+        print(aa.Last());
+        bool a = int.TryParse("s", out int aaa);
+        print(aaa);
         __InstanceIEnumerableGenerator<TestClass> test = new __InstanceIEnumerableGenerator<TestClass>(testCsv.text);
         testClassList = test.GetInstanceIEnumerable().ToList();
         print("안녕");
+
     }
 }
 
@@ -181,7 +186,7 @@ class __InstanceIEnumerableGenerator<T>
                         for (int i = 0; i < length; i++)
                         {
                             currentIndex++;
-                            currentIndex = SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}");
+                            currentIndex = SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}{i}");
                             //Debug.Log(currentIndex);
                         }
                         currentIndex++;
@@ -209,13 +214,8 @@ class __InstanceIEnumerableGenerator<T>
 
             void AddIndexs(string name)
             {
-                if (indexsByKey.TryGetValue(currentKey + name, out List<int> list))
-                {
-                    list.Add(GetIndexs()[0]); // 일단 이렇게라도 해봐
-                }
-                else
-                    indexsByKey.Add(currentKey + name, GetIndexs());
-
+                Debug.Log(currentKey + name);
+                indexsByKey.Add(currentKey + name, GetIndexs());
                 currentIndex++;
             }
 
@@ -246,6 +246,8 @@ class __InstanceIEnumerableGenerator<T>
     public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
     bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
 
+    bool IsList(string typeName) => typeName.Contains("List");
+
     object GetInstance(Type type, string[] cells, string current = "")
     {
         object obj = Activator.CreateInstance(type);
@@ -260,7 +262,7 @@ class __InstanceIEnumerableGenerator<T>
                     Array array = Array.CreateInstance(info.FieldType.GetElementType(), length);
                     for (int i = 0; i < length; i++)
                     {
-                        GetInstance(info.FieldType.GetElementType(), cells, $"{current}{info.Name}{arraw}");
+                        array.SetValue(GetInstance(info.FieldType.GetElementType(), cells, $"{current}{info.Name}{arraw}{i}"), i);
                     }
                     info.SetValue(obj, array);
                 }
@@ -268,12 +270,8 @@ class __InstanceIEnumerableGenerator<T>
                     info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
             }
             else
-            {
                 CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
-                Debug.Log(info.Name);
-            }        
         }
-        Debug.Log("end");
         return obj;
     }
 
@@ -282,8 +280,6 @@ class __InstanceIEnumerableGenerator<T>
     bool InfoIsCustomClass(FieldInfo info)
     {
         string identifier = "System.";
-        if (info.FieldType.ToString().StartsWith(identifier)) return false;
-        // if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
-        return true;
+        return info.FieldType.ToString().StartsWith(identifier);
     }
 }
