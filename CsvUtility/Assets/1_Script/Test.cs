@@ -10,7 +10,7 @@ public class TestClass
 {
     [SerializeField] int TT;
     [SerializeField] bool Ta;
-    [SerializeField] HasTestClass[] hasTestClass;
+    [SerializeField] List<HasTestClass> hasTestClass;
     [SerializeField] string[] kkkk;
     [SerializeField] string sktt1;
 }
@@ -245,11 +245,18 @@ class __InstanceIEnumerableGenerator<T>
 
     public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
     bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
-
     bool IsList(string typeName) => typeName.Contains("List");
+    
+    IEnumerable ArrayToIEnumerable(Array array)
+    {
+        IEnumerable vs;
+        vs = array;
+        return vs;
+    }
 
     object GetInstance(Type type, string[] cells, string current = "")
     {
+        Debug.Log(type.ToString());
         object obj = Activator.CreateInstance(type);
 
         foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
@@ -259,12 +266,18 @@ class __InstanceIEnumerableGenerator<T>
                 if(IsEnumerable(info.FieldType.ToString()))
                 {
                     int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-                    Array array = Array.CreateInstance(info.FieldType.GetElementType(), length);
+                    Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                    Array array = Array.CreateInstance(elementType, length);
+
                     for (int i = 0; i < length; i++)
                     {
-                        array.SetValue(GetInstance(info.FieldType.GetElementType(), cells, $"{current}{info.Name}{arraw}{i}"), i);
+                        array.SetValue(GetInstance(elementType, cells, $"{current}{info.Name}{arraw}{i}"), i);
                     }
-                    info.SetValue(obj, array);
+
+                    if (IsList(info.FieldType.ToString()) == false)
+                        info.SetValue(obj, array);
+                    else
+                        info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { ArrayToIEnumerable(array) }));
                 }
                 else
                     info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
@@ -280,6 +293,13 @@ class __InstanceIEnumerableGenerator<T>
     bool InfoIsCustomClass(FieldInfo info)
     {
         string identifier = "System.";
-        return info.FieldType.ToString().StartsWith(identifier);
+        if (IsList(info.FieldType.ToString()))
+        {
+            if (info.FieldType.GetGenericArguments()[0] != null && info.FieldType.GetGenericArguments()[0].ToString().StartsWith(identifier) == false)
+                return true;
+        }
+
+        if(info.FieldType.ToString().StartsWith(identifier)) return false;
+        return true;
     }
 }
