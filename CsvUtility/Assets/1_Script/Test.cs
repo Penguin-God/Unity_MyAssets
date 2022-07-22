@@ -11,7 +11,7 @@ public class TestClass
     [SerializeField] int TT;
     [SerializeField] bool Ta;
     [SerializeField] HasTestClass[] hasTestClass;
-    [SerializeField] string kkkk;
+    [SerializeField] string[] kkkk;
     [SerializeField] string sktt1;
 }
 
@@ -128,15 +128,12 @@ public class Test : MonoBehaviour
     [SerializeField] TestClass[] testClassArr;
     List<TestClass> testClassList = new List<TestClass>();
     [SerializeField] TestClass TestClass;
-
     [SerializeField] TextAsset testCsv;
     [ContextMenu("Test")]
-
     void Testss()
     {
         // 커스텀 클래스 배열 파싱할 때는 관련 값들을 긁어오고 csv를 새로 만들어서 파싱할거임
         __InstanceIEnumerableGenerator<TestClass> test = new __InstanceIEnumerableGenerator<TestClass>(testCsv.text);
-
     }
 }
 
@@ -149,7 +146,7 @@ class __InstanceIEnumerableGenerator<T>
 
     string _csv;
     string[] fieldNames;
-    Dictionary<string, int[]> indexsByKey = new Dictionary<string, int[]>();
+    Dictionary<string, List<int>> indexsByKey = new Dictionary<string, List<int>>();
 
     string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
     string[] GetCells(string line, int start, int end) => line.Split(comma).Select(x => x.Trim()).ToList().GetRange(start, end).ToArray();
@@ -161,6 +158,7 @@ class __InstanceIEnumerableGenerator<T>
 
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
+
         foreach (var item in indexsByKey)
         {
             Debug.Log($"{item.Key}");
@@ -176,39 +174,73 @@ class __InstanceIEnumerableGenerator<T>
             {
                 if (InfoIsCustomClass(info))
                 {
-                    currentIndex++;
-                    currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
-                    currentIndex++;
+                    if (IsEnumerable(info.FieldType.ToString()))
+                    {
+                        int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+
+                        for (int i = 0; i < length; i++)
+                        {
+                            currentIndex++;
+                            currentIndex = SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}");
+                            //Debug.Log(currentIndex);
+                        }
+                        currentIndex++;
+                    }
+                    else
+                    {
+                        currentIndex++;
+                        currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
+                        currentIndex++;
+                    }
                 }
                 else
                 {
-                    indexsByKey.Add(currentKey + info.Name, GetIndexs());
-                    currentIndex++;
+                    AddIndexs(info.Name);
+
+                    //if (indexsByKey.TryGetValue(currentKey + info.Name, out List<int> list))
+                    //    list = list.Concat(GetIndexs()).ToList();
+                    //else
+                    //    indexsByKey.Add(currentKey + info.Name, GetIndexs());
+
+                    //currentIndex++;
                 }
             }
             return currentIndex;
 
-            int[] GetIndexs()
+            bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
+
+            void AddIndexs(string name)
             {
-                List<int> indexs = new List<int>();
+                if (indexsByKey.TryGetValue(currentKey + name, out List<int> list))
+                {
+                    list.Add(GetIndexs()[0]); // 일단 이렇게라도 해봐
+                }
+                else
+                    indexsByKey.Add(currentKey + name, GetIndexs());
+
+                currentIndex++;
+            }
+
+            List<int> GetIndexs()
+            {
+                List<int> indexs =  new List<int>();
                 while (true)
                 {
                     indexs.Add(currentIndex);
-
-                    if(string.IsNullOrEmpty(currentKey) == false)
-                    {
-                        string currentClass = currentKey.Split(arraw)[currentKey.Split(arraw).Length - 1];
-                        if (fieldNames.Where(x => x == currentClass).Count() - 1 > indexs.Where(x => x == -1).Count())
-                        {
-                            indexs.Add(-1);
-                            currentIndex++;
-                            continue;
-                        }
-                    }
                     if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
                     currentIndex++;
                 }
-                return indexs.ToArray();
+                return indexs;
+            }
+
+            int SetCustomIEnumeralbe(string name, string key)
+            {
+                while (name != fieldNames[currentIndex])
+                {
+                    AddIndexs(key + fieldNames[currentIndex]);
+                    //currentIndex++;
+                }
+                return currentIndex;
             }
         }
     }
@@ -238,8 +270,5 @@ class __InstanceIEnumerableGenerator<T>
         if (info.FieldType.ToString().StartsWith(identifier)) return false;
         // if (IsEnumerable(info.FieldType.Name) || IsPair(info.FieldType.Name)) return false;
         return true;
-
-        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
-        bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }

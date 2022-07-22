@@ -29,6 +29,15 @@ class InstanceIEnumerableGenerator<T>
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
 
+        foreach (var item in indexsByKey)
+        {
+            Debug.Log($"{item.Key}");
+            foreach (var item2 in item.Value)
+            {
+                Debug.Log(item2);
+            }
+        }
+
         int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
         {
             foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
