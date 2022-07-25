@@ -120,7 +120,7 @@ public class Test : MonoBehaviour
     [ContextMenu("Master Test")]
     void MasterTest()
     {
-        masterTests = CsvUtility.GetEnumerableFromCsv<MasterTest>(asset.text).ToArray();
+        masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text).ToArray();
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
     }
@@ -130,12 +130,13 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void Testss()
     {
-        testClassList = CsvUtility.GetEnumerableFromCsv<TestClass>(testCsv.text).ToList();
+        
+        testClassList = new ___CsvLoder<TestClass>(testCsv.text).GetInstanceIEnumerable().ToList();
     }
 }
 
 
-class __InstanceIEnumerableGenerator<T>
+class ___CsvLoder<T>
 {
     const char comma = ',';
     const char lineBreak = '\n';
@@ -147,7 +148,7 @@ class __InstanceIEnumerableGenerator<T>
 
     string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
-    public __InstanceIEnumerableGenerator(string csv)
+    public ___CsvLoder(string csv)
     {
         _csv = csv.Substring(0, csv.Length - 1); ;
         fieldNames = GetCells(_csv.Split(lineBreak)[0]);
@@ -159,54 +160,61 @@ class __InstanceIEnumerableGenerator<T>
         {
             foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
-                if (InfoIsCustomClass(info))
-                {
-                    if (IsEnumerable(info.FieldType.ToString()))
-                    {
-                        int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-
-                        for (int i = 0; i < length; i++)
-                        {
-                            currentIndex++;
-                            SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}{i}");
-                        }
-                        currentIndex++;
-                    }
-                    else
-                    {
-                        currentIndex++;
-                        currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
-                        currentIndex++;
-                    }
-                }
+                if (InfoIsCustomClass(info)) // 커스텀 클래스 or 구조체면 SetCustom() 내부에서 재귀 돌림
+                    currentIndex = SetCustom(currentKey, currentIndex, info);
                 else
-                    AddIndexs(info.Name);
+                    currentIndex = AddIndexs(info.Name, currentIndex);
             }
             return currentIndex;
 
-            void AddIndexs(string name)
+            int AddIndexs(string name, int currentIndex)
             {
-                Debug.Log(currentKey + name);
-                indexsByKey.Add(currentKey + name, GetIndexs());
+                indexsByKey.Add(currentKey + name, GetIndexs(ref currentIndex));
+
                 currentIndex++;
+                return currentIndex;
+
+                List<int> GetIndexs(ref int currentIndex)
+                {
+                    List<int> indexs = new List<int>();
+                    while (true)
+                    {
+                        indexs.Add(currentIndex);
+                        if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
+                        currentIndex++;
+                    }
+                    return indexs;
+                }
             }
 
-            List<int> GetIndexs()
+            int SetCustom(string currentKey, int currentIndex, FieldInfo info)
             {
-                List<int> indexs =  new List<int>();
-                while (true)
+                if (IsEnumerable(info.FieldType.ToString()))
                 {
-                    indexs.Add(currentIndex);
-                    if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
+                    int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        currentIndex++;
+                        currentIndex = SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}{i}", currentIndex);
+                    }
                     currentIndex++;
                 }
-                return indexs;
-            }
+                else
+                {
+                    currentIndex++;
+                    currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
+                    currentIndex++;
+                }
 
-            void SetCustomIEnumeralbe(string name, string key)
-            {
-                while (name != fieldNames[currentIndex])
-                    AddIndexs(key + fieldNames[currentIndex]);
+                return currentIndex;
+
+                int SetCustomIEnumeralbe(string name, string key, int currentIndex)
+                {
+                    while (name != fieldNames[currentIndex])
+                        currentIndex = AddIndexs(key + fieldNames[currentIndex], currentIndex);
+                    return currentIndex;
+                }
             }
         }
     }
@@ -215,50 +223,49 @@ class __InstanceIEnumerableGenerator<T>
 
     object GetInstance(Type type, string[] cells, string current = "")
     {
-        Debug.Log(type.ToString());
         object obj = Activator.CreateInstance(type);
 
         foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
         {
-            if (InfoIsCustomClass(info))
-            {
-                if(IsEnumerable(info.FieldType.ToString()))
-                    SetIEnumerableValue(obj, GetArray(cells, current, info), info);
-                else
-                    info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
-            }
+            if (InfoIsCustomClass(info)) // 커스텀은 내부에서 재귀 돌림
+                SetCustomValue(cells, current, obj, info);
             else
                 CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
         }
         return obj;
 
-        Array GetArray(string[] cells, string current, FieldInfo info)
+        void SetCustomValue(string[] cells, string current, object obj, FieldInfo info)
         {
-            int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-            Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
-            Array array = Array.CreateInstance(elementType, length);
-
-            for (int i = 0; i < length; i++)
-                array.SetValue(GetInstance(elementType, cells, $"{current}{info.Name}{arraw}{i}"), i);
-            return array;
-
-
-
-        }
-
-        void SetIEnumerableValue(object obj, Array array, FieldInfo info)
-        {
-
-            if (IsList(info.FieldType.ToString()) == false)
-                info.SetValue(obj, array);
+            if (IsEnumerable(info.FieldType.ToString())) 
+                SetCsutomIEnumerableValue(obj, GetArray(cells, current, info), info);
             else
-                info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { ArrayToIEnumerable(array) }));
+                info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
 
-            IEnumerable ArrayToIEnumerable(Array array)
+            // 중첩 함수
+            Array GetArray(string[] cells, string current, FieldInfo info)
             {
-                IEnumerable vs;
-                vs = array;
-                return vs;
+                int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+                Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                Array array = Array.CreateInstance(elementType, length);
+
+                for (int i = 0; i < length; i++)
+                    array.SetValue(GetInstance(elementType, cells, $"{current}{info.Name}{arraw}{i}"), i);
+                return array;
+            }
+
+            void SetCsutomIEnumerableValue(object obj, Array array, FieldInfo info)
+            {
+                if (IsList(info.FieldType.ToString()) == false)
+                    info.SetValue(obj, array);
+                else
+                    info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { ArrayToIEnumerable(array) }));
+
+                IEnumerable ArrayToIEnumerable(Array array)
+                {
+                    IEnumerable vs;
+                    vs = array;
+                    return vs;
+                }
             }
         }
     }
@@ -274,7 +281,7 @@ class __InstanceIEnumerableGenerator<T>
                 return true;
         }
 
-        if(info.FieldType.ToString().StartsWith(identifier)) return false;
+        if (info.FieldType.ToString().StartsWith(identifier)) return false;
         return true;
     }
     bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");

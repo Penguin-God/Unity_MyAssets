@@ -389,5 +389,57 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
   asset: {fileID: 4900000, guid: bc8beb6c985cadb4b9c77ae4a77dd832, type: 3}
-  testClassList: []
+  testClassList:
+  - TT: 22
+    Ta: 1
+    hasTestClass:
+    - aaa: 123
+      AAA: A
+    - aaa: 123
+      AAA: A
+    - aaa: 123
+      AAA: A
+    kkkk:
+    - "\uC548\uB155 \uC138\uC0C1"
+    - "\uC548\uB155 \uC138\uC0C1"
+    sktt1: "\uC6B0\uC2B9!"
+  - TT: 33
+    Ta: 0
+    hasTestClass:
+    - aaa: 456
+      AAA: AA
+    - aaa: 456
+      AAA: AA
+    - aaa: 456
+      AAA: AA
+    kkkk:
+    - "\uC548\uB155 \uC138\uC0C1"
+    - "\uC548\uB155 \uC138\uC0C1"
+    sktt1: "\uC6B0\uC2B9!!"
+  - TT: 44
+    Ta: 1
+    hasTestClass:
+    - aaa: 789
+      AAA: AAA
+    - aaa: 789
+      AAA: AAA
+    - aaa: 789
+      AAA: AAA
+    kkkk:
+    - "\uC548\uB155 \uC138\uC0C1"
+    - "\uC548\uB155 \uC138\uC0C1"
+    sktt1: "\uC6B0\uC2B9!!!"
+  - TT: 55
+    Ta: 1
+    hasTestClass:
+    - aaa: 0
+      AAA: AAAA
+    - aaa: 0
+      AAA: AAAA
+    - aaa: 0
+      AAA: AAAA
+    kkkk:
+    - "\uC548\uB155 \uC138\uC0C1"
+    - "\uC548\uB155 \uC138\uC0C1"
+    sktt1: "\uC6B0\uC2B9!!!!"
   testCsv: {fileID: 4900000, guid: 34d13703728c9264ab65b7f35d346504, type: 3}
