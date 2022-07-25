@@ -4,6 +4,9 @@ using UnityEngine;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
+
 
 [Serializable]
 public class TestClass
@@ -130,10 +133,36 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void Testss()
     {
-        
         testClassList = new ___CsvLoder<TestClass>(testCsv.text).GetInstanceIEnumerable().ToList();
     }
 }
+
+#if UNITY_EDITOR
+class CsvUtilituAssertion
+{
+    //[Conditional("UNITY_EDITOR")] // TODO : CsvLoder 안에 넣기
+    //static void CheckFieldNames<T>(string[] fieldNames)
+    //{
+    //    string[] fields = GetSerializedFields(Activator.CreateInstance<T>()).Select(x => x.Name).ToArray();
+    //    fieldNames = fieldNames.Distinct().ToArray();
+
+    //    for (int i = 0; i < fieldNames.Length; i++)
+    //    {
+    //        if (fields.Contains(fieldNames[i]) == false)
+    //            Debug.LogError($"찾을 수 없는 필드명 : {fieldNames[i]}");
+    //    }
+    //}
+
+    [Conditional("UNITY_EDITOR")]
+    public void CheckFieldNames(Type type, Dictionary<string, int[]> indexsByKey, string[] filedNames)
+    {
+        List<string> keys = new List<string>();
+        foreach (var item in indexsByKey) keys.Add(item.Key);
+        keys = keys.Distinct().Where(x => x.Contains('>')).ToList();
+        keys.ForEach(x => Debug.Log(x));
+    }
+}
+#endif
 
 
 class ___CsvLoder<T>
@@ -148,6 +177,36 @@ class ___CsvLoder<T>
 
     string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
+    [Conditional("UNITY_EDITOR")]
+    void CheckFieldNames(Type type, string[] filedNames)
+    {
+        List<string> realFieldNames = GetInfoNames(typeof(T));
+
+        for (int i = 0; i < filedNames.Length; i++)
+            Debug.Assert(realFieldNames.Contains(filedNames[i]), $"변수명과 일치하지 않는 {i + 1}번째 컬럼명 : {filedNames[i]}");
+
+        List<string> GetInfoNames(Type type)
+        {
+            List<string> restul = new List<string>();
+            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
+            {
+                restul.Add(info.Name);
+
+                if (InfoIsCustomClass(info))
+                {
+                    if (IsEnumerable(info.FieldType.ToString()))
+                    {
+                        Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                        restul = restul.Concat(GetInfoNames(elementType)).ToList();
+                    }
+                    else
+                        restul = restul.Concat(GetInfoNames(info.FieldType)).ToList();
+                }
+            }
+            return restul;
+        }
+    }
+
     public ___CsvLoder(string csv)
     {
         _csv = csv.Substring(0, csv.Length - 1); ;
@@ -155,10 +214,11 @@ class ___CsvLoder<T>
 
         indexsByKey.Clear();
         SetIndexsByKey(typeof(T));
+        CheckFieldNames(typeof(T), fieldNames);
 
         int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
         {
-            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
             {
                 if (InfoIsCustomClass(info)) // 커스텀 클래스 or 구조체면 SetCustom() 내부에서 재귀 돌림
                     currentIndex = SetCustom(currentKey, currentIndex, info);
@@ -224,8 +284,8 @@ class ___CsvLoder<T>
     object GetInstance(Type type, string[] cells, string current = "")
     {
         object obj = Activator.CreateInstance(type);
-
-        foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
+        
+        foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
         {
             if (InfoIsCustomClass(info)) // 커스텀은 내부에서 재귀 돌림
                 SetCustomValue(cells, current, obj, info);
@@ -270,7 +330,12 @@ class ___CsvLoder<T>
         }
     }
 
-    string[] GetFieldValues(string key, string[] cells) => indexsByKey[key].Select(x => cells[x]).ToArray();
+    string[] GetFieldValues(string key, string[] cells)
+    {
+        if(indexsByKey.ContainsKey(key))
+            return indexsByKey[key].Select(x => cells[x]).ToArray();
+        return new string[] { "" };
+    }
 
     bool InfoIsCustomClass(FieldInfo info)
     {
