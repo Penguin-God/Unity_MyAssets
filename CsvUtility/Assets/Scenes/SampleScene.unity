@@ -395,7 +395,7 @@ MonoBehaviour:
     hasTestClass:
     - aaa: 123
       AAA: A
-    - aaa: 123
+    - aaa: 0
       AAA: A
     - aaa: 123
       AAA: A
@@ -408,7 +408,7 @@ MonoBehaviour:
     hasTestClass:
     - aaa: 456
       AAA: AA
-    - aaa: 456
+    - aaa: 0
       AAA: AA
     - aaa: 456
       AAA: AA
@@ -421,7 +421,7 @@ MonoBehaviour:
     hasTestClass:
     - aaa: 789
       AAA: AAA
-    - aaa: 789
+    - aaa: 0
       AAA: AAA
     - aaa: 789
       AAA: AAA
@@ -443,3 +443,10 @@ MonoBehaviour:
     - "\uC548\uB155 \uC138\uC0C1"
     sktt1: "\uC6B0\uC2B9!!!!"
   testCsv: {fileID: 4900000, guid: 34d13703728c9264ab65b7f35d346504, type: 3}
+  saveTest:
+    aaa: 123
+    AAA: "\uC548\uB155 \uC138\uC0C1"
+    test1:
+    - 22
+    - fasdasd
+    test2: 01000000170000007b000000
