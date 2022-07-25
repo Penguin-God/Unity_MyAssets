@@ -115,6 +115,16 @@ public class MasterTest
     bool HasClassIsSame() => 777 == hasClass.aaa && "æ»≥Á«œººø‰." == hasClass.AAA;
 }
 
+[Serializable]
+public class SaveTestCalss
+{
+    [SerializeField] public int aaa = 123;
+    [SerializeField] public string AAA = "æ»≥Á ººªÛ";
+    [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
+    [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
+    public Dictionary<float, bool> test3 = new Dictionary<float, bool>();
+}
+
 public class Test : MonoBehaviour
 {
     [SerializeField] MasterTest[] masterTests;
@@ -130,9 +140,48 @@ public class Test : MonoBehaviour
 
     [SerializeField] List<TestClass> testClassList = new List<TestClass>();
     [SerializeField] TextAsset testCsv;
+    [SerializeField] SaveTestCalss saveTest;
+
     [ContextMenu("Test")]
     void Testss()
     {
-        
+        saveTest.test3.Add(11.22f, false);
+        saveTest.test3.Add(331.2555f, false);
+        saveTest.test3.Add(11123.22f, false);
+        foreach (var info in saveTest.GetType().GetFields())
+        {
+            if (info.FieldType.IsArray)
+            {
+                Array array = info.GetValue(saveTest) as Array;
+                foreach (var item in array)
+                {
+                    print(item);
+                }
+            }
+
+            if (info.FieldType.IsGenericType && (info.FieldType.GetGenericTypeDefinition() == typeof(List<>)))
+            {
+                IList array = info.GetValue(saveTest) as IList;
+                foreach (var item in array)
+                {
+                    print(item);
+                }
+            }
+
+            if(info.FieldType.IsGenericType && info.FieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                print(saveTest.test3.Count);
+                IDictionary array = info.GetValue(saveTest) as IDictionary;
+                foreach (var item in array.Keys)
+                {
+                    print(item);
+                }
+                foreach (var item in array.Values)
+                {
+                    print(item);
+                }
+            }
+            print(info.GetValue(saveTest));
+        }
     }
 }
