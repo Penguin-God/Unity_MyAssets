@@ -220,18 +220,47 @@ public static class CsvUtility
         public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Join(",", GetSerializedFields(typeof(T)).Select(x => x.Name)));
+            Dictionary<string, int> countByName = GetCountByName(datas);
+            stringBuilder.AppendLine(string.Join(",", GetFirstRow(datas, countByName)));
 
             foreach (var data in datas)
             {
-                IEnumerable<string> values = GetValues(data);
+                IEnumerable<string> values = GetValues(data, countByName);
                 stringBuilder.AppendLine(string.Join(",", values));
             }
 
             return SubLastLine(stringBuilder.ToString());
         }
 
-        IEnumerable<string> GetValues(T data)
+        List<string> GetFirstRow(IEnumerable<T> datas, Dictionary<string, int> countByName)
+        {
+            List<string> firstRow = new List<string>();
+            foreach (var item in countByName)
+            {
+                for (int i = 0; i < item.Value; i++)
+                    firstRow.Add(item.Key);
+            }
+
+            return firstRow;
+        }
+
+        Dictionary<string, int> GetCountByName(IEnumerable<T> datas)
+        {
+            Dictionary<string, int> countByName = GetSerializedFields(typeof(T)).ToDictionary(x => x.Name, x => 0);
+
+            foreach (T data in datas)
+            {
+                foreach (FieldInfo info in GetSerializedFields(data))
+                {
+                    if (GetValueLength(data, info) > countByName[info.Name])
+                        countByName[info.Name] = GetValueLength(data, info);
+                }
+            }
+
+            return countByName;
+        }
+
+        IEnumerable<string> GetValues(T data, Dictionary<string, int> countByName)
         {
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(data))
@@ -241,10 +270,22 @@ public static class CsvUtility
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
                     result = result.Concat(new EnumerableTypeParser().GetIEnumerableValues(data, info)).ToList();
+                    for (int i = 0; i < countByName[info.Name] - new EnumerableTypeParser().GetIEnumerableValues(data, info).Count(); i++)
+                        result.Add("");
                 }
             }
             return result;
         }
+
+        int GetValueLength(T data, FieldInfo info)
+        {
+            if (info.FieldType.IsPrimitive || info.FieldType == typeof(string))
+                return 1;
+            else if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                return new EnumerableTypeParser().GetIEnumerableValues(data, info).Length;
+            return 0;
+        }
+
 
         public void Save(IEnumerable<T> enumerable, string filePath)
         {

@@ -165,8 +165,10 @@ public class Test : MonoBehaviour
     [ContextMenu("Save Test")]
     void SaveTest()
     {
+
         foreach (var item in saveTests)
         {
+            item.test3.Clear();
             item.test3.Add("µÒº≈≥ ∏Æ true¿‘¥œ¥Á", true);
             item.test3.Add("µÒº≈≥ ∏Æ false¿‘¥œ¥Á", false);
         }
