@@ -73,9 +73,9 @@ class PrimitiveTypeParser : CsvParser
     }
 
     object GetParserValue(string typeName, string value) => GetPrimitiveParser(typeName).GetParserValue(value);
+    object GetParserValue(Type type, string value) => GetPrimitiveParser(type).GetParserValue(value);
 
-    public void SetValue(object obj, FieldInfo info, string[] value)
-        => info.SetValue(obj, GetParserValue(info.FieldType.Name, value[0]));
+    public void SetValue(object obj, FieldInfo info, string[] value) => info.SetValue(obj, GetParserValue(info.FieldType, value[0]));
 }
 
 class EnumerableTypeParser : CsvParser
@@ -88,15 +88,15 @@ class EnumerableTypeParser : CsvParser
         _typeName = info.FieldType.Name;
         _type = GetEnumableType(info.FieldType);
         // _elementTypeName = GetElementTypeName().Replace("System.", "");
-        _elementTypeName = GetElementTypeName(info.FieldType).ToString().Replace("System.", "");
+        // _elementTypeName = GetElementTypeName(info.FieldType).ToString().Replace("System.", "");
 
-        string GetElementTypeName(Type type)
-        {
-            if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
-                return (type.IsArray) ? type.GetElementType().ToString() : type.GetGenericArguments()[0].ToString();
-            else
-                return "";
-        }
+        //string GetElementTypeName(Type type)
+        //{
+        //    if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
+        //        return (type.IsArray) ? type.GetElementType().ToString() : type.GetGenericArguments()[0].ToString();
+        //    else
+        //        return "";
+        //}
 
         //string GetElementTypeName()
         //{
@@ -187,8 +187,9 @@ public class CsvListParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
     {
+        Type elementType = info.FieldType.GetGenericArguments()[0];
         ConstructorInfo constructor = info.FieldType.GetConstructors()[2];
-        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserEnumerable(values) }));
+        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserEnumerable(values) }));
     }
 }
 
@@ -206,28 +207,33 @@ public class CsvArrayParser
 
 public class CsvDictionaryParser
 {
-    string keyTypeName;
-    string valueTypeName;
+    //string keyTypeName;
+    //string valueTypeName;
+    //Type keyType;
+    //Type valueType;
     public CsvDictionaryParser(FieldInfo info)
     {
         //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
         //keyTypeName = elementTypeNames[0].Replace("System.", "");
         //valueTypeName = elementTypeNames[1].Replace("System.", "");
 
-        Type[] elementTypes = info.FieldType.GetGenericArguments();
-        keyTypeName = elementTypes[0].ToString().Replace("System.", "");
-        valueTypeName = elementTypes[1].ToString().Replace("System.", "");
+        //Type[] elementTypes = info.FieldType.GetGenericArguments();
+        //keyType = elementTypes[0];
+        //valueType = elementTypes[1];
+        //keyTypeName = elementTypes[0].ToString().Replace("System.", "");
+        //valueTypeName = elementTypes[1].ToString().Replace("System.", "");
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         if (values.Length % 2 != 0) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
 
+        Type[] elementTypes = info.FieldType.GetGenericArguments();
         MethodInfo methodInfo = info.FieldType.GetMethod("Add");
         for (int i = 0; i < values.Length; i+=2)
         {
-            methodInfo.Invoke(info.GetValue(obj), new object[] { PrimitiveTypeParser.GetPrimitiveParser(keyTypeName).GetParserValue(values[i]),
-                                                                 PrimitiveTypeParser.GetPrimitiveParser(valueTypeName).GetParserValue(values[i+1]) });
+            methodInfo.Invoke(info.GetValue(obj), new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[i]),
+                                                                 PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[i+1]) });
         }
     }
 }
@@ -237,24 +243,25 @@ public class CsvPairParser : CsvParser
 {
     string keyTypeName;
     string valueTypeName;
+    //Type[] elementTypes;
     public CsvPairParser(FieldInfo info)
     {
         //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
         //keyTypeName = elementTypeNames[0].Replace("System.", "");
         //valueTypeName = elementTypeNames[1].Replace("System.", "");
 
-        Type[] elementTypes = info.FieldType.GetGenericArguments();
-        keyTypeName = elementTypes[0].ToString().Replace("System.", "");
-        valueTypeName = elementTypes[1].ToString().Replace("System.", "");
+        //elementTypes = info.FieldType.GetGenericArguments();
+        //keyTypeName = elementTypes[0].ToString().Replace("System.", "");
+        //valueTypeName = elementTypes[1].ToString().Replace("System.", "");
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         if (values.Length != 2) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
-
+        Type[] elementTypes = info.FieldType.GetGenericArguments();
         ConstructorInfo constructor = info.FieldType.GetConstructors()[0];
-        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(keyTypeName).GetParserValue(values[0]),
-                                                             PrimitiveTypeParser.GetPrimitiveParser(valueTypeName).GetParserValue(values[1]) } ));
+        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[0]),
+                                                             PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[1]) } ));
     }
 }
 
