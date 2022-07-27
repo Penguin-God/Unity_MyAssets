@@ -30,14 +30,17 @@ public abstract class CsvParsers
 {
     public static CsvParser GetParser(FieldInfo info)
     {
-        if (IsEnumerable(info.FieldType.Name))
+        if (IsEnumerable(info.FieldType))
             return new EnumerableTypeParser(info);
         else if (IsPair(info.FieldType.Name))
             return new CsvPairParser(info);
         else
             return new PrimitiveTypeParser();
 
-        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
+        bool IsEnumerable(Type type) 
+            => type.IsArray || 
+            ( type.IsGenericType && ( type.GetGenericTypeDefinition() == typeof(List<>) || type.GetGenericTypeDefinition() == typeof(Dictionary<,>) ) );
+        // bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }
@@ -59,6 +62,16 @@ class PrimitiveTypeParser : CsvParser
         return null;
     }
 
+    public static CsvPrimitiveTypeParser GetPrimitiveParser(Type type)
+    {
+        if(type == typeof(int)) return new CsvIntParser();
+        else if(type == typeof(string)) return new CsvStringParser();
+        else if (type == typeof(float)) return new CsvFloatParser();
+        else if (type == typeof(bool)) return new CsvBooleanParser();
+        else Debug.LogError("Csv 파싱 타입을 찾지 못함");
+        return null;
+    }
+
     object GetParserValue(string typeName, string value) => GetPrimitiveParser(typeName).GetParserValue(value);
 
     public void SetValue(object obj, FieldInfo info, string[] value)
@@ -73,26 +86,44 @@ class EnumerableTypeParser : CsvParser
     public EnumerableTypeParser(FieldInfo info)
     {
         _typeName = info.FieldType.Name;
-        _elementTypeName = GetElementTypeName().Replace("System.", "");
-        _type = GetEnumableType(_typeName);
+        _type = GetEnumableType(info.FieldType);
+        // _elementTypeName = GetElementTypeName().Replace("System.", "");
+        _elementTypeName = GetElementTypeName(info.FieldType).ToString().Replace("System.", "");
 
-        string GetElementTypeName()
+        string GetElementTypeName(Type type)
         {
-            if (info.FieldType.Name.Contains("[]"))
-                return info.FieldType.GetElementType().Name;
-            else if (info.FieldType.Name.Contains("List"))
-                return info.FieldType.ToString().GetMiddleString("[", "]");
-
-            return "";
+            if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
+                return (type.IsArray) ? type.GetElementType().ToString() : type.GetGenericArguments()[0].ToString();
+            else
+                return "";
         }
 
-        EnumerableType GetEnumableType(string typeName)
+        //string GetElementTypeName()
+        //{
+        //    if (info.FieldType.Name.Contains("[]"))
+        //        return info.FieldType.GetElementType().Name;
+        //    else if (info.FieldType.Name.Contains("List"))
+        //        return info.FieldType.ToString().GetMiddleString("[", "]");
+
+        //    return "";
+        //}
+
+        EnumerableType GetEnumableType(Type type)
         {
-            if (typeName.Contains("[]")) return EnumerableType.Array;
-            else if (typeName.Contains("List")) return EnumerableType.List;
-            else if (typeName.Contains("Dict")) return EnumerableType.Dictionary;
+            if (type.IsArray) return EnumerableType.Array;
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) return EnumerableType.List;
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) return EnumerableType.Dictionary;
             return EnumerableType.Unknown;
         }
+
+
+        //EnumerableType GetEnumableType(string typeName, int a)
+        //{
+        //    if (typeName.Contains("[]")) return EnumerableType.Array;
+        //    else if (typeName.Contains("List")) return EnumerableType.List;
+        //    else if (typeName.Contains("Dict")) return EnumerableType.Dictionary;
+        //    return EnumerableType.Unknown;
+        //}
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
@@ -165,9 +196,10 @@ public class CsvArrayParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
     {
-        Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserType(), values.Length);
+        Type elementType = info.FieldType.GetElementType();
+        Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserType(), values.Length);
         for (int i = 0; i < array.Length; i++)
-            array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(typeName).GetParserValue(values[i]), i);
+            array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[i]), i);
         info.SetValue(obj, array);
     }
 }
@@ -178,9 +210,13 @@ public class CsvDictionaryParser
     string valueTypeName;
     public CsvDictionaryParser(FieldInfo info)
     {
-        string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
-        keyTypeName = elementTypeNames[0].Replace("System.", "");
-        valueTypeName = elementTypeNames[1].Replace("System.", "");
+        //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
+        //keyTypeName = elementTypeNames[0].Replace("System.", "");
+        //valueTypeName = elementTypeNames[1].Replace("System.", "");
+
+        Type[] elementTypes = info.FieldType.GetGenericArguments();
+        keyTypeName = elementTypes[0].ToString().Replace("System.", "");
+        valueTypeName = elementTypes[1].ToString().Replace("System.", "");
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
@@ -203,9 +239,13 @@ public class CsvPairParser : CsvParser
     string valueTypeName;
     public CsvPairParser(FieldInfo info)
     {
-        string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
-        keyTypeName = elementTypeNames[0].Replace("System.", "");
-        valueTypeName = elementTypeNames[1].Replace("System.", "");
+        //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
+        //keyTypeName = elementTypeNames[0].Replace("System.", "");
+        //valueTypeName = elementTypeNames[1].Replace("System.", "");
+
+        Type[] elementTypes = info.FieldType.GetGenericArguments();
+        keyTypeName = elementTypes[0].ToString().Replace("System.", "");
+        valueTypeName = elementTypes[1].ToString().Replace("System.", "");
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
