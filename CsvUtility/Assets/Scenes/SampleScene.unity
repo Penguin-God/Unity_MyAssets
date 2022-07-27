@@ -312,6 +312,9 @@ MonoBehaviour:
     - 22
     - fasdasd
     test2: 01000000170000007b000000
+    hasClass:
+      aaa: 0
+      AAA: 
   saveTests:
   - aaa: 222
     AAA: 222
@@ -320,11 +323,17 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    hasClass:
+      aaa: 123
+      AAA: Has
   - aaa: 333
     AAA: 333
     test1:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    hasClass:
+      aaa: 456
+      AAA: Has
   - aaa: 444
     AAA: 444
     test1:
@@ -334,6 +343,9 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    hasClass:
+      aaa: 789
+      AAA: Has
   saveArrays:
   - aaa: 123123
     hello: ???aa

@@ -221,7 +221,7 @@ public static class CsvUtility
         {
             StringBuilder stringBuilder = new StringBuilder();
             Dictionary<string, int> countByName = GetCountByName(datas);
-            stringBuilder.AppendLine(string.Join(",", GetFirstRow(datas, countByName)));
+            stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), countByName)));
 
             foreach (var data in datas)
             {
@@ -232,39 +232,81 @@ public static class CsvUtility
             return SubLastLine(stringBuilder.ToString());
         }
 
-        List<string> GetFirstRow(IEnumerable<T> datas, Dictionary<string, int> countByName)
+        List<string> GetFirstRow(Type type, Dictionary<string, int> countByName)
         {
-            List<string> firstRow = new List<string>();
-            foreach (var item in countByName)
+            List<string> result = new List<string>();
+            foreach (FieldInfo info in GetSerializedFields(type))
             {
-                for (int i = 0; i < item.Value; i++)
-                    firstRow.Add(item.Key);
+                if (TypeIdentifier.IsCustom(info.FieldType))
+                {
+                    result.Add(info.Name);
+                    result = result.Concat(GetFirstRow(info.FieldType, countByName)).ToList();
+                    result.Add(info.Name);
+                }
+                else
+                {
+                    for (int i = 0; i < countByName[info.Name]; i++)
+                        result.Add(info.Name);
+                }
             }
-
-            return firstRow;
+            return result;
         }
 
         Dictionary<string, int> GetCountByName(IEnumerable<T> datas)
         {
-            Dictionary<string, int> countByName = GetSerializedFields(typeof(T)).ToDictionary(x => x.Name, x => 0);
+            Dictionary<string, int> countByName = GetFieldNames(typeof(T)).ToDictionary(x => x, x => 0);
 
             foreach (T data in datas)
             {
+                SetDict(countByName, data);
+            }
+
+            return countByName;
+
+            IEnumerable<string> GetFieldNames(Type type)
+            {
+                List<string> result = new List<string>();
+                foreach (FieldInfo info in GetSerializedFields(type))
+                {
+                    if (TypeIdentifier.IsCustom(info.FieldType))
+                    {
+                        result.Add(info.Name);
+                        result = result.Concat(GetFieldNames(info.FieldType)).ToList();
+                    }
+                    else
+                        result.Add(info.Name);
+                }
+                return result;
+            }
+
+            void SetDict(Dictionary<string, int> countByName, object data)
+            {
                 foreach (FieldInfo info in GetSerializedFields(data))
                 {
+                    if (TypeIdentifier.IsCustom(info.FieldType))
+                    {
+                        SetDict(countByName, info.GetValue(data));
+                    }
                     if (GetValueLength(data, info) > countByName[info.Name])
                         countByName[info.Name] = GetValueLength(data, info);
                 }
             }
-
-            return countByName;
         }
 
-        IEnumerable<string> GetValues(T data, Dictionary<string, int> countByName)
+
+
+        IEnumerable<string> GetValues(object data, Dictionary<string, int> countByName)
         {
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(data))
             {
+                if (TypeIdentifier.IsCustom(info.FieldType))
+                {
+                    result.Add("");
+                    result = result.Concat(GetValues(info.GetValue(data), countByName)).ToList();
+                    result.Add("");
+                }
+
                 if(info.FieldType.IsPrimitive || info.FieldType == typeof(string))
                     result.Add(info.GetValue(data).ToString());
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
@@ -277,7 +319,7 @@ public static class CsvUtility
             return result;
         }
 
-        int GetValueLength(T data, FieldInfo info)
+        int GetValueLength(object data, FieldInfo info)
         {
             if (info.FieldType.IsPrimitive || info.FieldType == typeof(string))
                 return 1;
@@ -285,6 +327,7 @@ public static class CsvUtility
                 return new EnumerableTypeParser().GetIEnumerableValues(data, info).Length;
             return 0;
         }
+
 
 
         public void Save(IEnumerable<T> enumerable, string filePath)

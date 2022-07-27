@@ -128,11 +128,13 @@ public class MasterTest
 [Serializable]
 public class SaveTestCalss
 {
-    [SerializeField] public int aaa = 123;
-    [SerializeField] public string AAA = "¾È³ç ¼¼»ó";
+    [SerializeField] public int aaab = 123;
+    [SerializeField] public string AAAb = "¾È³ç ¼¼»ó";
     [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
     public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
+    [SerializeField] HasTestClass hasClass;
+    [SerializeField] int a;
 }
 
 [Serializable]
