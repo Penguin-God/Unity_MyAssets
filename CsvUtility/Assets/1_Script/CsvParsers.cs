@@ -33,14 +33,13 @@ public abstract class CsvParsers
         if (IsEnumerable(info.FieldType))
             return new EnumerableTypeParser(info);
         else if (IsPair(info.FieldType.Name))
-            return new CsvPairParser(info);
+            return new CsvPairParser();
         else
             return new PrimitiveTypeParser();
 
         bool IsEnumerable(Type type) 
             => type.IsArray || 
             ( type.IsGenericType && ( type.GetGenericTypeDefinition() == typeof(List<>) || type.GetGenericTypeDefinition() == typeof(Dictionary<,>) ) );
-        // bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List") || typeName.Contains("Dict");
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }
@@ -48,20 +47,6 @@ public abstract class CsvParsers
 
 class PrimitiveTypeParser : CsvParser
 {
-    public static CsvPrimitiveTypeParser GetPrimitiveParser(string typeName)
-    {
-        typeName = typeName.Replace("System.", "");
-        switch (typeName)
-        {
-            case nameof(Int32): return new CsvIntParser();
-            case nameof(Single): return new CsvFloatParser();
-            case nameof(Boolean): return new CsvBooleanParser();
-            case nameof(String): return new CsvStringParser();
-            default: Debug.LogError("Csv 파싱 타입을 찾지 못함"); break;
-        }
-        return null;
-    }
-
     public static CsvPrimitiveTypeParser GetPrimitiveParser(Type type)
     {
         if(type == typeof(int)) return new CsvIntParser();
@@ -72,41 +57,16 @@ class PrimitiveTypeParser : CsvParser
         return null;
     }
 
-    object GetParserValue(string typeName, string value) => GetPrimitiveParser(typeName).GetParserValue(value);
     object GetParserValue(Type type, string value) => GetPrimitiveParser(type).GetParserValue(value);
-
     public void SetValue(object obj, FieldInfo info, string[] value) => info.SetValue(obj, GetParserValue(info.FieldType, value[0]));
 }
 
 class EnumerableTypeParser : CsvParser
 {
-    string _typeName;
-    string _elementTypeName;
     EnumerableType _type;
     public EnumerableTypeParser(FieldInfo info)
     {
-        _typeName = info.FieldType.Name;
         _type = GetEnumableType(info.FieldType);
-        // _elementTypeName = GetElementTypeName().Replace("System.", "");
-        // _elementTypeName = GetElementTypeName(info.FieldType).ToString().Replace("System.", "");
-
-        //string GetElementTypeName(Type type)
-        //{
-        //    if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
-        //        return (type.IsArray) ? type.GetElementType().ToString() : type.GetGenericArguments()[0].ToString();
-        //    else
-        //        return "";
-        //}
-
-        //string GetElementTypeName()
-        //{
-        //    if (info.FieldType.Name.Contains("[]"))
-        //        return info.FieldType.GetElementType().Name;
-        //    else if (info.FieldType.Name.Contains("List"))
-        //        return info.FieldType.ToString().GetMiddleString("[", "]");
-
-        //    return "";
-        //}
 
         EnumerableType GetEnumableType(Type type)
         {
@@ -115,26 +75,17 @@ class EnumerableTypeParser : CsvParser
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) return EnumerableType.Dictionary;
             return EnumerableType.Unknown;
         }
-
-
-        //EnumerableType GetEnumableType(string typeName, int a)
-        //{
-        //    if (typeName.Contains("[]")) return EnumerableType.Array;
-        //    else if (typeName.Contains("List")) return EnumerableType.List;
-        //    else if (typeName.Contains("Dict")) return EnumerableType.Dictionary;
-        //    return EnumerableType.Unknown;
-        //}
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         values = values.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-        if (_type == EnumerableType.Array)
-            new CsvArrayParser().SetValue(obj, info, values, _elementTypeName);
-        else if (_type == EnumerableType.List)
-            new CsvListParser().SetValue(obj, info, values, _elementTypeName);
-        else if (_type == EnumerableType.Dictionary)
-            new CsvDictionaryParser(info).SetValue(obj, info, values);
+        switch (_type)
+        {
+            case EnumerableType.Array: new CsvArrayParser().SetValue(obj, info, values); break;
+            case EnumerableType.List: new CsvListParser().SetValue(obj, info, values); break;
+            case EnumerableType.Dictionary: new CsvDictionaryParser().SetValue(obj, info, values); break;
+        }    
     }
 }
 
@@ -185,7 +136,7 @@ class CsvBooleanParser : CsvPrimitiveTypeParser
 #region 열거형 파싱
 public class CsvListParser
 {
-    public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
+    public void SetValue(object obj, FieldInfo info, string[] values)
     {
         Type elementType = info.FieldType.GetGenericArguments()[0];
         ConstructorInfo constructor = info.FieldType.GetConstructors()[2];
@@ -195,7 +146,7 @@ public class CsvListParser
 
 public class CsvArrayParser
 {
-    public void SetValue(object obj, FieldInfo info, string[] values, string typeName)
+    public void SetValue(object obj, FieldInfo info, string[] values)
     {
         Type elementType = info.FieldType.GetElementType();
         Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserType(), values.Length);
@@ -207,23 +158,6 @@ public class CsvArrayParser
 
 public class CsvDictionaryParser
 {
-    //string keyTypeName;
-    //string valueTypeName;
-    //Type keyType;
-    //Type valueType;
-    public CsvDictionaryParser(FieldInfo info)
-    {
-        //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
-        //keyTypeName = elementTypeNames[0].Replace("System.", "");
-        //valueTypeName = elementTypeNames[1].Replace("System.", "");
-
-        //Type[] elementTypes = info.FieldType.GetGenericArguments();
-        //keyType = elementTypes[0];
-        //valueType = elementTypes[1];
-        //keyTypeName = elementTypes[0].ToString().Replace("System.", "");
-        //valueTypeName = elementTypes[1].ToString().Replace("System.", "");
-    }
-
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         if (values.Length % 2 != 0) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
@@ -241,20 +175,6 @@ public class CsvDictionaryParser
 
 public class CsvPairParser : CsvParser
 {
-    string keyTypeName;
-    string valueTypeName;
-    //Type[] elementTypes;
-    public CsvPairParser(FieldInfo info)
-    {
-        //string[] elementTypeNames = info.FieldType.ToString().GetMiddleString("[", "]").Split(',');
-        //keyTypeName = elementTypeNames[0].Replace("System.", "");
-        //valueTypeName = elementTypeNames[1].Replace("System.", "");
-
-        //elementTypes = info.FieldType.GetGenericArguments();
-        //keyTypeName = elementTypes[0].ToString().Replace("System.", "");
-        //valueTypeName = elementTypes[1].ToString().Replace("System.", "");
-    }
-
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         if (values.Length != 2) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
@@ -262,23 +182,5 @@ public class CsvPairParser : CsvParser
         ConstructorInfo constructor = info.FieldType.GetConstructors()[0];
         info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[0]),
                                                              PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[1]) } ));
-    }
-}
-
-
-public static class Extension
-{
-    public static string GetMiddleString(this string str, string begin, string end)
-    {
-        if (string.IsNullOrEmpty(str)) return null;
-
-        string result = null;
-        if (str.IndexOf(begin) > -1)
-        {
-            str = str.Substring(str.IndexOf(begin) + begin.Length);
-            if (str.IndexOf(end) > -1) result = str.Substring(0, str.IndexOf(end));
-            else result = str;
-        }
-        return result;
     }
 }
