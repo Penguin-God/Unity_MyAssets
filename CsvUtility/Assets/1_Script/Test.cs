@@ -133,7 +133,9 @@ public class SaveTestCalss
     [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
     public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
-    [SerializeField] HasTestClass hasClass;
+    //[SerializeField] HasTestClass hasClass;
+    
+    [SerializeField] HasTestClass[] hasClassArray;
     [SerializeField] int a;
 }
 

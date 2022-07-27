@@ -239,9 +239,16 @@ public static class CsvUtility
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
                 {
-                    result.Add(info.Name);
-                    result = result.Concat(GetFirstRow(info.FieldType, countByName)).ToList();
-                    result.Add(info.Name);
+                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                    {
+                        
+                    }
+                    else
+                    {
+                        result.Add(info.Name);
+                        result = result.Concat(GetFirstRow(info.FieldType, countByName)).ToList();
+                        result.Add(info.Name);
+                    }
                 }
                 else
                 {
@@ -270,8 +277,18 @@ public static class CsvUtility
                 {
                     if (TypeIdentifier.IsCustom(info.FieldType))
                     {
-                        result.Add(info.Name);
-                        result = result.Concat(GetFieldNames(info.FieldType)).ToList();
+                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        {
+                            result.Add(info.Name);
+                            Type elementType 
+                                = TypeIdentifier.IsList(info.FieldType) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                            result = result.Concat(GetFieldNames(elementType)).ToList();
+                        }
+                        else
+                        {
+                            result.Add(info.Name);
+                            result = result.Concat(GetFieldNames(info.FieldType)).ToList();
+                        }
                     }
                     else
                         result.Add(info.Name);
@@ -285,7 +302,20 @@ public static class CsvUtility
                 {
                     if (TypeIdentifier.IsCustom(info.FieldType))
                     {
-                        SetDict(countByName, info.GetValue(data));
+                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        {
+                            int count = 0;
+                            foreach (var item in info.GetValue(data) as IEnumerable)
+                            {
+                                SetDict(countByName, item);
+                                count++;
+                            }
+                            Debug.Log(count);
+                            if (count > countByName[info.Name])
+                                countByName[info.Name] = count;
+                        }
+                        else
+                            SetDict(countByName, info.GetValue(data));
                     }
                     if (GetValueLength(data, info) > countByName[info.Name])
                         countByName[info.Name] = GetValueLength(data, info);
@@ -302,12 +332,23 @@ public static class CsvUtility
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
                 {
-                    result.Add("");
-                    result = result.Concat(GetValues(info.GetValue(data), countByName)).ToList();
-                    result.Add("");
+                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                    {
+                        result.Add("");
+                        foreach (var item in info.GetValue(data) as IEnumerable)
+                        {
+                            result = result.Concat(GetValues(item, countByName)).ToList();
+                            result.Add("");
+                        }
+                    }
+                    else
+                    {
+                        result.Add("");
+                        result = result.Concat(GetValues(info.GetValue(data), countByName)).ToList();
+                        result.Add("");
+                    }
                 }
-
-                if(info.FieldType.IsPrimitive || info.FieldType == typeof(string))
+                else if(info.FieldType.IsPrimitive || info.FieldType == typeof(string))
                     result.Add(info.GetValue(data).ToString());
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
