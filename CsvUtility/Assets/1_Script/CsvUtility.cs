@@ -55,9 +55,10 @@ public static class CsvUtility
 
                     if (InfoIsCustomClass(info))
                     {
-                        if (IsEnumerable(info.FieldType.ToString()))
+                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
                         {
-                            Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                            Type elementType = 
+                                TypeIdentifier.IsList(info.FieldType) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
                             restul = restul.Concat(GetInfoNames(elementType)).ToList();
                         }
                         else
@@ -79,7 +80,7 @@ public static class CsvUtility
 
             int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
             {
-                foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
+                foreach (FieldInfo info in GetSerializedFields(type))
                 {
                     if (InfoIsCustomClass(info)) // 커스텀 클래스 or 구조체면 SetCustom() 내부에서 재귀 돌림
                         currentIndex = SetCustom(currentKey, currentIndex, info);
@@ -110,7 +111,7 @@ public static class CsvUtility
 
                 int SetCustom(string currentKey, int currentIndex, FieldInfo info)
                 {
-                    if (IsEnumerable(info.FieldType.ToString()))
+                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
                     {
                         int length = fieldNames.Where(x => x == info.Name).Count() - 1;
 
@@ -146,7 +147,7 @@ public static class CsvUtility
         {
             object obj = Activator.CreateInstance(type);
 
-            foreach (FieldInfo info in CsvUtility.GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
                 if (InfoIsCustomClass(info)) // 커스텀은 내부에서 재귀 돌림
                     SetCustomValue(cells, current, obj, info);
@@ -157,7 +158,7 @@ public static class CsvUtility
 
             void SetCustomValue(string[] cells, string current, object obj, FieldInfo info)
             {
-                if (IsEnumerable(info.FieldType.ToString()))
+                if (TypeIdentifier.IsIEnumerable(info.FieldType))
                     SetCsutomIEnumerableValue(obj, GetArray(cells, current, info), info);
                 else
                     info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
@@ -166,7 +167,7 @@ public static class CsvUtility
                 Array GetArray(string[] cells, string current, FieldInfo info)
                 {
                     int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-                    Type elementType = IsList(info.FieldType.ToString()) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
+                    Type elementType = TypeIdentifier.IsList(info.FieldType) ? info.FieldType.GetGenericArguments()[0] : info.FieldType.GetElementType();
                     Array array = Array.CreateInstance(elementType, length);
 
                     for (int i = 0; i < length; i++)
@@ -176,7 +177,7 @@ public static class CsvUtility
 
                 void SetCsutomIEnumerableValue(object obj, Array array, FieldInfo info)
                 {
-                    if (IsList(info.FieldType.ToString()) == false)
+                    if (TypeIdentifier.IsList(info.FieldType) == false)
                         info.SetValue(obj, array);
                     else
                         info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { ArrayToIEnumerable(array) }));
@@ -201,7 +202,7 @@ public static class CsvUtility
         bool InfoIsCustomClass(FieldInfo info)
         {
             string identifier = "System.";
-            if (IsList(info.FieldType.ToString()))
+            if (TypeIdentifier.IsList(info.FieldType))
             {
                 if (info.FieldType.GetGenericArguments()[0] != null && info.FieldType.GetGenericArguments()[0].ToString().StartsWith(identifier) == false)
                     return true;
@@ -210,13 +211,11 @@ public static class CsvUtility
             if (info.FieldType.ToString().StartsWith(identifier)) return false;
             return true;
         }
-        bool IsEnumerable(string typeName) => typeName.Contains("[]") || typeName.Contains("List");
-        bool IsList(string typeName) => typeName.Contains("List");
     }
 
     class CsvSaver<T>
     {
-        public static string EnumerableToCsv<T>(IEnumerable<T> datas)
+        public static string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(string.Join(",", GetSerializedFields(datas.First()).Select(x => x.Name)));
@@ -238,13 +237,12 @@ public static class CsvUtility
             outStream.Close();
         }
 
-        public static void SaveCsv<T>(IEnumerable<T> enumerable, string filePath)
+        public static void SaveCsv(IEnumerable<T> enumerable, string filePath)
         {
             Stream fileStream = new FileStream($"{filePath}.csv", FileMode.Create, FileAccess.Write);
             StreamWriter outStream = new StreamWriter(fileStream, Encoding.UTF8);
-            outStream.Write(EnumerableToCsv<T>(enumerable));
+            outStream.Write(EnumerableToCsv(enumerable));
             outStream.Close();
         }
-
     }
 }

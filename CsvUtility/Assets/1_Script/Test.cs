@@ -49,6 +49,7 @@ public class MasterTest
     [SerializeField] Dictionary<float, bool> actualNumberByBoolean = new Dictionary<float, bool>();
 
     [SerializeField] HasTestClass hasClass;
+    [SerializeField] HasTestClass[] hasClassArray;
 
     public bool IsSuccess()
     {
@@ -62,7 +63,7 @@ public class MasterTest
             && CheckDictionarySame(numberByText, new KeyValuePair<int, string>(12432, "아 루즈 마이셀프"))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
-            && HasClassIsSame();
+            && HasClassIsSame(hasClass);
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -112,7 +113,16 @@ public class MasterTest
         return true;
     }
 
-    bool HasClassIsSame() => 777 == hasClass.aaa && "안녕하세요." == hasClass.AAA;
+    bool HasClassIsSame(HasTestClass testClass) => 777 == testClass.aaa && "안녕하세요." == testClass.AAA;
+    bool HasClassEnumerableIsSame(IEnumerable<HasTestClass> hasClass)
+    {
+        foreach (HasTestClass item in hasClass)
+        {
+            if (HasClassIsSame(item) == false)
+                return false;
+        }
+        return true;
+    }
 }
 
 [Serializable]

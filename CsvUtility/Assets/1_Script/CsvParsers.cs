@@ -30,16 +30,13 @@ public abstract class CsvParsers
 {
     public static CsvParser GetParser(FieldInfo info)
     {
-        if (IsEnumerable(info.FieldType))
+        if (TypeIdentifier.IsIEnumerable(info.FieldType))
             return new EnumerableTypeParser(info);
         else if (IsPair(info.FieldType.Name))
             return new CsvPairParser();
         else
             return new PrimitiveTypeParser();
 
-        bool IsEnumerable(Type type) 
-            => type.IsArray || 
-            ( type.IsGenericType && ( type.GetGenericTypeDefinition() == typeof(List<>) || type.GetGenericTypeDefinition() == typeof(Dictionary<,>) ) );
         bool IsPair(string typeName) => typeName == "KeyValuePair`2";
     }
 }
@@ -71,8 +68,8 @@ class EnumerableTypeParser : CsvParser
         EnumerableType GetEnumableType(Type type)
         {
             if (type.IsArray) return EnumerableType.Array;
-            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) return EnumerableType.List;
-            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) return EnumerableType.Dictionary;
+            else if (TypeIdentifier.IsList(type)) return EnumerableType.List;
+            else if (TypeIdentifier.IsDictionary(type)) return EnumerableType.Dictionary;
             return EnumerableType.Unknown;
         }
     }
