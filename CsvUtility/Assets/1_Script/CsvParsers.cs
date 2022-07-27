@@ -13,6 +13,11 @@ enum EnumerableType
     Dictionary,
 }
 
+public interface ICsvIEnumeralbeParser
+{
+    string[] GetCsvValues(object obj, FieldInfo info);
+}
+
 public interface CsvPrimitiveTypeParser
 {
     object GetParserValue(string value);
@@ -31,7 +36,7 @@ public abstract class CsvParsers
     public static CsvParser GetParser(FieldInfo info)
     {
         if (TypeIdentifier.IsIEnumerable(info.FieldType))
-            return new EnumerableTypeParser(info);
+            return new EnumerableTypeParser();
         else if (IsPair(info.FieldType.Name))
             return new CsvPairParser();
         else
@@ -60,29 +65,40 @@ class PrimitiveTypeParser : CsvParser
 
 class EnumerableTypeParser : CsvParser
 {
-    EnumerableType _type;
-    public EnumerableTypeParser(FieldInfo info)
+    EnumerableType GetEnumableType(Type type)
     {
-        _type = GetEnumableType(info.FieldType);
-
-        EnumerableType GetEnumableType(Type type)
-        {
-            if (type.IsArray) return EnumerableType.Array;
-            else if (TypeIdentifier.IsList(type)) return EnumerableType.List;
-            else if (TypeIdentifier.IsDictionary(type)) return EnumerableType.Dictionary;
-            return EnumerableType.Unknown;
-        }
+        if (type.IsArray) return EnumerableType.Array;
+        else if (TypeIdentifier.IsList(type)) return EnumerableType.List;
+        else if (TypeIdentifier.IsDictionary(type)) return EnumerableType.Dictionary;
+        return EnumerableType.Unknown;
     }
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
         values = values.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-        switch (_type)
+        switch (GetEnumableType(info.FieldType))
         {
             case EnumerableType.Array: new CsvArrayParser().SetValue(obj, info, values); break;
             case EnumerableType.List: new CsvListParser().SetValue(obj, info, values); break;
             case EnumerableType.Dictionary: new CsvDictionaryParser().SetValue(obj, info, values); break;
         }    
+    }
+
+    public ICsvIEnumeralbeParser GetIEnumerableParser(Type type)
+    {
+        if (type.IsArray) return new CsvArrayParser();
+        else if (TypeIdentifier.IsList(type)) return new CsvListParser();
+        else if (TypeIdentifier.IsDictionary(type)) return new CsvDictionaryParser();
+        return null;
+    }
+
+    public string[] GetIEnumerableValues(object obj, FieldInfo info)
+    {
+        ICsvIEnumeralbeParser parser = GetIEnumerableParser(info.FieldType);
+        if (parser != null)
+            return parser.GetCsvValues(obj, info);
+        else
+            return null;
     }
 }
 
@@ -131,7 +147,7 @@ class CsvBooleanParser : CsvPrimitiveTypeParser
 
 
 #region 열거형 파싱
-public class CsvListParser
+public class CsvListParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
@@ -139,9 +155,17 @@ public class CsvListParser
         ConstructorInfo constructor = info.FieldType.GetConstructors()[2];
         info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserEnumerable(values) }));
     }
+
+    public string[] GetCsvValues(object obj, FieldInfo info)
+    {
+        IList list = info.GetValue(obj) as IList;
+        List<string> result = new List<string>();
+        foreach (var item in list) result.Add(item.ToString());
+        return result.ToArray();
+    }
 }
 
-public class CsvArrayParser
+public class CsvArrayParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
@@ -151,9 +175,18 @@ public class CsvArrayParser
             array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[i]), i);
         info.SetValue(obj, array);
     }
+
+    public string[] GetCsvValues(object obj, FieldInfo info)
+    {
+        Array array = info.GetValue(obj) as Array;
+        List<string> result = new List<string>();
+        foreach (var item in array) result.Add(item.ToString());
+        return result.ToArray();
+        throw new NotImplementedException();
+    }
 }
 
-public class CsvDictionaryParser
+public class CsvDictionaryParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
@@ -166,6 +199,25 @@ public class CsvDictionaryParser
             methodInfo.Invoke(info.GetValue(obj), new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[i]),
                                                                  PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[i+1]) });
         }
+    }
+
+    public string[] GetCsvValues(object obj, FieldInfo info)
+    {
+        IDictionary dictionary = info.GetValue(obj) as IDictionary;
+        List<string> keys = new List<string>();
+        List<string> values = new List<string>();
+
+        foreach (var item in dictionary.Keys) keys.Add(item.ToString());
+        foreach (var item in dictionary.Values) values.Add(item.ToString());
+
+        List<string> result = new List<string>();
+        for (int i = 0; i < keys.Count; i++)
+        {
+            result.Add(keys[i]);
+            result.Add(values[i]);
+        }
+        
+        return result.ToArray();
     }
 }
 #endregion 열거형 파싱 End

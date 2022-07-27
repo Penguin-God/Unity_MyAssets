@@ -15,6 +15,8 @@ public static class CsvUtility
     public static List<T> CsvToList<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToList();
     public static T[] CsvToArray<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToArray();
 
+    public static string EnumerableToCsv<T>(IEnumerable<T> datas) => new CsvSaver<T>().EnumerableToCsv(datas);
+    public static void EnumerableSaveByCsvFile<T>(IEnumerable<T> datas, string path) => new CsvSaver<T>().Save(datas, path);
 
     static string SubLastLine(string text) => text.Substring(0, text.Length - 1);
     static IEnumerable<FieldInfo> GetSerializedFields(object obj) => GetSerializedFields(obj.GetType());
@@ -215,31 +217,38 @@ public static class CsvUtility
 
     class CsvSaver<T>
     {
-        public static string EnumerableToCsv(IEnumerable<T> datas)
+        public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Join(",", GetSerializedFields(datas.First()).Select(x => x.Name)));
+            stringBuilder.AppendLine(string.Join(",", GetSerializedFields(typeof(T)).Select(x => x.Name)));
 
             foreach (var data in datas)
             {
-                IEnumerable<string> values = GetSerializedFields(data).Select(x => x.GetValue(data).ToString());
+                IEnumerable<string> values = GetValues(data);
                 stringBuilder.AppendLine(string.Join(",", values));
             }
 
             return SubLastLine(stringBuilder.ToString());
         }
 
-        public static void SaveCsv(string text, string filePath)
+        IEnumerable<string> GetValues(T data)
         {
-            Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-            StreamWriter outStream = new StreamWriter(fileStream, Encoding.UTF8);
-            outStream.Write(text);
-            outStream.Close();
+            List<string> result = new List<string>();
+            foreach (FieldInfo info in GetSerializedFields(data))
+            {
+                if(info.FieldType.IsPrimitive || info.FieldType == typeof(string))
+                    result.Add(info.GetValue(data).ToString());
+                else if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                {
+                    result = result.Concat(new EnumerableTypeParser().GetIEnumerableValues(data, info)).ToList();
+                }
+            }
+            return result;
         }
 
-        public static void SaveCsv(IEnumerable<T> enumerable, string filePath)
+        public void Save(IEnumerable<T> enumerable, string filePath)
         {
-            Stream fileStream = new FileStream($"{filePath}.csv", FileMode.Create, FileAccess.Write);
+            Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             StreamWriter outStream = new StreamWriter(fileStream, Encoding.UTF8);
             outStream.Write(EnumerableToCsv(enumerable));
             outStream.Close();

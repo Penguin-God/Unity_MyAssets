@@ -132,7 +132,16 @@ public class SaveTestCalss
     [SerializeField] public string AAA = "æ»≥Á ººªÛ";
     [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
-    public Dictionary<float, bool> test3 = new Dictionary<float, bool>();
+    public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
+}
+
+[Serializable]
+public class SaveTestCalssTest
+{
+    [SerializeField] public int aaa = 123;
+    [SerializeField] string hello = "HelloWorld";
+    [SerializeField] bool FF = false;
+    [SerializeField] float aaaaa = 2.2222f;
 }
 
 public class Test : MonoBehaviour
@@ -151,13 +160,24 @@ public class Test : MonoBehaviour
     [SerializeField] List<TestClass> testClassList = new List<TestClass>();
     [SerializeField] TextAsset testCsv;
     [SerializeField] SaveTestCalss saveTest;
-
-    [ContextMenu("Test")]
-    void Testss()
+    [SerializeField] SaveTestCalss[] saveTests;
+    [SerializeField] SaveTestCalssTest[] saveArrays;
+    [ContextMenu("Save Test")]
+    void SaveTest()
     {
-        saveTest.test3.Add(11.22f, false);
-        saveTest.test3.Add(331.2555f, false);
-        saveTest.test3.Add(11123.22f, false);
+        foreach (var item in saveTests)
+        {
+            item.test3.Add("µÒº≈≥ ∏Æ true¿‘¥œ¥Á", true);
+            item.test3.Add("µÒº≈≥ ∏Æ false¿‘¥œ¥Á", false);
+        }
+        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv");
+
+
+        return;
+
+        //saveTest.test3.Add(11.22f, false);
+        //saveTest.test3.Add(331.2555f, false);
+        //saveTest.test3.Add(11123.22f, false);
         foreach (var info in saveTest.GetType().GetFields())
         {
             if (info.FieldType.IsArray)
@@ -178,19 +198,24 @@ public class Test : MonoBehaviour
                 }
             }
 
-            if(info.FieldType.IsGenericType && info.FieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                print(saveTest.test3.Count);
-                IDictionary array = info.GetValue(saveTest) as IDictionary;
-                foreach (var item in array.Keys)
-                {
-                    print(item);
-                }
-                foreach (var item in array.Values)
-                {
-                    print(item);
-                }
-            }
+            //if(info.FieldType.IsGenericType && info.FieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            //{
+            //    print(saveTest.test3.Count);
+            //    IDictionary array = info.GetValue(saveTest) as IDictionary;
+            //    foreach (var item in array.Keys)
+            //    {
+            //        print(item);
+            //    }
+            //    foreach (var item in array.Values)
+            //    {
+            //        print(item);
+            //    }
+
+            //    foreach (var item in array)
+            //    {
+            //        print(item);
+            //    }
+            //}
             print(info.GetValue(saveTest));
         }
     }
