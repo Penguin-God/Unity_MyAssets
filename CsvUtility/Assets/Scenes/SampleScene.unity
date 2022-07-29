@@ -274,14 +274,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -306,14 +306,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -338,14 +338,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -370,14 +370,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -402,14 +402,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -434,14 +434,14 @@ MonoBehaviour:
       aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     hasClassArray:
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - aaa: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
+    - aaa: 0
+      AAA: 
   asset: {fileID: 4900000, guid: 33380155e49e9984a8033ba8f0580e9a, type: 3}
   testClassList:
   - TT: 22

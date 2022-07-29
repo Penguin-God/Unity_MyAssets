@@ -160,7 +160,8 @@ public class Test : MonoBehaviour
     [ContextMenu("Master Test")]
     void MasterTest()
     {
-        masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text).ToArray();
+        // masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
+        masterTests = CsvUtility.TestGet<MasterTest>(asset.text).ToArray();
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
     }
@@ -173,7 +174,7 @@ public class Test : MonoBehaviour
     [ContextMenu("Save Test")]
     void SaveTest()
     {
-
+        print(testClassList.GetType().ToString());
         foreach (var item in saveTests)
         {
             item.test3.Clear();
@@ -228,5 +229,13 @@ public class Test : MonoBehaviour
             //}
             print(info.GetValue(saveTest));
         }
+    }
+
+    [ContextMenu("Test")]
+    void __Test()
+    {
+        int[] intarr = new int[] { 1, 2, 3, 4, 5, 213, 6, 2 };
+        int indexof = Array.IndexOf(intarr, 2, 2);
+        print(indexof);
     }
 }
