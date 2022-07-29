@@ -63,7 +63,7 @@ public class MasterTest
             && CheckDictionarySame(numberByText, new KeyValuePair<int, string>(12432, "아 루즈 마이셀프"))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
-            && HasClassIsSame(hasClass);
+            && HasClassIsSame(hasClass) && HasClassEnumerableIsSame(hasClassArray);
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -71,8 +71,8 @@ public class MasterTest
     {
         if (parsingValue.CompareTo(value) != 0)
         {
-            Debug.LogError("서로 달라요!!!!!!!!!");
-            Debug.Log($"{parsingValue} : {value}");
+            // Debug.LogError("서로 달라요!!!!!!!!!");
+            Debug.LogError($"서로 달라요!!!!!!!!! \n 파싱한 값 : {parsingValue} :  정답 : {value}");
             return false;
         }
 
@@ -85,7 +85,7 @@ public class MasterTest
 
         for (int i = 0; i < parsingValue.Length; i++)
         {
-            if (parsingValue[i].CompareTo(value[i]) != 0)
+            if (CheckSame(parsingValue[i], value[i]) == false)
                 return false;
         }
 
@@ -98,7 +98,7 @@ public class MasterTest
 
         for (int i = 0; i < parsingValue.Count; i++)
         {
-            if (parsingValue[i].CompareTo(value[i]) != 0)
+            if (CheckSame(parsingValue[i], value[i]) == false)
                 return false;
         }
 
@@ -107,13 +107,17 @@ public class MasterTest
     
     bool CheckDictionarySame<T, T2>(Dictionary<T, T2> parsingValue, KeyValuePair<T, T2> value) where T : IComparable where T2 : IComparable
     {
-        if (parsingValue.TryGetValue(value.Key, out T2 t2) == false) return false;
-        if (t2.CompareTo(value.Value) != 0) return false;
+        if (parsingValue.TryGetValue(value.Key, out T2 t2) == false)
+        {
+            Debug.LogError($"딕셔너리에 {value.Key} 라는 키가 있어야 되는데 없어요!!!");
+            return false;
+        }
+        if (CheckSame(t2, value.Value) == false) return false;
 
         return true;
     }
 
-    bool HasClassIsSame(HasTestClass testClass) => 777 == testClass.aaa && "안녕하세요." == testClass.AAA;
+    bool HasClassIsSame(HasTestClass testClass) => CheckSame(testClass.aaa, 777) && CheckSame(testClass.AAA, "안녕하세요.");
     bool HasClassEnumerableIsSame(IEnumerable<HasTestClass> hasClass)
     {
         foreach (HasTestClass item in hasClass)
