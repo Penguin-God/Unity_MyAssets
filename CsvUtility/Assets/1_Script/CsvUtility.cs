@@ -49,12 +49,9 @@ public static class CsvUtility
     {
         const char comma = ',';
         const char lineBreak = '\n';
-        const char arraw = '>';
 
         string _csv;
         string[] fieldNames;
-        Dictionary<string, List<int>> indexsByKey = new Dictionary<string, List<int>>();
-        //Dictionary<string, int> countByKey = new Dictionary<string, int>();
 
         string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
@@ -71,83 +68,14 @@ public static class CsvUtility
         {
             _csv = csv.Substring(0, csv.Length - 1); ;
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
-
-            indexsByKey.Clear();
-            SetIndexsByKey(typeof(T));
-            CheckFieldNames(typeof(T), fieldNames);
-
-            // new code
-            //countByKey.Clear();
-            //countByKey = GetCountByFieldName();
-
-            //foreach (var item in countByKey)
-            //{
-            //    Debug.Log($"{item.Key} : {item.Value}");
-            //}
-
-            int SetIndexsByKey(Type type, string currentKey = "", int currentIndex = 0)
-            {
-                foreach (FieldInfo info in GetSerializedFields(type))
-                {
-                    if (TypeIdentifier.IsCustom(info.FieldType)) // 커스텀 클래스 or 구조체면 SetCustom() 내부에서 재귀 돌림
-                        currentIndex = SetCustom(currentKey, currentIndex, info);
-                    else
-                        currentIndex = AddIndexs(info.Name, currentIndex);
-                }
-                return currentIndex;
-
-                int AddIndexs(string name, int currentIndex)
-                {
-                    indexsByKey.Add(currentKey + name, GetIndexs(ref currentIndex));
-                    currentIndex++;
-                    return currentIndex;
-
-                    List<int> GetIndexs(ref int currentIndex) // 자기 이름 있는 index들 list로 묶어서 return
-                    {
-                        List<int> indexs = new List<int>();
-                        while (true)
-                        {
-                            indexs.Add(currentIndex);
-                            if (currentIndex + 1 >= fieldNames.Length || fieldNames[currentIndex] != fieldNames[currentIndex + 1]) break;
-                            currentIndex++;
-                        }
-                        return indexs;
-                    }
-                }
-
-                int SetCustom(string currentKey, int currentIndex, FieldInfo info)
-                {
-                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                    {
-                        int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-
-                        for (int i = 0; i < length; i++)
-                            currentIndex = SetCustom(GetElementType(info.FieldType), $"{currentKey}{info.Name}{arraw}{i}", currentIndex);
-                    }
-                    else
-                        currentIndex = SetCustom(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
-
-                    currentIndex++;
-                    return currentIndex;
-
-                    int SetCustom(Type type, string key, int currentIndex)
-                    {
-                        currentIndex++;
-                        currentIndex = SetIndexsByKey(type, key, currentIndex);
-                        return currentIndex;
-                    }
-                }
-            }
+            // CheckFieldNames(typeof(T), fieldNames);
         }
 
         Dictionary<string, int> GetCountByFieldName(Type type, string[] fieldNames)
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
             foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
-            {
                 result.Add(info.Name, GetCount(info));
-                //Debug.Log(info.Name);
-            }
             return result;
 
             int GetCount(FieldInfo info)
@@ -172,34 +100,75 @@ public static class CsvUtility
                 {
                     if (TypeIdentifier.IsCustom(info.FieldType))
                     {
-                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                        {
-                            cellIndex++;
-                            cellIndex = SetArray(obj, info, cellIndex);
-                        }
-                        else
-                        {
-                            object customObj = Activator.CreateInstance(info.FieldType);
-                            cellIndex++;
-                            cellIndex = SetInfoValue(customObj, info.FieldType, GetCustomCells(info, cellIndex), cellIndex);
-                            info.SetValue(obj, customObj);
-                            cellIndex++;
-                        }
+                        //cellIndex++;
+                        info.SetValue(obj, GetCustomValue(info, ref cellIndex));
+
+                        //if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        //{   
+                        //    cellIndex = SetArray(obj, info, cellIndex);
+                        //}
+                        //else
+                        //{
+                            
+                        //    info.SetValue(obj, GetSingleCustomValue(info, ref cellIndex));
+                        //    //object customObj = Activator.CreateInstance(info.FieldType);
+                        //    //cellIndex = SetInfoValue(customObj, info.FieldType, GetCustomCells(info, cellIndex), cellIndex);
+                        //    //info.SetValue(obj, customObj);
+                        //    //cellIndex++;
+                        //}
                     }
                     else
                     {
-                        //Debug.Log(info.Name + " : " + countByKey[info.Name]);
                         CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(countByKey[info.Name], cells, cellIndex));
                         cellIndex += countByKey[info.Name];
                     }
                 }
                 return cellIndex;
+
+
+                object GetCustomValue(FieldInfo info, ref int cellIndex)
+                {
+                    cellIndex++;
+                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        return GetArray(obj, info, ref cellIndex);
+                    else
+                        return GetSingleCustomValue(info, ref cellIndex);
+                }
+            }
+
+
+            object GetSingleCustomValue(FieldInfo info, ref int cellIndex)
+            {
+                object customValue = Activator.CreateInstance(GetCoustomType(info.FieldType));
+                cellIndex = SetInfoValue(customValue, GetCoustomType(info.FieldType), GetCustomCells(info, cellIndex), cellIndex);
+                cellIndex++;
+                return customValue;
             }
 
             string[] GetCustomCells(FieldInfo info, int index)
             {
-                int lastIndex = Array.IndexOf(fieldNames.Skip(index).ToArray(), info.Name);
-                return fieldNames.Skip(index).Take(lastIndex+1).ToArray();
+                int indexof = Array.IndexOf(fieldNames.Skip(index).ToArray(), info.Name);
+                //Debug.Log(fieldNames.Skip(index).Take(indexof).ToArray().Length);
+                return fieldNames.Skip(index).Take(indexof).ToArray();
+            }
+
+            Array GetArray(object obj, FieldInfo info, ref int currentIndex)
+            {
+                int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+                Type elementType = GetElementType(info.FieldType);
+
+                Array array = Array.CreateInstance(elementType, length);
+                for (int i = 0; i < length; i++)
+                {
+                    //object value = Activator.CreateInstance(elementType);
+                    //currentIndex = SetInfoValue(value, elementType, GetCustomCells(info, currentIndex), currentIndex);
+                    array.SetValue(GetSingleCustomValue(info, ref currentIndex), i);
+                    //currentIndex++;
+
+                }
+
+                info.SetValue(obj, GetIEnumerableValue(info.FieldType, array));
+                return array;
             }
 
             int SetArray(object obj, FieldInfo info, int currentIndex)
@@ -210,62 +179,17 @@ public static class CsvUtility
                 Array array = Array.CreateInstance(elementType, length);
                 for (int i = 0; i < length; i++)
                 {
-                    object value = Activator.CreateInstance(elementType);
-                    currentIndex = SetInfoValue(value, elementType, GetCustomCells(info, currentIndex), currentIndex);
-                    array.SetValue(value, i);
-                    currentIndex++;
+                    //object value = Activator.CreateInstance(elementType);
+                    //currentIndex = SetInfoValue(value, elementType, GetCustomCells(info, currentIndex), currentIndex);
+                    array.SetValue(GetSingleCustomValue(info, ref currentIndex), i);
+                    //currentIndex++;
+
                 }
 
                 info.SetValue(obj, GetIEnumerableValue(info.FieldType, array));
                 return currentIndex;
             }
-
             object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
-        }
-
-        object GetInstance(Type type, string[] cells, string current = "")
-        {
-            object obj = Activator.CreateInstance(type);
-
-            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
-            {
-                if (TypeIdentifier.IsCustom(info.FieldType)) // 커스텀은 내부에서 재귀 돌림
-                    SetCustomValue(cells, current, obj, info);
-                else
-                    CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(current + info.Name, cells));
-            }
-            return obj;
-
-            void SetCustomValue(string[] cells, string current, object obj, FieldInfo info)
-            {
-                if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                    info.SetValue(obj, GetIEnumerableValue(info.FieldType, GetArray(cells, current, info)));
-                else
-                    info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
-
-                // 중첩 함수
-                Array GetArray(string[] cells, string current, FieldInfo info)
-                {
-                    int length = fieldNames.Where(x => x == info.Name).Count() - 1;
-                    Type elementType = GetElementType(info.FieldType);
-
-                    Array array = Array.CreateInstance(elementType, length);
-                    for (int i = 0; i < length; i++)
-                        array.SetValue(GetInstance(elementType, cells, $"{current}{info.Name}{arraw}{i}"), i);
-
-                    return array;
-                }
-
-                object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
-            }
-        }
-
-        string[] GetFieldValues(string key, string[] cells)
-        {
-            if (indexsByKey.ContainsKey(key))
-                return indexsByKey[key].Select(x => cells[x]).ToArray();
-            else
-                return new string[] { "" };
         }
 
         string[] GetFieldValues(int count, string[] cells, int currentIndex)
