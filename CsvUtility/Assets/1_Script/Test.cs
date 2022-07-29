@@ -161,7 +161,7 @@ public class Test : MonoBehaviour
     void MasterTest()
     {
         // masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
-        masterTests = CsvUtility.TestGet<MasterTest>(asset.text).ToArray();
+        masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
     }
@@ -183,52 +183,7 @@ public class Test : MonoBehaviour
         }
         CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv");
 
-
         return;
-
-        //saveTest.test3.Add(11.22f, false);
-        //saveTest.test3.Add(331.2555f, false);
-        //saveTest.test3.Add(11123.22f, false);
-        foreach (var info in saveTest.GetType().GetFields())
-        {
-            if (info.FieldType.IsArray)
-            {
-                Array array = info.GetValue(saveTest) as Array;
-                foreach (var item in array)
-                {
-                    print(item);
-                }
-            }
-
-            if (info.FieldType.IsGenericType && (info.FieldType.GetGenericTypeDefinition() == typeof(List<>)))
-            {
-                IList array = info.GetValue(saveTest) as IList;
-                foreach (var item in array)
-                {
-                    print(item);
-                }
-            }
-
-            //if(info.FieldType.IsGenericType && info.FieldType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            //{
-            //    print(saveTest.test3.Count);
-            //    IDictionary array = info.GetValue(saveTest) as IDictionary;
-            //    foreach (var item in array.Keys)
-            //    {
-            //        print(item);
-            //    }
-            //    foreach (var item in array.Values)
-            //    {
-            //        print(item);
-            //    }
-
-            //    foreach (var item in array)
-            //    {
-            //        print(item);
-            //    }
-            //}
-            print(info.GetValue(saveTest));
-        }
     }
 
     [ContextMenu("Test")]
