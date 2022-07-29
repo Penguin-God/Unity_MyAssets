@@ -312,7 +312,9 @@ MonoBehaviour:
     - 22
     - fasdasd
     test2: 01000000170000007b000000
-    hasClassArray: []
+    hasClass:
+      aaa: 0
+      AAA: 
     a: 0
   saveTests:
   - aaab: 123
@@ -322,22 +324,18 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClassArray:
-    - aaa: 0
-      AAA: "\uD074\uB798\uC2A4"
+    hasClass:
+      aaa: 222
+      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
     a: 99999
   - aaab: 123
     AAAb: "\uC548\uB155 \uC138\uC0C1"
     test1:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClassArray:
-    - aaa: 1
-      AAA: "\uD074\uB798\uC2A4"
-    - aaa: 1
-      AAA: "\uD074\uB798\uC2A4"
-    - aaa: 1
-      AAA: "\uD074\uB798\uC2A4"
+    hasClass:
+      aaa: 222
+      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
     a: 99999
   - aaab: 123
     AAAb: "\uC548\uB155 \uC138\uC0C1"
@@ -348,11 +346,9 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClassArray:
-    - aaa: 3
-      AAA: "\uD074\uB798\uC2A4"
-    - aaa: 3
-      AAA: "\uD074\uB798\uC2A4"
+    hasClass:
+      aaa: 222
+      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
     a: 99999
   saveArrays:
   - aaa: 123123
