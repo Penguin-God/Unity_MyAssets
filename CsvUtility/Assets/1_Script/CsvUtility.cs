@@ -62,29 +62,6 @@ public static class CsvUtility
 
             for (int i = 0; i < filedNames.Length; i++)
                 Debug.Assert(realFieldNames.Contains(filedNames[i]), $"변수명과 일치하지 않는 {i + 1}번째 컬럼명 : {filedNames[i]}");
-
-            List<string> GetInfoNames(Type type)
-            {
-                List<string> restul = new List<string>();
-                foreach (FieldInfo info in CsvUtility.GetSerializedFields(type))
-                {
-                    restul.Add(info.Name);
-
-                    if (InfoIsCustomClass(info))
-                    {
-                        // restul = GetConcatList(restul, GetInfoNames(GetCoustomType(info.FieldType)));
-
-                        //if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                        //{
-                        //    Type elementType = GetElementType(info.FieldType);
-                        //    restul = restul.Concat(GetInfoNames(elementType)).ToList();
-                        //}
-                        //else
-                        //    restul = restul.Concat(GetInfoNames(info.FieldType)).ToList();
-                    }
-                }
-                return restul;
-            }
         }
 
         public CsvLoder(string csv)
@@ -133,18 +110,10 @@ public static class CsvUtility
                         int length = fieldNames.Where(x => x == info.Name).Count() - 1;
 
                         for (int i = 0; i < length; i++)
-                        {
                             currentIndex = SetCustom(GetElementType(info.FieldType), $"{currentKey}{info.Name}{arraw}{i}", currentIndex);
-                            //currentIndex++;
-                            //currentIndex = SetCustomIEnumeralbe(info.Name, $"{currentKey}{info.Name}{arraw}{i}", currentIndex);
-                        }
                     }
                     else
-                    {
-                        //currentIndex++;
-                        //currentIndex = SetIndexsByKey(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
                         currentIndex = SetCustom(info.FieldType, $"{currentKey}{info.Name}{arraw}", currentIndex);
-                    }
 
                     currentIndex++;
                     return currentIndex;
@@ -153,13 +122,6 @@ public static class CsvUtility
                     {
                         currentIndex++;
                         currentIndex = SetIndexsByKey(type, key, currentIndex);
-                        return currentIndex;
-                    }
-
-                    int SetCustomIEnumeralbe(string name, string key, int currentIndex)
-                    {
-                        while (name != fieldNames[currentIndex])
-                            currentIndex = AddIndexs(key + fieldNames[currentIndex], currentIndex);
                         return currentIndex;
                     }
                 }
@@ -184,10 +146,7 @@ public static class CsvUtility
             void SetCustomValue(string[] cells, string current, object obj, FieldInfo info)
             {
                 if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                {
-                    // SetCsutomIEnumerableValue(obj, GetArray(cells, current, info), info);
                     info.SetValue(obj, GetIEnumerableValue(info.FieldType, GetArray(cells, current, info)));
-                }
                 else
                     info.SetValue(obj, GetInstance(info.FieldType, cells, $"{current}{info.Name}{arraw}"));
 
@@ -205,21 +164,6 @@ public static class CsvUtility
                 }
 
                 object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
-
-                void SetCsutomIEnumerableValue(object obj, Array array, FieldInfo info)
-                {
-                    if (info.FieldType.IsArray)
-                        info.SetValue(obj, array);
-                    else // 리스트
-                        info.SetValue(obj, info.FieldType.GetConstructors()[2].Invoke(new object[] { array }));
-
-                    IEnumerable ArrayToIEnumerable(Array array)
-                    {
-                        IEnumerable vs;
-                        vs = array;
-                        return vs;
-                    }
-                }
             }
         }
 
@@ -291,7 +235,6 @@ public static class CsvUtility
 
         Dictionary<string, int> GetCountByName(IEnumerable<T> datas)
         {
-            // Dictionary<string, int> countByName = GetFieldNames(typeof(T)).ToDictionary(x => x, x => 0);
             Dictionary<string, int> countByName = GetSerializedFieldNames(typeof(T)).ToDictionary(x => x, x => 0);
 
             foreach (T data in datas)
@@ -300,38 +243,6 @@ public static class CsvUtility
             }
 
             return countByName;
-
-            IEnumerable<string> GetFieldNames(Type type)
-            {
-                List<string> result = new List<string>();
-                foreach (FieldInfo info in GetSerializedFields(type))
-                {
-                    result.Add(info.Name);
-                    if (TypeIdentifier.IsCustom(info.FieldType))
-                    {
-                        // result = GetConcatList(result, GetFieldNames(GetCoustomType(info.FieldType))); 
-                        // result.Concat().ToList();
-                        // Type customType = TypeIdentifier.IsIEnumerable(info.FieldType) ? GetElementType(info.FieldType) : info.FieldType;
-                        //result.Add(info.Name);
-                        
-
-                        //if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                        //{
-                        //    result.Add(info.Name);
-                        //    Type elementType = GetElementType(info.FieldType);
-                        //    result = result.Concat(GetFieldNames(elementType)).ToList();
-                        //}
-                        //else
-                        //{
-                        //    result.Add(info.Name);
-                        //    result = result.Concat(GetFieldNames(info.FieldType)).ToList();
-                        //}
-                    }
-                    //else
-                    //    result.Add(info.Name);
-                }
-                return result;
-            }
 
             void SetDict(Dictionary<string, int> countByName, object data)
             {
@@ -371,7 +282,6 @@ public static class CsvUtility
                     result.Add("");
                     if (TypeIdentifier.IsIEnumerable(info.FieldType))
                     {
-                        // result = result.Concat(GetValues(item, countByName)).ToList();
                         foreach (var item in info.GetValue(data) as IEnumerable)
                         {
                             result = GetConcatList(result, GetValues(item, countByName));
@@ -380,7 +290,6 @@ public static class CsvUtility
                     }
                     else
                     {
-                        // result = result.Concat(GetValues(info.GetValue(data), countByName)).ToList();
                         result = GetConcatList(result, GetValues(info.GetValue(data), countByName));
                         AddBlank(1);
                     }
@@ -392,10 +301,6 @@ public static class CsvUtility
                     IEnumerable<string> values = new EnumerableTypeParser().GetIEnumerableValues(data, info);
                     result = GetConcatList(result, values);
                     AddBlank(countByName[info.Name] - values.Count());
-
-                    // result = result.Concat(new EnumerableTypeParser().GetIEnumerableValues(data, info)).ToList();
-                    //for (int i = 0; i < countByName[info.Name] - new EnumerableTypeParser().GetIEnumerableValues(data, info).Count(); i++)
-                    //    result.Add("");
                 }
 
                 void AddBlank(int blankCount)
