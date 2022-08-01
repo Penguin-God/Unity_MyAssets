@@ -66,7 +66,7 @@ public static class CsvUtility
         {
             _csv = csv.Substring(0, csv.Length - 1); ;
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
-            // CheckFieldNames(typeof(T), fieldNames);
+            CheckFieldNames(typeof(T), fieldNames);
         }
 
         Dictionary<string, int> GetCountByFieldName(Type type, string[] fieldNames)
@@ -157,6 +157,9 @@ public static class CsvUtility
 
     class CsvSaver<T>
     {
+        // 클래스 하나당 딕셔너리 하나 매칭
+        // 클래스 배열을 한 요소당 딕셔너리 하나 매칭
+
         public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -179,13 +182,17 @@ public static class CsvUtility
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
                 {
+                    result.Add(info.Name);
                     if (TypeIdentifier.IsIEnumerable(info.FieldType))
                     {
-                        
+                        for (int i = 0; i < countByName[info.Name]; i++)
+                        {
+                            result = result.Concat(GetFirstRow(GetElementType(info.FieldType), countByName)).ToList();
+                            result.Add(info.Name);
+                        }
                     }
                     else
                     {
-                        result.Add(info.Name);
                         result = result.Concat(GetFirstRow(info.FieldType, countByName)).ToList();
                         result.Add(info.Name);
                     }
@@ -206,6 +213,11 @@ public static class CsvUtility
             foreach (T data in datas)
             {
                 SetDict(countByName, data);
+
+                foreach (var item in countByName)
+                {
+                    Debug.Log($"{item.Key} : {item.Value}");
+                }
             }
 
             return countByName;
@@ -224,7 +236,7 @@ public static class CsvUtility
                                 SetDict(countByName, item);
                                 count++;
                             }
-                            Debug.Log(count);
+                            
                             if (count > countByName[info.Name])
                                 countByName[info.Name] = count;
                         }

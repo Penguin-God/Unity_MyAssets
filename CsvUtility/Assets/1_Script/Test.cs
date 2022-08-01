@@ -137,9 +137,9 @@ public class SaveTestCalss
     [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
     public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
-    [SerializeField] HasTestClass hasClass;
+    //[SerializeField] HasTestClass hasClass;
     
-    // [SerializeField] HasTestClass[] hasClassArray;
+    [SerializeField] HasTestClass[] hasClassArray;
     [SerializeField] int a;
 }
 
@@ -174,7 +174,6 @@ public class Test : MonoBehaviour
     [ContextMenu("Save Test")]
     void SaveTest()
     {
-        print(testClassList.GetType().ToString());
         foreach (var item in saveTests)
         {
             item.test3.Clear();

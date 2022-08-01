@@ -249,7 +249,199 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de255b65784c0043a108ad4694162a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  masterTests: []
+  masterTests:
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - aaa: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
   asset: {fileID: 4900000, guid: 33380155e49e9984a8033ba8f0580e9a, type: 3}
   testClassList:
   - TT: 22
@@ -312,9 +504,7 @@ MonoBehaviour:
     - 22
     - fasdasd
     test2: 01000000170000007b000000
-    hasClass:
-      aaa: 0
-      AAA: 
+    hasClassArray: []
     a: 0
   saveTests:
   - aaab: 123
@@ -324,18 +514,22 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClass:
-      aaa: 222
-      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
+    hasClassArray:
+    - aaa: 777
+      AAA: ccc
+    - aaa: 777
+      AAA: ccc
     a: 99999
   - aaab: 123
     AAAb: "\uC548\uB155 \uC138\uC0C1"
     test1:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClass:
-      aaa: 222
-      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
+    hasClassArray:
+    - aaa: 777
+      AAA: ccc
+    - aaa: 777
+      AAA: ccc
     a: 99999
   - aaab: 123
     AAAb: "\uC548\uB155 \uC138\uC0C1"
@@ -346,9 +540,11 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
-    hasClass:
-      aaa: 222
-      AAA: "\uC548\uB155 \uB09C \uD074\uB798\uC2A4\uC57C"
+    hasClassArray:
+    - aaa: 777
+      AAA: ccc
+    - aaa: 777
+      AAA: ccc
     a: 99999
   saveArrays:
   - aaa: 123123

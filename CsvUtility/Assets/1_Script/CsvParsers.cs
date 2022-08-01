@@ -182,7 +182,6 @@ public class CsvArrayParser : ICsvIEnumeralbeParser
         List<string> result = new List<string>();
         foreach (var item in array) result.Add(item.ToString());
         return result.ToArray();
-        throw new NotImplementedException();
     }
 }
 
