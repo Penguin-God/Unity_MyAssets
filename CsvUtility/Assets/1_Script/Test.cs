@@ -186,11 +186,10 @@ public class Test : MonoBehaviour
         else print("Bad!!");
     }
 
-    [SerializeField] List<TestClass> testClassList = new List<TestClass>();
     [SerializeField] TextAsset testCsv;
-    [SerializeField] SaveTestCalss saveTest;
     [SerializeField] SaveTestCalss[] saveTests;
-    [SerializeField] SaveTestCalssTest[] saveArrays;
+    [SerializeField] string[] testStrSplit;
+
     [ContextMenu("Save Test")]
     void SaveTest()
     {
@@ -200,9 +199,47 @@ public class Test : MonoBehaviour
             item.test3.Add("딕셔너리 true입니당", true);
             item.test3.Add("딕셔너리 false입니당", false);
         }
-        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv");
+        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(2, 2, 2));
 
+        string temp = "배열입니당,배열입니당,배열입니당";
+        //print(3 / 2);
+        //print(3 / 2.0);
+        testStrSplit = SetString(temp, 2);
         return;
+    }
+
+    string[] SetString(string value, int count)
+    {
+        string[] result = new string[count];
+        value = value.Replace("\"", "");
+        string[] values = value.Split(',');
+
+        int length = values.Length;
+        //print(length);
+        int[] counts = new int[count];
+        while (length > 0)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                counts[i]++;
+                length--;
+                if (length <= 0) break;
+            }
+        }
+
+        int current = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+            string _value = "";
+            _value += "\"";
+            _value += string.Join(",", values.Skip(current).Take(counts[i]));
+            _value += "\"";
+            result[i] = _value;
+            current += counts[i];
+        }
+
+        return result;
     }
 
     [SerializeField] EnumClass enumClass;

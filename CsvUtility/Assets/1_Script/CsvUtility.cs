@@ -15,8 +15,16 @@ public static class CsvUtility
     public static List<T> CsvToList<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToList();
     public static T[] CsvToArray<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToArray();
 
-    public static string EnumerableToCsv<T>(IEnumerable<T> datas) => new CsvSaver<T>().EnumerableToCsv(datas);
-    public static void EnumerableSaveByCsvFile<T>(IEnumerable<T> datas, string path) => new CsvSaver<T>().Save(datas, path);
+    public static string EnumerableToCsv<T>(IEnumerable<T> datas, CsvSaveOption option = null) => GetSaver<T>(option).EnumerableToCsv(datas);
+    
+    public static void EnumerableSaveByCsvFile<T>(IEnumerable<T> datas, string path, CsvSaveOption option = null) => GetSaver<T>(option).Save(datas, path);
+
+    static CsvSaver<T> GetSaver<T>(CsvSaveOption option = null)
+    {
+        if (option == null)
+            option = new CsvSaveOption();
+        return new CsvSaver<T>(option);
+    }
 
     static string SubLastLine(string text) => text.Substring(0, text.Length - 1);
     static IEnumerable<FieldInfo> GetSerializedFields(object obj)
@@ -176,6 +184,25 @@ public static class CsvUtility
 
     class CsvSaver<T>
     {
+        CsvSaveOption _option;
+        public CsvSaver(CsvSaveOption option)
+        {
+            _option = option;
+        }
+
+        int GetOptionCount(Type type)
+        {
+            if (TypeIdentifier.IsIEnumerable(type) == false) return 1;
+            else if (type.IsArray) return _option.ArrayCount;
+            else if (TypeIdentifier.IsList(type)) return _option.ListCount;
+            else if (TypeIdentifier.IsDictionary(type)) return _option.DitionaryCount;
+            else
+            {
+                Debug.LogError("진짜 뭐노?");
+                return 1;
+            }
+        }
+
         public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -200,9 +227,9 @@ public static class CsvUtility
                     result = GetCustomConcat(countByName, result, info, info.Name);
                 else
                 {
-                    result.Add(info.Name);
+                    for (int i = 0; i < GetOptionCount(info.FieldType); i++)
+                        result.Add(info.Name);
                     //for (int i = 0; i < countByName[info.Name]; i++)
-                        
                 }
             }
             return result;
@@ -269,13 +296,46 @@ public static class CsvUtility
                     temp.Add(string.Join(",", values));
                     temp.Add("\"");
                     string tempValue = string.Join("", temp);
-                    result.Add(tempValue);
-                    //result = GetConcatList(result, values);
-                    Debug.Log(tempValue);
-                    //AddBlank(countByName[info.Name] - values.Count());
+                    // result.Add(tempValue);
+
+                    result = GetConcatList(result, SetString(tempValue, GetOptionCount(info.FieldType)));
+                    // AddBlank(GetOptionCount(info.FieldType) - 1);
                 }
             }
             return result;
+
+            string[] SetString(string value, int count)
+            {
+                string[] result = new string[count];
+                value = value.Replace("\"", "");
+                string[] values = value.Split(',');
+
+                int length = values.Length;
+                int[] counts = new int[count];
+                while (length > 0)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        counts[i]++;
+                        length--;
+                        if (length <= 0) break;
+                    }
+                }
+
+                int current = 0;
+
+                for (int i = 0; i < count; i++)
+                {
+                    string _value = "";
+                    _value += "\"";
+                    _value += string.Join(",", values.Skip(current).Take(counts[i]));
+                    _value += "\"";
+                    result[i] = _value;
+                    current += counts[i];
+                }
+
+                return result;
+            }
 
             List<string> GetCustomConcat(object data, Dictionary<string, int> countByName, List<string> result, FieldInfo info)
             {
