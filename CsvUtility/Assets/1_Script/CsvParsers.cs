@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Reflection;
 using System;
 using System.Linq;
+using System.Text;
 
 enum EnumerableType
 {
@@ -76,13 +77,26 @@ class EnumerableTypeParser : CsvParser
 
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
-        values = values.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        values = SetValue(values);
         switch (GetEnumableType(info.FieldType))
         {
             case EnumerableType.Array: new CsvArrayParser().SetValue(obj, info, values); break;
             case EnumerableType.List: new CsvListParser().SetValue(obj, info, values); break;
             case EnumerableType.Dictionary: new CsvDictionaryParser().SetValue(obj, info, values); break;
-        }    
+        }
+    }
+
+    string[] SetValue(string[] values)
+    {
+        const char replaceMark = '+';
+        StringBuilder builder = new StringBuilder();
+        
+        foreach (string value in values.Where(x => !string.IsNullOrEmpty(x)))
+        {
+            builder.Append(replaceMark);
+            builder.Append(value);
+        }
+        return builder.ToString().Split(replaceMark).Skip(1).Select(x => x.Trim()).ToArray();
     }
 
     public ICsvIEnumeralbeParser GetIEnumerableParser(Type type)

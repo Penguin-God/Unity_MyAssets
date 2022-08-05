@@ -257,6 +257,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -282,6 +283,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -289,6 +291,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -314,6 +317,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -321,6 +325,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -346,6 +351,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -353,6 +359,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -378,6 +385,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -385,6 +393,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -410,6 +419,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -417,6 +427,7 @@ MonoBehaviour:
     numberArray: f334050043330000
     textArray:
     - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
     - "\uB77C\uD5E4\uC57C"
     actualNumberArray:
     - 4224.12
@@ -442,6 +453,7 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     - aaa: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
   asset: {fileID: 4900000, guid: 33380155e49e9984a8033ba8f0580e9a, type: 3}
   testClassList:
   - TT: 22
@@ -504,6 +516,7 @@ MonoBehaviour:
     - 22
     - fasdasd
     test2: 01000000170000007b000000
+    testType: 6
     hasClassArray: []
     a: 0
   saveTests:
@@ -514,6 +527,7 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    testType: 6
     hasClassArray:
     - aaa: 777
       AAA: ccc
@@ -525,6 +539,7 @@ MonoBehaviour:
     test1:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    testType: 6
     hasClassArray:
     - aaa: 777
       AAA: ccc
@@ -540,6 +555,7 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
+    testType: 6
     hasClassArray:
     - aaa: 777
       AAA: ccc
@@ -569,3 +585,76 @@ MonoBehaviour:
     aaaaa: 0
   enumClass:
     type: 1
+--- !u!1 &1021502608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1021502610}
+  - component: {fileID: 1021502609}
+  m_Layer: 0
+  m_Name: EnemyTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1021502609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021502608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b9cfc1098dfb8c459be0c8b29e2094d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 1424742239}
+  text: {fileID: 4900000, guid: 10a54849792e9ae4a8233b5436405376, type: 3}
+  testText: {fileID: 4900000, guid: 645fa33e4d6a192469a3324095bb978a, type: 3}
+  result:
+  - 123,
+  - aa.bb.cc
+  - ','
+  - 11.22.33
+  - ",kkk\r"
+--- !u!4 &1021502610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021502608}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.059361, y: -0.41941229, z: -21.832058}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1424742239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4264a5b88b5be1c4c88e69d4f6f12a49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxhp: 200
+  type: wolf
+  intarray: 0a000000140000001e000000
+  floatarray:
+  - 10
+  - 1
+  stringarray:
+  - bigmac
+  - inandout

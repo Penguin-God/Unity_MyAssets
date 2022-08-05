@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
@@ -151,7 +152,7 @@ public class CSVSerializer
         List<string> line = new List<string>();
         StringBuilder token = new StringBuilder();
         bool quotes = false;
-
+        Debug.Log(text);
         for (int i = 0; i < text.Length; i++)
         {
             if (quotes == true)
@@ -188,6 +189,9 @@ public class CSVSerializer
                 }
                 if (line.Count > 0)
                 {
+                    Debug.Log($"Start : {i}");
+                    line.ForEach(x => Debug.Log(x));
+                    Debug.Log($"End : {i}");
                     lines.Add(line.ToArray());
                     line.Clear();
                 }
@@ -213,6 +217,9 @@ public class CSVSerializer
         }
         if (line.Count > 0)
         {
+            Debug.Log("Start : Last");
+            line.ForEach(x => Debug.Log(x));
+            Debug.Log($"End : Last");
             lines.Add(line.ToArray());
         }
         return lines;

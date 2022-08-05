@@ -52,12 +52,25 @@ public static class CsvUtility
     class CsvLoder<T>
     {
         const char comma = ',';
+        const char mark = '\"';
+        const char replaceMark = '+';
         const char lineBreak = '\n';
 
         string _csv;
         string[] fieldNames;
 
         string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
+        string[] GetValues(string line)
+        {
+            string[] tokens = line.Split(mark);
+
+            for (int i = 0; i < tokens.Length - 1; i++)
+            {
+                if (i % 2 == 1)
+                    tokens[i] = tokens[i].Replace(',', replaceMark);
+            }
+            return GetCells(string.Join("", tokens).Replace("\"", ""));
+        }
 
         [Conditional("UNITY_EDITOR")]
         void CheckFieldNames(Type type, string[] filedNames)
@@ -70,7 +83,7 @@ public static class CsvUtility
 
         public CsvLoder(string csv)
         {
-            _csv = csv.Substring(0, csv.Length - 1); ;
+            _csv = csv.Substring(0, csv.Length - 1);
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
             CheckFieldNames(typeof(T), fieldNames);
         }
@@ -86,7 +99,7 @@ public static class CsvUtility
                 => TypeIdentifier.IsCustom(info.FieldType) ? fieldNames.Count(x => x == info.Name) - 1 : fieldNames.Count(x => x == info.Name);
         }
 
-        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetCells(x)));
+        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetValues(x)));
 
         object GetInstance(Type type, string[] cells)
         {
