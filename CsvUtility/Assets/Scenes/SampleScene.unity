@@ -567,3 +567,5 @@ MonoBehaviour:
     hello: ssss
     FF: 1
     aaaaa: 0
+  enumClass:
+    type: 1

@@ -10,7 +10,9 @@ public static class TypeIdentifier
     public static bool IsIEnumerable(Type type) => type.IsArray || IsList(type) || IsDictionary(type);
     public static bool IsCustom(Type type)
     {
-        if (type.ToString().StartsWith("System.") == false)
+        if (type.IsEnum) 
+            return false;
+        else if (type.ToString().StartsWith("System.") == false) 
             return true;
         else if (IsList(type) && type.GetGenericArguments()[0] != null && type.GetGenericArguments()[0].ToString().StartsWith("System.") == false)
             return true;

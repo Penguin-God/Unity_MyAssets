@@ -50,6 +50,7 @@ public class MasterTest
 
     [SerializeField] HasTestClass hasClass;
     [SerializeField] HasTestClass[] hasClassArray;
+    [SerializeField] TestType testType;
 
     public bool IsSuccess()
     {
@@ -63,7 +64,8 @@ public class MasterTest
             && CheckDictionarySame(numberByText, new KeyValuePair<int, string>(12432, "아 루즈 마이셀프"))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
-            && HasClassIsSame(hasClass) && HasClassEnumerableIsSame(hasClassArray);
+            && HasClassIsSame(hasClass) && HasClassEnumerableIsSame(hasClassArray)
+            && CheckSame(testType, TestType.Devlop);
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -137,6 +139,7 @@ public class SaveTestCalss
     [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
     public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
+    public TestType testType = TestType.Devlop;
     //[SerializeField] HasTestClass hasClass;
     
     [SerializeField] HasTestClass[] hasClassArray;
@@ -150,6 +153,23 @@ public class SaveTestCalssTest
     [SerializeField] string hello = "HelloWorld";
     [SerializeField] bool FF = false;
     [SerializeField] float aaaaa = 2.2222f;
+}
+
+public enum TestType
+{
+    Happy,
+    Fun,
+    Life,
+    Game,
+    Patten,
+    Testing,
+    Devlop,
+}
+
+[Serializable]
+class EnumClass
+{
+    public TestType type;
 }
 
 public class Test : MonoBehaviour
@@ -185,11 +205,15 @@ public class Test : MonoBehaviour
         return;
     }
 
+    [SerializeField] EnumClass enumClass;
+
     [ContextMenu("Test")]
     void __Test()
     {
-        int[] intarr = new int[] { 1, 2, 3, 4, 5, 213, 6, 2 };
-        int indexof = Array.IndexOf(intarr, 2, 2);
-        print(indexof);
+        enumClass.type = TestType.Devlop;
+        print(enumClass.GetType().GetField("type").GetValue(enumClass));
+        enumClass.GetType().GetField("type").SetValue(enumClass, Enum.Parse(enumClass.GetType().GetField("type").FieldType, "Fun"));
+        print(enumClass.GetType().GetField("type").GetValue(enumClass));
+        print(enumClass.GetType().GetField("type").FieldType.ToString());
     }
 }

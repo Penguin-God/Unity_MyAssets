@@ -47,6 +47,8 @@ public static class CsvUtility
         return restul;
     }
 
+    static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum;
+
     class CsvLoder<T>
     {
         const char comma = ',';
@@ -241,7 +243,7 @@ public static class CsvUtility
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(data.GetType()))
             {
-                if (info.FieldType.IsPrimitive || info.FieldType == typeof(string))
+                if (IsPrimitive(info.FieldType))
                     result.Add(info.GetValue(data).ToString());
                 else if (TypeIdentifier.IsCustom(info.FieldType))
                     result = GetCustomConcat(data, countByName, result, info);
@@ -284,7 +286,7 @@ public static class CsvUtility
 
         int GetValueLength(object data, FieldInfo info)
         {
-            if (info.FieldType.IsPrimitive || info.FieldType == typeof(string))
+            if (IsPrimitive(info.FieldType))
                 return 1;
             else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 return new EnumerableTypeParser().GetIEnumerableValues(data, info).Length;

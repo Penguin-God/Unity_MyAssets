@@ -51,10 +51,11 @@ class PrimitiveTypeParser : CsvParser
 {
     public static CsvPrimitiveTypeParser GetPrimitiveParser(Type type)
     {
-        if(type == typeof(int)) return new CsvIntParser();
-        else if(type == typeof(string)) return new CsvStringParser();
+        if (type == typeof(int)) return new CsvIntParser();
+        else if (type == typeof(string)) return new CsvStringParser();
         else if (type == typeof(float)) return new CsvFloatParser();
         else if (type == typeof(bool)) return new CsvBooleanParser();
+        else if (type.IsEnum) return new CsvEnumParser(type);
         else Debug.LogError("Csv 파싱 타입을 찾지 못함");
         return null;
     }
@@ -143,7 +144,21 @@ class CsvBooleanParser : CsvPrimitiveTypeParser
     public Type GetParserType() => typeof(bool);
 }
 
+class CsvEnumParser : CsvPrimitiveTypeParser
+{
+    Type _type;
+    public CsvEnumParser(Type type)
+    {
+        _type = type;
+    }
+    public object GetParserValue(string value) => Enum.Parse(_type, value);
+    public IEnumerable GetParserEnumerable(string[] value) => value.Select(x => Convert.ChangeType(GetParserValue(x), _type));
+    public Type GetParserType() => _type;
+}
+
 #endregion 기본형 파싱 End
+
+
 
 
 #region 열거형 파싱
