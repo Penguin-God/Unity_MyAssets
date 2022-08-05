@@ -199,7 +199,7 @@ public class Test : MonoBehaviour
             item.test3.Add("딕셔너리 true입니당", true);
             item.test3.Add("딕셔너리 false입니당", false);
         }
-        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(2, 2, 2));
+        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(20, 2, 2));
 
         string temp = "배열입니당,배열입니당,배열입니당";
         //print(3 / 2);
@@ -210,36 +210,47 @@ public class Test : MonoBehaviour
 
     string[] SetString(string value, int count)
     {
-        string[] result = new string[count];
+
         value = value.Replace("\"", "");
         string[] values = value.Split(',');
 
-        int length = values.Length;
-        //print(length);
-        int[] counts = new int[count];
-        while (length > 0)
+        int[] counts = GetCounts(count, values.Length);
+        return SetValue(count, values, counts);
+
+        int[] GetCounts(int count, int valueLength)
         {
+            int length = valueLength;
+            int[] counts = new int[count];
+            while (length > 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    counts[i]++;
+                    length--;
+                    if (length <= 0) break;
+                }
+            }
+
+            return counts;
+        }
+
+        static string[] SetValue(int count, string[] values, int[] counts)
+        {
+            string[] result = new string[count];
+            
+            int current = 0;
             for (int i = 0; i < count; i++)
             {
-                counts[i]++;
-                length--;
-                if (length <= 0) break;
+                string _value = "";
+                _value += "\"";
+                _value += string.Join(",", values.Skip(current).Take(counts[i]));
+                _value += "\"";
+                result[i] = _value;
+                current += counts[i];
             }
+
+            return result;
         }
-
-        int current = 0;
-
-        for (int i = 0; i < count; i++)
-        {
-            string _value = "";
-            _value += "\"";
-            _value += string.Join(",", values.Skip(current).Take(counts[i]));
-            _value += "\"";
-            result[i] = _value;
-            current += counts[i];
-        }
-
-        return result;
     }
 
     [SerializeField] EnumClass enumClass;

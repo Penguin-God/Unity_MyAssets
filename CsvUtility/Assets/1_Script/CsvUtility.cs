@@ -298,6 +298,7 @@ public static class CsvUtility
                     string tempValue = string.Join("", temp);
                     // result.Add(tempValue);
 
+                    Debug.Log(SetString(tempValue, GetOptionCount(info.FieldType)).Length);
                     result = GetConcatList(result, SetString(tempValue, GetOptionCount(info.FieldType)));
                     // AddBlank(GetOptionCount(info.FieldType) - 1);
                 }
@@ -306,35 +307,43 @@ public static class CsvUtility
 
             string[] SetString(string value, int count)
             {
-                string[] result = new string[count];
-                value = value.Replace("\"", "");
-                string[] values = value.Split(',');
+                string[] values = value.Replace("\"", "").Split(',');
+                return GetResult(count, values, GetCounts(count, values.Length));
 
-                int length = values.Length;
-                int[] counts = new int[count];
-                while (length > 0)
+
+                int[] GetCounts(int count, int valueLength)
                 {
+                    int length = valueLength;
+                    int[] counts = new int[count];
+                    while (length > 0)
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            counts[i]++;
+                            length--;
+                            if (length <= 0) break;
+                        }
+                    }
+
+                    return counts;
+                }
+
+                static string[] GetResult(int count, string[] values, int[] counts)
+                {
+                    string[] result = new string[count];
+                    int current = 0;
                     for (int i = 0; i < count; i++)
                     {
-                        counts[i]++;
-                        length--;
-                        if (length <= 0) break;
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.Append("\"");
+                        stringBuilder.Append(string.Join(",", values.Skip(current).Take(counts[i])));
+                        stringBuilder.Append("\"");
+                        result[i] = stringBuilder.ToString();
+                        current += counts[i];
                     }
+
+                    return result;
                 }
-
-                int current = 0;
-
-                for (int i = 0; i < count; i++)
-                {
-                    string _value = "";
-                    _value += "\"";
-                    _value += string.Join(",", values.Skip(current).Take(counts[i]));
-                    _value += "\"";
-                    result[i] = _value;
-                    current += counts[i];
-                }
-
-                return result;
             }
 
             List<string> GetCustomConcat(object data, Dictionary<string, int> countByName, List<string> result, FieldInfo info)
