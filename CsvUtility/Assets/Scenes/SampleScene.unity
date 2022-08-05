@@ -295,9 +295,7 @@ MonoBehaviour:
     - aaa: 777
       AAA: ccc
     a: 99999
-  testStrSplit:
-  - "\"\uBC30\uC5F4\uC785\uB2C8\uB2F9,\uBC30\uC5F4\uC785\uB2C8\uB2F9\""
-  - "\"\uBC30\uC5F4\uC785\uB2C8\uB2F9\""
+  saveCsv: {fileID: 4900000, guid: ee21084bd7be6a444bfa5e60bff64c59, type: 3}
   enumClass:
     type: 1
 --- !u!1 &1021502608

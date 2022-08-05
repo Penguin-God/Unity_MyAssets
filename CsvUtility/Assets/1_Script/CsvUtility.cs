@@ -185,6 +185,33 @@ public static class CsvUtility
     class CsvSaver<T>
     {
         CsvSaveOption _option;
+        
+        Dictionary<Type, int> GetCountByType(IEnumerable<T> datas)
+        {
+            Dictionary<Type, int> countByType = new Dictionary<Type, int>();
+            foreach (T data in datas)
+            {
+                foreach (FieldInfo info in GetSerializedFields(data))
+                {
+                    if (TypeIdentifier.IsCustom(info.FieldType))
+                    {
+                        if (countByType.ContainsKey(info.FieldType) == false)
+                            countByType.Add(info.FieldType, 1);
+
+                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        {
+                            int count = 0;
+                            foreach (var item in info.GetValue(data) as IEnumerable)
+                                count++;
+                            if (count > countByType[info.FieldType])
+                                countByType[info.FieldType] = count;
+                        }
+                    }
+                }
+            }
+            return countByType;
+        }
+
         public CsvSaver(CsvSaveOption option)
         {
             _option = option;
@@ -206,80 +233,44 @@ public static class CsvUtility
         public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            Dictionary<string, int> countByName = GetCountByName(datas);
-            stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), countByName)));
+            stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), GetCountByType(datas))));
 
             foreach (var data in datas)
             {
-                IEnumerable<string> values = GetValues(data, countByName);
+                IEnumerable<string> values = GetValues(data);
                 stringBuilder.AppendLine(string.Join(",", values));
             }
 
             return SubLastLine(stringBuilder.ToString());
         }
 
-        List<string> GetFirstRow(object type, Dictionary<string, int> countByName)
+        List<string> GetFirstRow(object type, Dictionary<Type, int> countByType)
         {
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(type))
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
-                    result = GetCustomConcat(countByName, result, info, info.Name);
+                    result = GetCustomConcat(type, result, info, info.Name);
                 else
                 {
                     for (int i = 0; i < GetOptionCount(info.FieldType); i++)
                         result.Add(info.Name);
-                    //for (int i = 0; i < countByName[info.Name]; i++)
                 }
             }
             return result;
 
-            List<string> GetCustomConcat(Dictionary<string, int> countByName, List<string> result, FieldInfo info, string blank)
+            List<string> GetCustomConcat(object obj, List<string> result, FieldInfo info, string blank)
             {
                 result.Add(blank);
-                int length = TypeIdentifier.IsIEnumerable(info.FieldType) ? countByName[blank] : 1;
+                int length = countByType[info.FieldType];
+
                 for (int i = 0; i < length; i++)
-                    result = GetCustomList(result, () => GetFirstRow(GetElementType(info.FieldType), countByName), info.Name);
+                    result = GetCustomList(result, () => GetFirstRow(GetElementType(info.FieldType), countByType), info.Name);
                 return result;
             }
         }
 
-        Dictionary<string, int> GetCountByName(IEnumerable<T> datas)
-        {
-            Dictionary<string, int> countByName = GetSerializedFieldNames(typeof(T)).ToDictionary(x => x, x => 0);
-
-            foreach (T data in datas)
-                SetDict(countByName, data);
-            return countByName;
-
-            void SetDict(Dictionary<string, int> countByName, object data)
-            {
-                foreach (FieldInfo info in GetSerializedFields(data))
-                {
-                    if (TypeIdentifier.IsCustom(info.FieldType))
-                    {
-                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                        {
-                            int count = 0;
-                            foreach (var item in info.GetValue(data) as IEnumerable)
-                            {
-                                SetDict(countByName, item);
-                                count++;
-                            }
-                            
-                            if (count > countByName[info.Name])
-                                countByName[info.Name] = count;
-                        }
-                        else
-                            SetDict(countByName, info.GetValue(data));
-                    }
-                    if (GetValueLength(data, info) > countByName[info.Name])
-                        countByName[info.Name] = GetValueLength(data, info);
-                }
-            }
-        }
-
-        IEnumerable<string> GetValues(object data, Dictionary<string, int> countByName)
+        IEnumerable<string> GetValues(object data)
         {
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(data.GetType()))
@@ -287,28 +278,14 @@ public static class CsvUtility
                 if (IsPrimitive(info.FieldType))
                     result.Add(info.GetValue(data).ToString());
                 else if (TypeIdentifier.IsCustom(info.FieldType))
-                    result = GetCustomConcat(data, countByName, result, info);
+                    result = GetCustomConcat(data, result, info);
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
-                    //List<string> temp = new List<string>();
-                    
-                    //IEnumerable<string> values = ;
-                    //string tempValue = string.Join("", temp);
-
                     result = 
                         GetConcatList(result, GetIEnumerableValue(GetOptionCount(info.FieldType), new EnumerableTypeParser().GetIEnumerableValues(data, info)));
                 }
             }
             return result;
-
-            string GetValue(IEnumerable<string> values)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append("\"");
-                stringBuilder.Append(string.Join(",", values));
-                stringBuilder.Append("\"");
-                return stringBuilder.ToString();
-            }
 
             string[] GetIEnumerableValue(int count, string[] values)
             {
@@ -317,39 +294,11 @@ public static class CsvUtility
                 int current = 0;
                 for (int i = 0; i < count; i++)
                 {
-                    //StringBuilder stringBuilder = new StringBuilder();
-                    //stringBuilder.Append("\"");
-                    //stringBuilder.Append(string.Join(",", values.Skip(current).Take(counts[i])));
-                    //stringBuilder.Append("\"");
-                    //result[i] = stringBuilder.ToString();
                     result[i] = GetValue(values.Skip(current).Take(counts[i]));
                     current += counts[i];
                 }
 
-                int[] GetCounts(int count, int valueLength)
-                {
-                    int length = valueLength;
-                    int[] counts = new int[count];
-                    while (length > 0)
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            counts[i]++;
-                            length--;
-                            if (length <= 0) break;
-                        }
-                    }
-
-                    return counts;
-                }
-
                 return result;
-            }
-
-            string[] SetString(string value, int count)
-            {
-                string[] values = value.Replace("\"", "").Split(',');
-                return GetResult(count, values, GetCounts(count, values.Length));
 
 
                 int[] GetCounts(int count, int valueLength)
@@ -369,42 +318,29 @@ public static class CsvUtility
                     return counts;
                 }
 
-                string[] GetResult(int count, string[] values, int[] counts)
+                string GetValue(IEnumerable<string> values)
                 {
-                    string[] result = new string[count];
-                    int current = 0;
-                    for (int i = 0; i < count; i++)
-                    {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.Append("\"");
-                        stringBuilder.Append(string.Join(",", values.Skip(current).Take(counts[i])));
-                        stringBuilder.Append("\"");
-                        result[i] = stringBuilder.ToString();
-                        current += counts[i];
-                    }
-
-                    return result;
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append("\"");
+                    stringBuilder.Append(string.Join(",", values));
+                    stringBuilder.Append("\"");
+                    return stringBuilder.ToString();
                 }
+
             }
 
-            List<string> GetCustomConcat(object data, Dictionary<string, int> countByName, List<string> result, FieldInfo info)
+            List<string> GetCustomConcat(object data, List<string> result, FieldInfo info)
             {
                 result.Add("");
                 if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
                     foreach (var item in info.GetValue(data) as IEnumerable)
-                        result = GetCustomList(result, () => GetValues(item, countByName));
+                        result = GetCustomList(result, () => GetValues(item));
                 }
                 else
-                    result = GetCustomList(result, () => GetValues(info.GetValue(data), countByName));
+                    result = GetCustomList(result, () => GetValues(info.GetValue(data)));
 
                 return result;
-            }
-
-            void AddBlank(int blankCount = 1)
-            {
-                for (int i = 0; i < blankCount; i++)
-                    result.Add("");
             }
         }
 
@@ -413,15 +349,6 @@ public static class CsvUtility
             result = GetConcatList(result, OriginFunc());
             result.Add(blank);
             return result;
-        }
-
-        int GetValueLength(object data, FieldInfo info)
-        {
-            if (IsPrimitive(info.FieldType))
-                return 1;
-            else if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                return new EnumerableTypeParser().GetIEnumerableValues(data, info).Length;
-            return 0;
         }
 
         public void Save(IEnumerable<T> enumerable, string filePath)
