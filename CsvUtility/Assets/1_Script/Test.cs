@@ -180,7 +180,6 @@ public class Test : MonoBehaviour
     [ContextMenu("Master Test")]
     void MasterTest()
     {
-        // masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
         masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
@@ -188,7 +187,8 @@ public class Test : MonoBehaviour
 
     [SerializeField] TextAsset testCsv;
     [SerializeField] SaveTestCalss[] saveTests;
-    [SerializeField] string[] testStrSplit;
+    [SerializeField] TextAsset saveCsv;
+    // [SerializeField] string[] testStrSplit;
 
     [ContextMenu("Save Test")]
     void SaveTest()
@@ -199,12 +199,8 @@ public class Test : MonoBehaviour
             item.test3.Add("딕셔너리 true입니당", true);
             item.test3.Add("딕셔너리 false입니당", false);
         }
-        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(20, 2, 2));
-
-        string temp = "배열입니당,배열입니당,배열입니당";
-        //print(3 / 2);
-        //print(3 / 2.0);
-        testStrSplit = SetString(temp, 2);
+        // CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(20, 2, 2));
+        saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
         return;
     }
 

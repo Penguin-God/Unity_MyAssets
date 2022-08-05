@@ -290,20 +290,61 @@ public static class CsvUtility
                     result = GetCustomConcat(data, countByName, result, info);
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
-                    List<string> temp = new List<string>();
-                    temp.Add("\"");
-                    IEnumerable<string> values = new EnumerableTypeParser().GetIEnumerableValues(data, info);
-                    temp.Add(string.Join(",", values));
-                    temp.Add("\"");
-                    string tempValue = string.Join("", temp);
-                    // result.Add(tempValue);
+                    //List<string> temp = new List<string>();
+                    
+                    //IEnumerable<string> values = ;
+                    //string tempValue = string.Join("", temp);
 
-                    Debug.Log(SetString(tempValue, GetOptionCount(info.FieldType)).Length);
-                    result = GetConcatList(result, SetString(tempValue, GetOptionCount(info.FieldType)));
-                    // AddBlank(GetOptionCount(info.FieldType) - 1);
+                    result = 
+                        GetConcatList(result, GetIEnumerableValue(GetOptionCount(info.FieldType), new EnumerableTypeParser().GetIEnumerableValues(data, info)));
                 }
             }
             return result;
+
+            string GetValue(IEnumerable<string> values)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append("\"");
+                stringBuilder.Append(string.Join(",", values));
+                stringBuilder.Append("\"");
+                return stringBuilder.ToString();
+            }
+
+            string[] GetIEnumerableValue(int count, string[] values)
+            {
+                string[] result = new string[count];
+                int[] counts = GetCounts(count, values.Length);
+                int current = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    //StringBuilder stringBuilder = new StringBuilder();
+                    //stringBuilder.Append("\"");
+                    //stringBuilder.Append(string.Join(",", values.Skip(current).Take(counts[i])));
+                    //stringBuilder.Append("\"");
+                    //result[i] = stringBuilder.ToString();
+                    result[i] = GetValue(values.Skip(current).Take(counts[i]));
+                    current += counts[i];
+                }
+
+                int[] GetCounts(int count, int valueLength)
+                {
+                    int length = valueLength;
+                    int[] counts = new int[count];
+                    while (length > 0)
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            counts[i]++;
+                            length--;
+                            if (length <= 0) break;
+                        }
+                    }
+
+                    return counts;
+                }
+
+                return result;
+            }
 
             string[] SetString(string value, int count)
             {
@@ -328,7 +369,7 @@ public static class CsvUtility
                     return counts;
                 }
 
-                static string[] GetResult(int count, string[] values, int[] counts)
+                string[] GetResult(int count, string[] values, int[] counts)
                 {
                     string[] result = new string[count];
                     int current = 0;
