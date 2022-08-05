@@ -200,8 +200,9 @@ public static class CsvUtility
                     result = GetCustomConcat(countByName, result, info, info.Name);
                 else
                 {
-                    for (int i = 0; i < countByName[info.Name]; i++)
-                        result.Add(info.Name);
+                    result.Add(info.Name);
+                    //for (int i = 0; i < countByName[info.Name]; i++)
+                        
                 }
             }
             return result;
@@ -262,9 +263,16 @@ public static class CsvUtility
                     result = GetCustomConcat(data, countByName, result, info);
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
+                    List<string> temp = new List<string>();
+                    temp.Add("\"");
                     IEnumerable<string> values = new EnumerableTypeParser().GetIEnumerableValues(data, info);
-                    result = GetConcatList(result, values);
-                    AddBlank(countByName[info.Name] - values.Count());
+                    temp.Add(string.Join(",", values));
+                    temp.Add("\"");
+                    string tempValue = string.Join("", temp);
+                    result.Add(tempValue);
+                    //result = GetConcatList(result, values);
+                    Debug.Log(tempValue);
+                    //AddBlank(countByName[info.Name] - values.Count());
                 }
             }
             return result;
