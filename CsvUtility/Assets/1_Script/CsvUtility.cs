@@ -80,6 +80,18 @@ public static class CsvUtility
             return GetCells(string.Join("", tokens).Replace("\"", ""));
         }
 
+        List<string> GetValueList(string line)
+        {
+            string[] tokens = line.Split(mark);
+
+            for (int i = 0; i < tokens.Length - 1; i++)
+            {
+                if (i % 2 == 1)
+                    tokens[i] = tokens[i].Replace(',', replaceMark);
+            }
+            return GetCells(string.Join("", tokens).Replace("\"", "")).ToList();
+        }
+
         [Conditional("UNITY_EDITOR")]
         void CheckFieldNames(Type type, string[] filedNames)
         {
@@ -103,16 +115,17 @@ public static class CsvUtility
                 result.Add(info.Name, GetCount(info));
             return result;
 
-            int GetCount(FieldInfo info)
-                => TypeIdentifier.IsCustom(info.FieldType) ? fieldNames.Count(x => x == info.Name) - 1 : fieldNames.Count(x => x == info.Name);
+            int GetCount(FieldInfo _info)
+                => TypeIdentifier.IsCustom(_info.FieldType) ? fieldNames.Count(x => x == _info.Name) - 1 : fieldNames.Count(x => x == _info.Name);
         }
 
-        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetValues(x)));
+        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetValueList(x)));
 
-        object GetInstance(Type type, string[] cells)
+        object GetInstance(Type type, List<string> cells)
         {
             object obj = Activator.CreateInstance(type);
-            
+            cells.RemoveAll(x => string.IsNullOrEmpty(x));
+
             SetInfoValue(obj, type, fieldNames);
             return obj;
 
@@ -173,11 +186,24 @@ public static class CsvUtility
             object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
         }
 
-        string[] GetFieldValues(int count, string[] cells, int currentIndex)
+        string[] GetFieldValues(int count, List<string> cells, int currentIndex)
         {
             string[] result = new string[count];
+            //for (int i = 0; i < count; i++)
+            //{
+            //    result[i] = cells[currentIndex + i];
+            //    Debug.Log(cells[currentIndex + i]);
+            //}
+
             for (int i = 0; i < count; i++)
-                result[i] = cells[currentIndex + i];
+            {
+                result[i] = cells[0];
+                cells.RemoveAt(0);
+            }
+
+            //Debug.Log("Start");
+            //result.ToList().ForEach(x => Debug.Log(x));
+            //Debug.Log("End");
             return result;
         }
     }
