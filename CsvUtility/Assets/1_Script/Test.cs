@@ -13,7 +13,7 @@ public class TestClass
 {
     [SerializeField] int TT;
     [SerializeField] bool Ta;
-    [SerializeField] HasTestClass[] hasTestClass;
+    [SerializeField] HasTestClass hasTestClass;
     [SerializeField] string[] kkkk;
     [SerializeField] string sktt1;
 }
@@ -252,13 +252,16 @@ public class Test : MonoBehaviour
 
     [SerializeField] EnumClass enumClass;
 
+    [SerializeField] TestClass[] ts;
+    [SerializeField] TextAsset tsT;
     [ContextMenu("Test")]
     void __Test()
     {
-        enumClass.type = TestType.Devlop;
-        print(enumClass.GetType().GetField("type").GetValue(enumClass));
-        enumClass.GetType().GetField("type").SetValue(enumClass, Enum.Parse(enumClass.GetType().GetField("type").FieldType, "Fun"));
-        print(enumClass.GetType().GetField("type").GetValue(enumClass));
-        print(enumClass.GetType().GetField("type").FieldType.ToString());
+        ts = CsvUtility.CsvToArray<TestClass>(tsT.text);
+        //enumClass.type = TestType.Devlop;
+        //print(enumClass.GetType().GetField("type").GetValue(enumClass));
+        //enumClass.GetType().GetField("type").SetValue(enumClass, Enum.Parse(enumClass.GetType().GetField("type").FieldType, "Fun"));
+        //print(enumClass.GetType().GetField("type").GetValue(enumClass));
+        //print(enumClass.GetType().GetField("type").FieldType.ToString());
     }
 }

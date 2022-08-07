@@ -133,13 +133,21 @@ public static class CsvUtility
             {
                 int cellIndex = currentIndex;
                 Dictionary<string, int> countByKey = GetCountByFieldName(type, fieldNames);
-
+                //Debug.Log("Start");
+                //countByKey.Keys.ToList().ForEach(x => Debug.Log(x));
+                //countByKey.Values.ToList().ForEach(x => Debug.Log(x));
                 foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
                 {
                     if (TypeIdentifier.IsCustom(info.FieldType))
+                    {
+                        //object customValue = Activator.CreateInstance(GetCoustomType(info.FieldType));
+                        //SetInfoValue(customValue, GetCoustomType(info.FieldType), info.FieldType.GetFields().Select(x => x.Name).ToArray());
+                        //info.SetValue(obj, customValue);
                         info.SetValue(obj, GetCustomValue(info, ref cellIndex));
+                    }
                     else
                     {
+                        //Debug.Log(info.Name);
                         CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(countByKey[info.Name], cells, cellIndex));
                         cellIndex += countByKey[info.Name];
                     }
@@ -152,14 +160,14 @@ public static class CsvUtility
                     if (TypeIdentifier.IsIEnumerable(info.FieldType))
                         return GetArray(obj, info, ref cellIndex);
                     else
-                        return GetSingleCustomValue(info, ref cellIndex);
+                        return GetSingleCustomValue(info.FieldType, ref cellIndex);
                 }
             }
 
-            object GetSingleCustomValue(FieldInfo info, ref int cellIndex)
+            object GetSingleCustomValue(Type type, ref int cellIndex)
             {
-                object customValue = Activator.CreateInstance(GetCoustomType(info.FieldType));
-                cellIndex = SetInfoValue(customValue, GetCoustomType(info.FieldType), GetCustomCells(info, cellIndex), cellIndex);
+                object customValue = Activator.CreateInstance(GetCoustomType(type));
+                SetInfoValue(customValue, GetCoustomType(type), type.GetFields().Select(x => x.Name).ToArray());
                 cellIndex++;
                 return customValue;
             }
@@ -167,6 +175,7 @@ public static class CsvUtility
             string[] GetCustomCells(FieldInfo info, int index)
             {
                 int indexof = Array.IndexOf(fieldNames.Skip(index).ToArray(), info.Name);
+                fieldNames.Skip(index).Take(indexof).ToList().ForEach(x => Debug.Log(x));
                 return fieldNames.Skip(index).Take(indexof).ToArray();
             }
 
@@ -177,9 +186,9 @@ public static class CsvUtility
 
                 Array array = Array.CreateInstance(elementType, length);
                 for (int i = 0; i < length; i++)
-                    array.SetValue(GetSingleCustomValue(info, ref currentIndex), i);
+                    array.SetValue(GetSingleCustomValue(elementType, ref currentIndex), i);
 
-                info.SetValue(obj, GetIEnumerableValue(info.FieldType, array));
+                // info.SetValue(obj, GetIEnumerableValue(info.FieldType, array));
                 return array;
             }
 
