@@ -177,4 +177,12 @@ public class Test : MonoBehaviour
         CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
         return;
     }
+
+
+    [ContextMenu("Test")]
+    void TTTTTT()
+    {
+        int[] a = new int[] { 1, 2, 3, 4, 5, 6 };
+        a.Skip(2).Take(5).ToList().ForEach(x => print(x));
+    }
 }

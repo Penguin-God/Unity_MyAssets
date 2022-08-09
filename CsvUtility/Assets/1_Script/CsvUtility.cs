@@ -106,7 +106,7 @@ public static class CsvUtility
         void CheckFieldNames(Type type, string[] filedNames)
         {
             List<string> realFieldNames = GetSerializedFieldNames(typeof(T));
-
+            // realFieldNames.ForEach(x => Debug);
             for (int i = 0; i < filedNames.Length; i++)
                 Debug.Assert(realFieldNames.Contains(filedNames[i]), $"변수명과 일치하지 않는 {i + 1}번째 컬럼명 : {filedNames[i]}");
         }
@@ -135,14 +135,6 @@ public static class CsvUtility
         {
             cells.RemoveAll(x => string.IsNullOrEmpty(x));
             return SetInfoValue(type, fieldNames, cells);
-
-            // TODO : 클래스 배열 문제 해결하기
-            string[] GetCustomCells(FieldInfo info, int index)
-            {
-                int indexof = Array.IndexOf(fieldNames.Skip(index).ToArray(), info.Name);
-                fieldNames.Skip(index).Take(indexof).ToList().ForEach(x => Debug.Log(x));
-                return fieldNames.Skip(index).Take(indexof).ToArray();
-            }
         }
 
         object SetInfoValue(Type type, string[] fieldNames, List<string> cells)
@@ -160,15 +152,21 @@ public static class CsvUtility
             return obj;
         }
 
+        string[] GetCustomFieldNames(string name, int index = 0)
+        {
+            int[] indexs = fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
+            return fieldNames.Skip(indexs[index] + 1).Take(indexs[index + 1] - indexs[index] - 1).ToArray();
+        }
+
         object GetCustomValue(FieldInfo _info, List<string> cells)
         {
             if (TypeIdentifier.IsIEnumerable(_info.FieldType))
                 return GetArray(_info, cells);
             else
-                return GetSingleCustomValue(_info.FieldType, cells);
+                return GetSingleCustomValue(_info.FieldType, cells, _info.Name);
         }
 
-        object GetSingleCustomValue(Type type, List<string> cells) => SetInfoValue(GetCoustomType(type), type.GetFields().Select(x => x.Name).ToArray(), cells);
+        object GetSingleCustomValue(Type type, List<string> cells, string name = "", int index = 0) => SetInfoValue(GetCoustomType(type), GetCustomFieldNames(name, index), cells);
 
         object GetArray(FieldInfo info, List<string> cells)
         {
@@ -177,7 +175,7 @@ public static class CsvUtility
 
             Array array = Array.CreateInstance(elementType, length);
             for (int i = 0; i < length; i++)
-                array.SetValue(GetSingleCustomValue(elementType, cells), i);
+                array.SetValue(GetSingleCustomValue(elementType, cells, info.Name, i), i);
 
             return GetIEnumerableValue(info.FieldType, array);
         }
