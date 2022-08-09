@@ -9,8 +9,6 @@ using System.IO;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
-
-
 public static class CsvUtility
 {
     public class CsvSaveOption
@@ -234,32 +232,6 @@ public static class CsvUtility
             return result;
         }
 
-        //Dictionary<Type, int> GetCountByType(IEnumerable<T> datas)
-        //{
-        //    Dictionary<Type, int> countByType = new Dictionary<Type, int>();
-        //    foreach (T data in datas)
-        //    {
-        //        foreach (FieldInfo info in GetSerializedFields(data))
-        //        {
-        //            if (TypeIdentifier.IsCustom(info.FieldType))
-        //            {
-        //                if (countByType.ContainsKey(info.FieldType) == false)
-        //                    countByType.Add(info.FieldType, 1);
-
-        //                if (TypeIdentifier.IsIEnumerable(info.FieldType))
-        //                {
-        //                    int count = 0;
-        //                    foreach (var item in info.GetValue(data) as IEnumerable)
-        //                        count++;
-        //                    if (count > countByType[info.FieldType])
-        //                        countByType[info.FieldType] = count;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return countByType;
-        //}
-        
         public CsvSaver(int arrayLength, int listLength, int dictionaryLength)
         {
             _option = new CsvSaveOption(arrayLength, listLength, dictionaryLength);
@@ -284,7 +256,7 @@ public static class CsvUtility
         {
             StringBuilder stringBuilder = new StringBuilder();
             _customCountByType = GetCountByType(datas);
-            stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), GetCountByType(datas))));
+            stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), _customCountByType)));
 
             foreach (var data in datas)
             {

@@ -7,24 +7,6 @@ using System.Reflection;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
-
-[Serializable]
-public class TestClass
-{
-    [SerializeField] int TT;
-    [SerializeField] bool Ta;
-    [SerializeField] HasTestClass hasTestClass;
-    [SerializeField] string[] kkkk;
-    [SerializeField] string sktt1;
-}
-
-[Serializable]
-public struct HasTestClass
-{
-    [SerializeField] public int aaa;
-    [SerializeField] public string AAA;
-}
-
 [Serializable]
 public class MasterTest
 {
@@ -146,15 +128,6 @@ public class SaveTestCalss
     [SerializeField] int a;
 }
 
-[Serializable]
-public class SaveTestCalssTest
-{
-    [SerializeField] public int aaa = 123;
-    [SerializeField] string hello = "HelloWorld";
-    [SerializeField] bool FF = false;
-    [SerializeField] float aaaaa = 2.2222f;
-}
-
 public enum TestType
 {
     Happy,
@@ -167,28 +140,29 @@ public enum TestType
 }
 
 [Serializable]
-class EnumClass
+public struct HasTestClass
 {
-    public TestType type;
+    [SerializeField] public int aaa;
+    [SerializeField] public string AAA;
 }
+
 
 public class Test : MonoBehaviour
 {
+    [SerializeField] TextAsset loadCsv;
     [SerializeField] MasterTest[] masterTests;
-    [SerializeField] TextAsset asset;
 
     [ContextMenu("Master Test")]
     void MasterTest()
     {
-        masterTests = CsvUtility.CsvToArray<MasterTest>(asset.text);
+        masterTests = CsvUtility.CsvToArray<MasterTest>(loadCsv.text);
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
     }
 
-    [SerializeField] TextAsset testCsv;
-    [SerializeField] SaveTestCalss[] saveTests;
+    [Header("Save Test Values")]
     [SerializeField] TextAsset saveCsv;
-    // [SerializeField] string[] testStrSplit;
+    [SerializeField] SaveTestCalss[] saveTests;
 
     [ContextMenu("Save Test")]
     void SaveTest()
@@ -201,68 +175,6 @@ public class Test : MonoBehaviour
         }
 
         CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
-        // saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
-        // print(saveTests[0].test3["µñ¼Å³Ê¸® falseÀÔ´Ï´ç"]);
         return;
-    }
-
-    string[] SetString(string value, int count)
-    {
-
-        value = value.Replace("\"", "");
-        string[] values = value.Split(',');
-
-        int[] counts = GetCounts(count, values.Length);
-        return SetValue(count, values, counts);
-
-        int[] GetCounts(int count, int valueLength)
-        {
-            int length = valueLength;
-            int[] counts = new int[count];
-            while (length > 0)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    counts[i]++;
-                    length--;
-                    if (length <= 0) break;
-                }
-            }
-
-            return counts;
-        }
-
-        static string[] SetValue(int count, string[] values, int[] counts)
-        {
-            string[] result = new string[count];
-            
-            int current = 0;
-            for (int i = 0; i < count; i++)
-            {
-                string _value = "";
-                _value += "\"";
-                _value += string.Join(",", values.Skip(current).Take(counts[i]));
-                _value += "\"";
-                result[i] = _value;
-                current += counts[i];
-            }
-
-            return result;
-        }
-    }
-
-    [SerializeField] EnumClass enumClass;
-
-    [SerializeField] TestClass[] ts;
-    [SerializeField] TextAsset tsT;
-    [ContextMenu("Test")]
-    void __Test()
-    {
-        ts = CsvUtility.CsvToArray<TestClass>(tsT.text);
-        //enumClass.type = TestType.Devlop;
-        //print(enumClass.GetType().GetField("type").GetValue(enumClass));
-        //enumClass.GetType().GetField("type").SetValue(enumClass, Enum.Parse(enumClass.GetType().GetField("type").FieldType, "Fun"));
-        //print(enumClass.GetType().GetField("type").GetValue(enumClass));
-        //print(enumClass.GetType().GetField("type").FieldType.ToString());
     }
 }
