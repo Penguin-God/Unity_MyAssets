@@ -265,7 +265,7 @@ public static class CsvUtility
             foreach (FieldInfo info in GetSerializedFields(type))
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
-                    result = GetCustomConcat(type, result, info, info.Name);
+                    result = GetCustomConcat(result, info, info.Name, countByType);
                 else
                 {
                     for (int i = 0; i < GetOptionCount(info.FieldType); i++)
@@ -273,16 +273,16 @@ public static class CsvUtility
                 }
             }
             return result;
+        }
 
-            List<string> GetCustomConcat(object obj, List<string> result, FieldInfo info, string blank)
-            {
-                result.Add(blank);
-                int length = countByType[info.FieldType];
+        List<string> GetCustomConcat(List<string> result, FieldInfo info, string blank, Dictionary<Type, int> countByType)
+        {
+            result.Add(blank);
+            int length = countByType[info.FieldType];
 
-                for (int i = 0; i < length; i++)
-                    result = GetCustomList(result, () => GetFirstRow(GetElementType(info.FieldType), countByType), info.Name);
-                return result;
-            }
+            for (int i = 0; i < length; i++)
+                result = GetCustomList(result, () => GetFirstRow(GetElementType(info.FieldType), countByType), info.Name);
+            return result;
         }
 
         IEnumerable<string> GetValues(object data)
@@ -301,63 +301,62 @@ public static class CsvUtility
                 }
             }
             return result;
-
-            string[] GetIEnumerableValue(int count, string[] values)
+        }
+        string[] GetIEnumerableValue(int count, string[] values)
+        {
+            string[] result = new string[count];
+            int[] counts = GetCounts(count, values.Length);
+            int current = 0;
+            for (int i = 0; i < count; i++)
             {
-                string[] result = new string[count];
-                int[] counts = GetCounts(count, values.Length);
-                int current = 0;
+                result[i] = GetValue(values.Skip(current).Take(counts[i]));
+                current += counts[i];
+            }
+
+            return result;
+        }
+
+        int[] GetCounts(int count, int valueLength)
+        {
+            int length = valueLength;
+            int[] counts = new int[count];
+            while (length > 0)
+            {
                 for (int i = 0; i < count; i++)
                 {
-                    result[i] = GetValue(values.Skip(current).Take(counts[i]));
-                    current += counts[i];
+                    counts[i]++;
+                    length--;
+                    if (length <= 0) break;
                 }
-
-                return result;
-
-
-                int[] GetCounts(int count, int valueLength)
-                {
-                    int length = valueLength;
-                    int[] counts = new int[count];
-                    while (length > 0)
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            counts[i]++;
-                            length--;
-                            if (length <= 0) break;
-                        }
-                    }
-
-                    return counts;
-                }
-
-                string GetValue(IEnumerable<string> values)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.Append("\"");
-                    stringBuilder.Append(string.Join(",", values));
-                    stringBuilder.Append("\"");
-                    return stringBuilder.ToString();
-                }
-
             }
 
-            List<string> GetCustomConcat(object data, List<string> result, FieldInfo info)
-            {
-                result.Add("");
-                if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                {
-                    foreach (var item in info.GetValue(data) as IEnumerable)
-                        result = GetCustomList(result, () => GetValues(item));
-                }
-                else
-                    result = GetCustomList(result, () => GetValues(info.GetValue(data)));
-
-                return result;
-            }
+            return counts;
         }
+
+        string GetValue(IEnumerable<string> values)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("\"");
+            stringBuilder.Append(string.Join(",", values));
+            stringBuilder.Append("\"");
+            return stringBuilder.ToString();
+        }
+
+        List<string> GetCustomConcat(object data, List<string> result, FieldInfo info)
+        {
+            result.Add("");
+            if (TypeIdentifier.IsIEnumerable(info.FieldType))
+            {
+                foreach (var item in info.GetValue(data) as IEnumerable)
+                    result = GetCustomList(result, () => GetValues(item));
+            }
+            else
+                result = GetCustomList(result, () => GetValues(info.GetValue(data)));
+
+            return result;
+        }
+
+
 
         List<string> GetCustomList(List<string> result, Func<IEnumerable<string>> OriginFunc, string blank = "")
         {
