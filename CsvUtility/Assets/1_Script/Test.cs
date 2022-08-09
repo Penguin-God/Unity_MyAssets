@@ -146,6 +146,13 @@ public struct HasTestClass
     [SerializeField] public string AAA;
 }
 
+[Serializable]
+public struct Testssss
+{
+    public int[] arr;
+    public int t;
+}
+
 
 public class Test : MonoBehaviour
 {
@@ -180,10 +187,10 @@ public class Test : MonoBehaviour
 
     [Header("아무거나 테스트")]
     [SerializeField] TextAsset testCsv;
-    [SerializeField] MasterTest[] Tests;
+    [SerializeField] Testssss[] Tests;
     [ContextMenu("Test")]
     void TTTTTT()
     {
-        
+        Tests = CsvUtility.GetEnumerableFromCsv<Testssss>(testCsv.text).ToArray();
     }
 }

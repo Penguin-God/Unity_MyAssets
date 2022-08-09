@@ -129,15 +129,9 @@ public static class CsvUtility
                 => TypeIdentifier.IsCustom(_info.FieldType) ? fieldNames.Count(x => x == _info.Name) - 1 : fieldNames.Count(x => x == _info.Name);
         }
 
-        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), GetValueList(x)));
+        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), fieldNames, GetValueList(x)));
 
-        object GetInstance(Type type, List<string> cells)
-        {
-            cells.RemoveAll(x => string.IsNullOrEmpty(x));
-            return SetInfoValue(type, fieldNames, cells);
-        }
-
-        object SetInfoValue(Type type, string[] fieldNames, List<string> cells)
+        object GetInstance(Type type, string[] fieldNames, List<string> cells)
         {
             object obj = Activator.CreateInstance(type);
             Dictionary<string, int> countByKey = GetCountByFieldName(type, fieldNames);
@@ -145,17 +139,20 @@ public static class CsvUtility
             foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
+                {
                     info.SetValue(obj, GetCustomValue(info, cells));
+                    cells.RemoveAt(0);
+                }
                 else
                     CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(countByKey[info.Name], cells));
             }
             return obj;
         }
 
-        string[] GetCustomFieldNames(string name, int index = 0)
+        string[] GetCustomFieldNames(string name, int startIndex = 0)
         {
             int[] indexs = fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
-            return fieldNames.Skip(indexs[index] + 1).Take(indexs[index + 1] - indexs[index] - 1).ToArray();
+            return fieldNames.Skip(indexs[startIndex] + 1).Take(indexs[startIndex + 1] - indexs[startIndex] - 1).ToArray();
         }
 
         object GetCustomValue(FieldInfo _info, List<string> cells)
@@ -166,7 +163,11 @@ public static class CsvUtility
                 return GetSingleCustomValue(_info.FieldType, cells, _info.Name);
         }
 
-        object GetSingleCustomValue(Type type, List<string> cells, string name = "", int index = 0) => SetInfoValue(GetCoustomType(type), GetCustomFieldNames(name, index), cells);
+        object GetSingleCustomValue(Type type, List<string> cells, string name = "", int index = 0)
+        {
+            cells.RemoveAt(0);
+            return GetInstance(GetCoustomType(type), GetCustomFieldNames(name, index), cells);
+        }
 
         object GetArray(FieldInfo info, List<string> cells)
         {
@@ -184,15 +185,18 @@ public static class CsvUtility
 
         string[] GetFieldValues(int count, List<string> cells)
         {
-            string[] result = new string[count];
+            List<string> result = new List<string>();
 
             for (int i = 0; i < count; i++)
             {
-                result[i] = cells[0];
+                string value = cells[0];
+                if (string.IsNullOrEmpty(value) == false)
+                    result.Add(value);
                 cells.RemoveAt(0);
             }
 
-            return result;
+            if (result.Count == 0) result.Add("");
+            return result.ToArray();
         }
     }
 

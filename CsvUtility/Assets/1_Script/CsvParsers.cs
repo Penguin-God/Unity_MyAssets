@@ -165,6 +165,7 @@ class CsvEnumParser : CsvPrimitiveTypeParser
     {
         _type = type;
     }
+
     public object GetParserValue(string value) => Enum.Parse(_type, value);
     public IEnumerable GetParserEnumerable(string[] value) => value.Select(x => Convert.ChangeType(GetParserValue(x), _type));
     public Type GetParserType() => _type;
