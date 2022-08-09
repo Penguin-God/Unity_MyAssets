@@ -465,6 +465,22 @@ MonoBehaviour:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
     testType: 6
+    hasClass:
+      aaa: 2
+      AAA: WWWWWWWWWW
+    hasClassArray:
+    - aaa: 777
+      AAA: ccc
+    a: 99999
+  - aaab: 123
+    AAAb: "\uC548\uB155 \uC138\uC0C1"
+    test1:
+    - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
+    test2: 6f0000006f000000
+    testType: 6
+    hasClass:
+      aaa: 22
+      AAA: wwwwwwwwww
     hasClassArray:
     - aaa: 777
       AAA: ccc
@@ -475,24 +491,15 @@ MonoBehaviour:
     AAAb: "\uC548\uB155 \uC138\uC0C1"
     test1:
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
-    test2: 6f0000006f000000
-    testType: 6
-    hasClassArray:
-    - aaa: 777
-      AAA: ccc
-    - aaa: 777
-      AAA: ccc
-    a: 99999
-  - aaab: 123
-    AAAb: "\uC548\uB155 \uC138\uC0C1"
-    test1:
-    - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     - "\uBC30\uC5F4\uC785\uB2C8\uB2F9"
     test2: 6f0000006f000000
     testType: 6
+    hasClass:
+      aaa: 2
+      AAA: WWWWWWWWWWWWW
     hasClassArray:
     - aaa: 777
       AAA: ccc

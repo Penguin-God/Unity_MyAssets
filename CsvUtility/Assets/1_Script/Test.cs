@@ -140,7 +140,7 @@ public class SaveTestCalss
     [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
     public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
     public TestType testType = TestType.Devlop;
-    //[SerializeField] HasTestClass hasClass;
+    [SerializeField] HasTestClass hasClass;
     
     [SerializeField] HasTestClass[] hasClassArray;
     [SerializeField] int a;

@@ -203,34 +203,69 @@ public static class CsvUtility
     class CsvSaver<T>
     {
         CsvSaveOption _option;
-        
+
+        Dictionary<Type, int> _customCountByType;
+
         Dictionary<Type, int> GetCountByType(IEnumerable<T> datas)
         {
             Dictionary<Type, int> countByType = new Dictionary<Type, int>();
             foreach (T data in datas)
             {
-                foreach (FieldInfo info in GetSerializedFields(data))
+                foreach (FieldInfo info in GetSerializedFields(data).Where(x => TypeIdentifier.IsCustom(x.FieldType) && TypeIdentifier.IsIEnumerable(x.FieldType)))
                 {
-                    if (TypeIdentifier.IsCustom(info.FieldType))
-                    {
-                        if (countByType.ContainsKey(info.FieldType) == false)
-                            countByType.Add(info.FieldType, 1);
+                    if (countByType.ContainsKey(info.FieldType) == false)
+                        countByType.Add(info.FieldType, 1);
 
-                        if (TypeIdentifier.IsIEnumerable(info.FieldType))
-                        {
-                            int count = 0;
-                            foreach (var item in info.GetValue(data) as IEnumerable)
-                                count++;
-                            if (count > countByType[info.FieldType])
-                                countByType[info.FieldType] = count;
-                        }
-                    }
+                    int count = 0;
+                    foreach (var item in info.GetValue(data) as IEnumerable)
+                        count++;
+                    if (count > countByType[info.FieldType])
+                        countByType[info.FieldType] = count;
                 }
             }
             return countByType;
         }
 
-        public CsvSaver(int arrayLength, int listLength, int dictionaryLength) => _option = new CsvSaveOption(arrayLength, listLength, dictionaryLength);
+        int GetTypeCellCount(Type type)
+        {
+            int result = 0;
+            foreach (FieldInfo info in GetSerializedFields(type))
+                result += GetOptionCount(info.FieldType);
+            return result;
+        }
+
+        //Dictionary<Type, int> GetCountByType(IEnumerable<T> datas)
+        //{
+        //    Dictionary<Type, int> countByType = new Dictionary<Type, int>();
+        //    foreach (T data in datas)
+        //    {
+        //        foreach (FieldInfo info in GetSerializedFields(data))
+        //        {
+        //            if (TypeIdentifier.IsCustom(info.FieldType))
+        //            {
+        //                if (countByType.ContainsKey(info.FieldType) == false)
+        //                    countByType.Add(info.FieldType, 1);
+
+        //                if (TypeIdentifier.IsIEnumerable(info.FieldType))
+        //                {
+        //                    int count = 0;
+        //                    foreach (var item in info.GetValue(data) as IEnumerable)
+        //                        count++;
+        //                    if (count > countByType[info.FieldType])
+        //                        countByType[info.FieldType] = count;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return countByType;
+        //}
+        
+        public CsvSaver(int arrayLength, int listLength, int dictionaryLength)
+        {
+            _option = new CsvSaveOption(arrayLength, listLength, dictionaryLength);
+            _customCountByType = new Dictionary<Type, int>();
+            _customCountByType.Clear();
+        }
 
         int GetOptionCount(Type type)
         {
@@ -248,6 +283,7 @@ public static class CsvUtility
         public string EnumerableToCsv(IEnumerable<T> datas)
         {
             StringBuilder stringBuilder = new StringBuilder();
+            _customCountByType = GetCountByType(datas);
             stringBuilder.AppendLine(string.Join(",", GetFirstRow(typeof(T), GetCountByType(datas))));
 
             foreach (var data in datas)
@@ -265,7 +301,13 @@ public static class CsvUtility
             foreach (FieldInfo info in GetSerializedFields(type))
             {
                 if (TypeIdentifier.IsCustom(info.FieldType))
-                    result = GetCustomConcat(result, info, info.Name, countByType);
+                {
+                    result.Add(info.Name);
+                    if (TypeIdentifier.IsIEnumerable(info.FieldType))
+                        result = GetCustomConcat(result, info, countByType);
+                    else
+                        result = GetCustomList(result, () => GetFirstRow(info.FieldType, countByType), info.Name);
+                }
                 else
                 {
                     for (int i = 0; i < GetOptionCount(info.FieldType); i++)
@@ -275,15 +317,13 @@ public static class CsvUtility
             return result;
         }
 
-        List<string> GetCustomConcat(List<string> result, FieldInfo info, string blank, Dictionary<Type, int> countByType)
+        List<string> GetCustomConcat(List<string> result, FieldInfo info, Dictionary<Type, int> countByType)
         {
-            result.Add(blank);
-            int length = countByType[info.FieldType];
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < countByType[info.FieldType]; i++)
                 result = GetCustomList(result, () => GetFirstRow(GetElementType(info.FieldType), countByType), info.Name);
             return result;
         }
+
 
         IEnumerable<string> GetValues(object data)
         {
@@ -347,8 +387,17 @@ public static class CsvUtility
             result.Add("");
             if (TypeIdentifier.IsIEnumerable(info.FieldType))
             {
+                int count = _customCountByType[info.FieldType];
                 foreach (var item in info.GetValue(data) as IEnumerable)
+                {
                     result = GetCustomList(result, () => GetValues(item));
+                    count--;
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    for (int j = 0; j < GetTypeCellCount(GetElementType(info.FieldType)) + 1; j++)
+                        result.Add("");
+                }
             }
             else
                 result = GetCustomList(result, () => GetValues(info.GetValue(data)));
