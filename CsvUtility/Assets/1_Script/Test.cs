@@ -199,9 +199,10 @@ public class Test : MonoBehaviour
             item.test3.Add("µÒº≈≥ ∏Æ true¿‘¥œ¥Á", true);
             item.test3.Add("µÒº≈≥ ∏Æ false¿‘¥œ¥Á", false);
         }
-        CsvUtility.EnumerableSaveByCsvFile(saveTests, "Assets/2_Data/save.csv", new CsvSaveOption(2, 1, 3));
-        saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
-        print(saveTests[0].test3["µÒº≈≥ ∏Æ false¿‘¥œ¥Á"]);
+
+        CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
+        // saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
+        // print(saveTests[0].test3["µÒº≈≥ ∏Æ false¿‘¥œ¥Á"]);
         return;
     }
 

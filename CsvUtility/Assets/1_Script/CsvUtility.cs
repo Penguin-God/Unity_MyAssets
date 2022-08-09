@@ -9,22 +9,45 @@ using System.IO;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
+
+
 public static class CsvUtility
 {
+    public class CsvSaveOption
+    {
+        [SerializeField] int _arrayCount;
+        [SerializeField] int _listCount;
+        [SerializeField] int _dictionaryCount;
+
+        public int ArrayCount => (_arrayCount > 0) ? _arrayCount : 1;
+        public int ListCount => (_listCount > 0) ? _listCount : 1;
+        public int DitionaryCount => (_dictionaryCount > 0) ? _dictionaryCount : 1;
+
+        public CsvSaveOption()
+        {
+            _arrayCount = 1;
+            _listCount = 1;
+            _dictionaryCount = 1;
+        }
+
+        public CsvSaveOption(int arrayCount, int listCount = 1, int dictionaryCount = 1)
+        {
+            _arrayCount = arrayCount;
+            _listCount = listCount;
+            _dictionaryCount = dictionaryCount;
+        }
+    }
+
     public static IEnumerable<T> GetEnumerableFromCsv<T>(string csv) => new CsvLoder<T>(csv).GetInstanceIEnumerable();
     public static List<T> CsvToList<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToList();
     public static T[] CsvToArray<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToArray();
 
-    public static string EnumerableToCsv<T>(IEnumerable<T> datas, CsvSaveOption option = null) => GetSaver<T>(option).EnumerableToCsv(datas);
-    
-    public static void EnumerableSaveByCsvFile<T>(IEnumerable<T> datas, string path, CsvSaveOption option = null) => GetSaver<T>(option).Save(datas, path);
+    public static string EnumerableToCsv<T>(IEnumerable<T> datas, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1) 
+        => GetSaver<T>(arrayLength, listLength, dictionaryLength).EnumerableToCsv(datas);
+    public static void SaveCsv<T>(IEnumerable<T> datas, string path, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1)
+        => GetSaver<T>(arrayLength, listLength, dictionaryLength).Save(datas, path);
+    static CsvSaver<T> GetSaver<T>(int arrayLength, int listLength, int dictionaryLength) => new CsvSaver<T>(arrayLength, listLength, dictionaryLength);
 
-    static CsvSaver<T> GetSaver<T>(CsvSaveOption option = null)
-    {
-        if (option == null)
-            option = new CsvSaveOption();
-        return new CsvSaver<T>(option);
-    }
 
     static string SubLastLine(string text) => text.Substring(0, text.Length - 1);
     static IEnumerable<FieldInfo> GetSerializedFields(object obj)
@@ -207,10 +230,7 @@ public static class CsvUtility
             return countByType;
         }
 
-        public CsvSaver(CsvSaveOption option)
-        {
-            _option = option;
-        }
+        public CsvSaver(int arrayLength, int listLength, int dictionaryLength) => _option = new CsvSaveOption(arrayLength, listLength, dictionaryLength);
 
         int GetOptionCount(Type type)
         {
@@ -220,7 +240,7 @@ public static class CsvUtility
             else if (TypeIdentifier.IsDictionary(type)) return _option.DitionaryCount;
             else
             {
-                Debug.LogError("진짜 뭐노?");
+                Debug.LogWarning("정의할 수 없는 타입");
                 return 1;
             }
         }
