@@ -178,11 +178,12 @@ public class Test : MonoBehaviour
         return;
     }
 
-
+    [Header("아무거나 테스트")]
+    [SerializeField] TextAsset testCsv;
+    [SerializeField] MasterTest[] Tests;
     [ContextMenu("Test")]
     void TTTTTT()
     {
-        int[] a = new int[] { 1, 2, 3, 4, 5, 6 };
-        a.Skip(2).Take(5).ToList().ForEach(x => print(x));
+        
     }
 }

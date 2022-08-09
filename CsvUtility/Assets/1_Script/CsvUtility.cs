@@ -106,9 +106,9 @@ public static class CsvUtility
         void CheckFieldNames(Type type, string[] filedNames)
         {
             List<string> realFieldNames = GetSerializedFieldNames(typeof(T));
-            // realFieldNames.ForEach(x => Debug);
+
             for (int i = 0; i < filedNames.Length; i++)
-                Debug.Assert(realFieldNames.Contains(filedNames[i]), $"변수명과 일치하지 않는 {i + 1}번째 컬럼명 : {filedNames[i]}");
+                Debug.Assert(realFieldNames.Contains(filedNames[i]), $"찾을 수 없는 {i + 1}번째 컬럼명 : {filedNames[i]}");
         }
 
         public CsvLoder(string csv)
