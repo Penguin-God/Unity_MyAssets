@@ -101,7 +101,7 @@ public class MasterTest
         return true;
     }
 
-    bool HasClassIsSame(HasTestClass testClass) => CheckSame(testClass.aaa, 777) && CheckSame(testClass.AAA, "æ»≥Á«œººø‰.");
+    bool HasClassIsSame(HasTestClass testClass) => CheckSame(testClass.number, 777) && CheckSame(testClass.AAA, "æ»≥Á«œººø‰.");
     bool HasClassEnumerableIsSame(IEnumerable<HasTestClass> hasClass)
     {
         foreach (HasTestClass item in hasClass)
@@ -142,7 +142,7 @@ public enum TestType
 [Serializable]
 public struct HasTestClass
 {
-    [SerializeField] public int aaa;
+    [SerializeField] public int number;
     [SerializeField] public string AAA;
 }
 
@@ -191,6 +191,7 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void TTTTTT()
     {
-        Tests = CsvUtility.GetEnumerableFromCsv<Testssss>(testCsv.text).ToArray();
+        Debug.LogError($"Unloadable type : a, variable name : b, class type : c");
+        //Tests = CsvUtility.GetEnumerableFromCsv<Testssss>(testCsv.text).ToArray();
     }
 }

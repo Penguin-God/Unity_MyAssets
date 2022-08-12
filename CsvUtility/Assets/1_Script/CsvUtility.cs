@@ -21,13 +21,6 @@ public static class CsvUtility
         public int ListCount => (_listCount > 0) ? _listCount : 1;
         public int DitionaryCount => (_dictionaryCount > 0) ? _dictionaryCount : 1;
 
-        public CsvSaveOption()
-        {
-            _arrayCount = 1;
-            _listCount = 1;
-            _dictionaryCount = 1;
-        }
-
         public CsvSaveOption(int arrayCount, int listCount = 1, int dictionaryCount = 1)
         {
             _arrayCount = arrayCount;
@@ -76,7 +69,8 @@ public static class CsvUtility
         return restul;
     }
 
-    static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum;
+    static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum 
+        || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>));
 
     class CsvLoder<T>
     {
@@ -126,7 +120,17 @@ public static class CsvUtility
             return result;
 
             int GetCount(FieldInfo _info)
-                => TypeIdentifier.IsCustom(_info.FieldType) ? fieldNames.Count(x => x == _info.Name) - 1 : fieldNames.Count(x => x == _info.Name);
+            {
+                if (IsPrimitive(_info.FieldType))
+                    return 1;
+                else if (TypeIdentifier.IsCustom(_info.FieldType))
+                    return fieldNames.Count(x => x == _info.Name) - 1;
+                else if (TypeIdentifier.IsIEnumerable(_info.FieldType))
+                    return fieldNames.Count(x => x == _info.Name);
+
+                Debug.LogError($"Unloadable type : {_info.FieldType}, variable name : {_info.Name}, class type : {type}");
+                return 1;
+            }
         }
 
         public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), fieldNames, GetValueList(x)));
