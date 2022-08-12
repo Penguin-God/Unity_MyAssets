@@ -102,7 +102,7 @@ public static class CsvUtility
             List<string> realFieldNames = GetSerializedFieldNames(typeof(T));
 
             for (int i = 0; i < filedNames.Length; i++)
-                Debug.Assert(realFieldNames.Contains(filedNames[i]), $"찾을 수 없는 {i + 1}번째 컬럼명 : {filedNames[i]}");
+                Debug.Assert(realFieldNames.Contains(filedNames[i]), $"Unable to find {i + 1}th column name: {filedNames[i]}");
         }
 
         public CsvLoder(string csv)

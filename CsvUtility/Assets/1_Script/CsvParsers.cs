@@ -54,7 +54,7 @@ class PrimitiveTypeParser : CsvParser
         else if (type == typeof(bool)) return new CsvBooleanParser();
         else if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
         else if (type.IsEnum) return new CsvEnumParser(type);
-        else Debug.LogError("Csv 파싱 타입을 찾지 못함");
+        else Debug.LogError($"Unloadable type : {type}");
         return null;
     }
 
@@ -216,7 +216,7 @@ public class CsvDictionaryParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
-        if (values.Length % 2 != 0) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
+        if (values.Length % 2 != 0) Debug.LogError($"{info.Name} : The input is incorrect.Please make sure you entered the Dictionary correctly.");
 
         Type[] elementTypes = info.FieldType.GetGenericArguments();
         MethodInfo methodInfo = info.FieldType.GetMethod("Add");
@@ -269,20 +269,10 @@ public class CsvPairParser : CsvPrimitiveTypeParser
     public object GetParserValue(string value)
     {
         string[] values = value.Split('+');
-        if (values.Length != 2) Debug.LogError($"{_type} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
+        if (values.Length != 2) Debug.LogError($"{_type} : The input is incorrect.Please make sure you entered the Key Value pair correctly.");
         Type[] elementTypes = _type.GetGenericArguments();
         ConstructorInfo constructor = _type.GetConstructors()[0];
         return constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[0]),
                                                              PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[1]) });
-    }
-
-    public void SetValue(object obj, FieldInfo info, string[] values)
-    {
-        values = values[0].Split('+');
-        if (values.Length != 2) Debug.LogError($"{info.Name} 입력이 올바르지 않습니다. Key Value 쌍을 정확히 입력했는지 확인해주세요");
-        Type[] elementTypes = info.FieldType.GetGenericArguments();
-        ConstructorInfo constructor = info.FieldType.GetConstructors()[0];
-        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementTypes[0]).GetParserValue(values[0]),
-                                                             PrimitiveTypeParser.GetPrimitiveParser(elementTypes[1]).GetParserValue(values[1]) } ));
     }
 }
