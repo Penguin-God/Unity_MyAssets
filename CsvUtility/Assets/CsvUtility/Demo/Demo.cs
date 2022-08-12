@@ -1,15 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class Demo : MonoBehaviour
 {
     [SerializeField] DemoData[] demoDatas;
+    [SerializeField, TextArea] string demoCsvText;
+
     [SerializeField] TextAsset demoCsv;
     [SerializeField] Color color;
     void Start()
     {
+        // Load
         demoDatas = CsvUtility.CsvToArray<DemoData>(demoCsv.text);
+
+        // Save (Run the demo scene and check your folder)
+        demoCsvText = CsvUtility.ArrayToCsv(demoDatas, 2, 1, 1);
+        string filePath = Application.dataPath + "/CsvUtility/Demo/SaveCsv.csv";
+        SaveCsvFile(demoCsvText, filePath);
+    }
+
+    void SaveCsvFile(string csv, string filePath)
+    {
+        Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+        StreamWriter outStream = new StreamWriter(fileStream, System.Text.Encoding.UTF8);
+        outStream.Write(csv);
+        outStream.Close();
     }
 
     [System.Serializable]
