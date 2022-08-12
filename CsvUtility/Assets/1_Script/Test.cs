@@ -181,7 +181,7 @@ public class Test : MonoBehaviour
             item.test3.Add("µÒº≈≥ ∏Æ false¿‘¥œ¥Á", false);
         }
 
-        CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
+        //CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
         return;
     }
 

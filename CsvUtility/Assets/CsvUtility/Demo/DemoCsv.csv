@@ -1,0 +1,6 @@
+﻿number,text,actualNumber,boolean,numberArray,numberArray,textList,actualNumberByBoolean,demoType,vector,x,y,z,vector,color,r,g,b,a,color
+1,one,1.1,TRUE,1,2,"Hi, Hi","1.1, True",AAA,,1,1,1,,,0,0,0,0,
+2,two,2.2,FALSE,"3,4",,"Hello, Hello","2.2, False",BBB,,2,2,2,,,255,0,0,255,
+3,three,3.3,TRUE,"5,6","7,8",,"3.3, True",CCC,,3,3,3,,,0,255,0,255,
+4,four,4.4,FALSE,9,,cake,"4.4, False",DDD,,4,4,4,,,0,0,255,255,
+5,five,5.5,TRUE,"10,11","12,13","Thank, You","5.5, True",EEE,,5,5,5,,,255,255,255,255,

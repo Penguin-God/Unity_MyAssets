@@ -49,6 +49,7 @@ class PrimitiveTypeParser : CsvParser
     public static CsvPrimitiveTypeParser GetPrimitiveParser(Type type)
     {
         if (type == typeof(int)) return new CsvIntParser();
+        else if(type == typeof(byte)) return new CsvByteParser();
         else if (type == typeof(string)) return new CsvStringParser();
         else if (type == typeof(float)) return new CsvFloatParser();
         else if (type == typeof(bool)) return new CsvBooleanParser();
@@ -115,6 +116,19 @@ class EnumerableTypeParser : CsvParser
 }
 
 #region 기본형 파싱
+
+class CsvByteParser : CsvPrimitiveTypeParser
+{
+    public object GetParserValue(string value)
+    {
+        Byte.TryParse(value, out byte result);
+        return result;
+    }
+
+    public IEnumerable GetParserEnumerable(string[] value) => value.Select(x => (byte)GetParserValue(x));
+
+    public Type GetParserType() => typeof(byte);
+}
 
 class CsvIntParser : CsvPrimitiveTypeParser
 {

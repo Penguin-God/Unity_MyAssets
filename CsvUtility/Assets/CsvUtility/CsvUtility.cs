@@ -11,7 +11,7 @@ using Debug = UnityEngine.Debug;
 
 public static class CsvUtility
 {
-    public class CsvSaveOption
+    class CsvSaveOption
     {
         [SerializeField] int _arrayCount;
         [SerializeField] int _listCount;
@@ -29,14 +29,16 @@ public static class CsvUtility
         }
     }
 
-    public static IEnumerable<T> GetEnumerableFromCsv<T>(string csv) => new CsvLoder<T>(csv).GetInstanceIEnumerable();
+    
     public static List<T> CsvToList<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToList();
     public static T[] CsvToArray<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToArray();
+    static IEnumerable<T> GetEnumerableFromCsv<T>(string csv) => new CsvLoder<T>(csv).GetInstanceIEnumerable();
 
-    public static string EnumerableToCsv<T>(IEnumerable<T> datas, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1) 
-        => GetSaver<T>(arrayLength, listLength, dictionaryLength).EnumerableToCsv(datas);
-    public static void SaveCsv<T>(IEnumerable<T> datas, string path, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1)
-        => GetSaver<T>(arrayLength, listLength, dictionaryLength).Save(datas, path);
+
+    public static string ListToCsv<T>(List<T> list, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1)
+        => GetSaver<T>(arrayLength, listLength, dictionaryLength).EnumerableToCsv(list);
+    public static string ArrayToCsv<T>(T[] array, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1)
+        => GetSaver<T>(arrayLength, listLength, dictionaryLength).EnumerableToCsv(array);
     static CsvSaver<T> GetSaver<T>(int arrayLength, int listLength, int dictionaryLength) => new CsvSaver<T>(arrayLength, listLength, dictionaryLength);
 
 
@@ -46,7 +48,7 @@ public static class CsvUtility
         Type type = obj as Type;
         return type == null ? GetSerializedFields(obj.GetType()) : GetSerializedFields(type);
     }
-    public static IEnumerable<FieldInfo> GetSerializedFields(Type type)
+    static IEnumerable<FieldInfo> GetSerializedFields(Type type)
     => type
         .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
         .Where(x => CsvSerializedCondition(x));
@@ -383,21 +385,11 @@ public static class CsvUtility
             return result;
         }
 
-
-
         List<string> GetCustomList(List<string> result, Func<IEnumerable<string>> OriginFunc, string blank = "")
         {
             result = GetConcatList(result, OriginFunc());
             result.Add(blank);
             return result;
-        }
-
-        public void Save(IEnumerable<T> enumerable, string filePath)
-        {
-            Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-            StreamWriter outStream = new StreamWriter(fileStream, Encoding.UTF8);
-            outStream.Write(EnumerableToCsv(enumerable));
-            outStream.Close();
         }
     }
 }
