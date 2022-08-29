@@ -250,187 +250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadCsv: {fileID: 4900000, guid: 33380155e49e9984a8033ba8f0580e9a, type: 3}
-  masterTests:
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
-  - number: 123
-    text: Hello World
-    actualNumber: 23.123
-    boolean: 1
-    numberArray: f334050043330000
-    textArray:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uC548\uB155"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberArray:
-    - 4224.12
-    - 1245.12
-    booleanArray: 0100
-    numberList: f334050043330000
-    textList:
-    - "\uACE0\uD0C0\uC5D0"
-    - "\uB77C\uD5E4\uC57C"
-    actualNumberList:
-    - 4224.12
-    - 1245.12
-    booleanList: 0100
-    hasClass:
-      number: 0
-      AAA: 777
-    hasClassArray:
-    - number: 0
-      AAA: 
-    - number: 0
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
-    testType: 777
+  masterTests: []
   saveCsv: {fileID: 4900000, guid: ee21084bd7be6a444bfa5e60bff64c59, type: 3}
   saveTests: []
   testCsv: {fileID: 4900000, guid: 04abff81bf35cbb4b92c6dcd1227c50d, type: 3}
@@ -518,3 +338,61 @@ MonoBehaviour:
   stringarray:
   - bigmac
   - inandout
+--- !u!1 &1857504259
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1857504262}
+  - component: {fileID: 1857504260}
+  m_Layer: 0
+  m_Name: BlogTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1857504260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857504259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35dfb4cb2a2ee6848bac1b00a9a25b2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blogTests:
+  - intArr: 010000000200000003000000
+    stringList:
+    - Hello
+    gamesArr: 
+  - intArr: 040000000500000006000000
+    stringList:
+    - World
+    gamesArr: 
+  - intArr: 070000000800000009000000
+    stringList:
+    - Hello
+    - World
+    gamesArr: 
+  csvAsset: {fileID: 4900000, guid: c56b215cef126b54b90081d17e35efd6, type: 3}
+--- !u!4 &1857504262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857504259}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
