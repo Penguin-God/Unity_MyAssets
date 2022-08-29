@@ -164,7 +164,7 @@ class CsvStringParser : CsvPrimitiveTypeParser
 
 class CsvBooleanParser : CsvPrimitiveTypeParser
 {
-    public object GetParserValue(string value) => value == "True" || value == "TRUE";
+    public object GetParserValue(string value) => value == "True" || value == "TRUE" || value == "true";
     public IEnumerable GetParserEnumerable(string[] value) => value.Select(x => (bool)GetParserValue(x));
     public Type GetParserType() => typeof(bool);
 }
@@ -178,7 +178,11 @@ class CsvEnumParser : CsvPrimitiveTypeParser
     }
 
     public object GetParserValue(string value) => Enum.Parse(_type, value);
-    public IEnumerable GetParserEnumerable(string[] value) => value.Select(x => Convert.ChangeType(GetParserValue(x), _type));
+    public IEnumerable GetParserEnumerable(string[] value)
+    {
+        Debug.Log(Convert.ChangeType(GetParserValue(value[0]), _type));
+        return value.Select(x => Convert.ChangeType(GetParserValue(x), _type));
+    }
     public Type GetParserType() => _type;
 }
 
@@ -192,9 +196,20 @@ public class CsvListParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
-        Type elementType = info.FieldType.GetGenericArguments()[0];
         ConstructorInfo constructor = info.FieldType.GetConstructors()[2];
-        info.SetValue(obj, constructor.Invoke(new object[] { PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserEnumerable(values) }));
+        info.SetValue(obj, constructor.Invoke(new object[] { GetValue(info, values) }));
+    }
+
+    Array GetValue(FieldInfo info, string[] values)
+    {
+        Type elementType = info.FieldType.GetGenericArguments()[0];
+        return new CsvArrayParser().GetValue(elementType, values);
+
+        //Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserType(), values.Length);
+        //Debug.Log(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[0]));
+        //for (int i = 0; i < array.Length; i++)
+        //    array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[i]), i);
+        //return array;
     }
 
     public string[] GetCsvValues(object obj, FieldInfo info)
@@ -210,11 +225,20 @@ public class CsvArrayParser : ICsvIEnumeralbeParser
 {
     public void SetValue(object obj, FieldInfo info, string[] values)
     {
-        Type elementType = info.FieldType.GetElementType();
+        //Type elementType = ;
+        //Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserType(), values.Length);
+        //Debug.Log(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[0]));
+        //for (int i = 0; i < array.Length; i++)
+        //    array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[i]), i);
+        info.SetValue(obj, GetValue(info.FieldType.GetElementType(), values));
+    }
+
+    public Array GetValue(Type elementType, string[] values)
+    {
         Array array = Array.CreateInstance(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserType(), values.Length);
         for (int i = 0; i < array.Length; i++)
             array.SetValue(PrimitiveTypeParser.GetPrimitiveParser(elementType).GetParserValue(values[i]), i);
-        info.SetValue(obj, array);
+        return array;
     }
 
     public string[] GetCsvValues(object obj, FieldInfo info)
