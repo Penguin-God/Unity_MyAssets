@@ -548,18 +548,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blogTests:
-  - intArr: 01000000020000000300000004000000
-    stringList: []
-    gamesArr: 0000000001000000
-  - intArr: 050000000600000007000000
-    stringList:
-    - World
-    gamesArr: 0200000003000000
-  - intArr: 08000000090000000a000000
-    stringList:
-    - Hello
-    - World
-    gamesArr: 0400000005000000
+  - vector: {x: 0, y: 0, z: 0}
+    hasClass:
+      number: 0
+      text: 
+    color: {r: 0, g: 0, b: 0, a: 0}
+  - vector: {x: 0, y: 0, z: 0}
+    hasClass:
+      number: 0
+      text: 
+    color: {r: 0, g: 0, b: 0, a: 0}
+  - vector: {x: 0, y: 0, z: 0}
+    hasClass:
+      number: 0
+      text: 
+    color: {r: 0, g: 0, b: 0, a: 0}
   csvAsset: {fileID: 4900000, guid: c56b215cef126b54b90081d17e35efd6, type: 3}
 --- !u!4 &1857504262
 Transform:

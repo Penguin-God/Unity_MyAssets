@@ -14,12 +14,18 @@ public enum Games
 }
 
 [Serializable]
+class HasClass
+{
+    [SerializeField] int number;
+    [SerializeField] string text;
+}
+
+[Serializable]
 class BlogTest
 {
-    [SerializeField] int[] intArr;
-    [SerializeField] List<string> stringList;
-    public Dictionary<float, bool> booleanByFloat = new Dictionary<float, bool>();
-    [SerializeField] Games[] gamesArr;
+    [SerializeField] Vector3 vector;
+    [SerializeField] HasClass hasClass;
+    [SerializeField] Color color;
 }
 
 public class Blog : MonoBehaviour
@@ -28,15 +34,5 @@ public class Blog : MonoBehaviour
     [SerializeField] TextAsset csvAsset;
 
     [ContextMenu("Do Test")]
-    void Test()
-    {
-        blogTests = CsvUtility.CsvToArray<BlogTest>(csvAsset.text);
-        foreach (var item in blogTests)
-        {
-            foreach (var pair in item.booleanByFloat)
-            {
-                print($"{pair.Key}, {pair.Value}");
-            }
-        }
-    }
+    void Test() => blogTests = CsvUtility.CsvToArray<BlogTest>(csvAsset.text);
 }
