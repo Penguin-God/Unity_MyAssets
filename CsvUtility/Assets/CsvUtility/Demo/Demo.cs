@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+class BattleGameData
+{
+
+}
+
 public class Demo : MonoBehaviour
 {
     [SerializeField] DemoData[] demoDatas;
@@ -10,6 +15,9 @@ public class Demo : MonoBehaviour
 
     [SerializeField] TextAsset demoCsv;
     [SerializeField] Color color;
+
+    BattleGameData BattleGameData;
+    TextAsset textAsset;
     void Start()
     {
         // Load
@@ -19,6 +27,14 @@ public class Demo : MonoBehaviour
         demoCsvText = CsvUtility.ArrayToCsv(demoDatas, 2, 1, 1);
         string filePath = Application.dataPath + "/CsvUtility/Demo/SaveCsv.csv";
         SaveCsvFile(demoCsvText, filePath);
+
+
+
+
+        BattleGameData = JsonUtility.FromJson<BattleGameData>(textAsset.text);
+
+
+
     }
 
     void SaveCsvFile(string csv, string filePath)
