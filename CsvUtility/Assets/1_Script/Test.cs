@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
-using System.Reflection;
-using System.Diagnostics;
+using System.IO;
 using Debug = UnityEngine.Debug;
 
 [Serializable]
@@ -116,16 +115,11 @@ public class MasterTest
 [Serializable]
 public class SaveTestCalss
 {
-    [SerializeField] public int aaab = 123;
-    [SerializeField] public string AAAb = "æ»≥Á ººªÛ";
-    [SerializeField] public string[] test1 = new string[] { "22", "fasdasd" };
-    [SerializeField] public List<int> test2 = new List<int>() { 1, 23, 123 };
-    public Dictionary<string, bool> test3 = new Dictionary<string, bool>();
-    public TestType testType = TestType.Devlop;
-    [SerializeField] HasTestClass hasClass;
-    
-    [SerializeField] HasTestClass[] hasClassArray;
-    [SerializeField] int a;
+    [SerializeField] public long aaab;
+    [SerializeField] public double AAAb;
+    [SerializeField] long[] longs;
+    [SerializeField] double[] doubles;
+    [SerializeField] public Dictionary<long, double> keyValuePairs = new Dictionary<long, double>();
 }
 
 public enum TestType
@@ -174,14 +168,16 @@ public class Test : MonoBehaviour
     [ContextMenu("Save Test")]
     void SaveTest()
     {
-        foreach (var item in saveTests)
-        {
-            item.test3.Clear();
-            item.test3.Add("µÒº≈≥ ∏Æ true¿‘¥œ¥Á", true);
-            item.test3.Add("µÒº≈≥ ∏Æ false¿‘¥œ¥Á", false);
-        }
+        //saveTests[0].keyValuePairs.Clear();
+        saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
+        return;
+        saveTests[0].keyValuePairs.Add(1124153215124355135,  12.51341412312312);
+        string csv = CsvUtility.ArrayToCsv(saveTests, 2, 1, 2);
 
-        //CsvUtility.SaveCsv(saveTests, "Assets/2_Data/save.csv", 2, 2, 2);
+        Stream fileStream = new FileStream("Assets/2_Data/save.csv", FileMode.Create, FileAccess.Write);
+        StreamWriter outStream = new StreamWriter(fileStream, System.Text.Encoding.UTF8);
+        outStream.Write(csv);
+        outStream.Close();
         return;
     }
 

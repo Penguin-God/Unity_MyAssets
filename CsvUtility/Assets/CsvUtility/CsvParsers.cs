@@ -49,8 +49,10 @@ namespace ParserCore
         {
             if (type == typeof(int)) return new CsvIntParser();
             else if (type == typeof(byte)) return new CsvByteParser();
+            else if (type == typeof(long)) return new CsvLongParser();
             else if (type == typeof(string)) return new CsvStringParser();
             else if (type == typeof(float)) return new CsvFloatParser();
+            else if (type == typeof(double)) return new CsvDoubleParser();
             else if (type == typeof(bool)) return new CsvBooleanParser();
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
             else if (type.IsEnum) return new CsvEnumParser(type);
@@ -138,6 +140,17 @@ namespace ParserCore
         public Type GetParserType() => typeof(int);
     }
 
+    class CsvLongParser : CsvPrimitiveTypeParser
+    {
+        public object GetParserValue(string value)
+        {
+            long.TryParse(value, out long valueInt);
+            return valueInt;
+        }
+
+        public Type GetParserType() => typeof(long);
+    }
+
     class CsvFloatParser : CsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
@@ -147,6 +160,17 @@ namespace ParserCore
         }
 
         public Type GetParserType() => typeof(float);
+    }
+
+    class CsvDoubleParser : CsvPrimitiveTypeParser
+    {
+        public object GetParserValue(string value)
+        {
+            double.TryParse(value, out double valueFloat);
+            return valueFloat;
+        }
+
+        public Type GetParserType() => typeof(double);
     }
 
     class CsvStringParser : CsvPrimitiveTypeParser

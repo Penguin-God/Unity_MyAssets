@@ -432,7 +432,19 @@ MonoBehaviour:
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
   saveCsv: {fileID: 4900000, guid: ee21084bd7be6a444bfa5e60bff64c59, type: 3}
-  saveTests: []
+  saveTests:
+  - aaab: 222222222222222
+    AAAb: 1.3124
+    longs: 06e10100000000007b00000000000000
+    doubles:
+    - 312412
+    - 142312.134123412
+  - aaab: 222222222222222
+    AAAb: 1.3124
+    longs: 06e10100000000007b00000000000000
+    doubles:
+    - 312412
+    - 142312.134123412
   testCsv: {fileID: 4900000, guid: 04abff81bf35cbb4b92c6dcd1227c50d, type: 3}
   Tests:
   - arr: 010000000200000003000000
@@ -547,17 +559,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35dfb4cb2a2ee6848bac1b00a9a25b2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blogTests:
-  - text: Hello
-    numbers: 0100000002000000
-    vector: {x: -1, y: -1, z: -1}
-  - text: World
-    numbers: 030000000400000005000000
-    vector: {x: 7, y: 7, z: 7}
-  - text: Hello World
-    numbers: 06000000
-    vector: {x: 2415, y: 124, z: 6785}
-  csvAsset: {fileID: 4900000, guid: c56b215cef126b54b90081d17e35efd6, type: 3}
+  blogTests: []
+  csvAsset: {fileID: 4900000, guid: cef34c3b307baf245ab008d4360ce60f, type: 3}
 --- !u!4 &1857504262
 Transform:
   m_ObjectHideFlags: 0

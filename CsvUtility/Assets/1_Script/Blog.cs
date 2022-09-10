@@ -25,7 +25,7 @@ class HasClass
 class BlogTest
 {
     [SerializeField] string text;
-    [SerializeField] int[] numbers; 
+    [SerializeField] int[,] numbers = new int[2, 2] { { 1, 2 }, { 3, 4 } };
     public Dictionary<Games, float> MetacriticScoreByGame = new Dictionary<Games, float>();
     [SerializeField] Vector3 vector;
 }
@@ -38,6 +38,11 @@ public class Blog : MonoBehaviour
     string filePath => Path.Combine(Application.dataPath, "saveTest.csv");
 
     [ContextMenu("Do Test")]
+    void Test2()
+    {
+        blogTests = CsvUtility.CsvToArray<BlogTest>(csvAsset.text);
+    }
+
     void Test()
     {
         blogTests[0].MetacriticScoreByGame.Clear();
