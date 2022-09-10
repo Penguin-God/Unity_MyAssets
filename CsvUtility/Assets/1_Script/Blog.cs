@@ -40,6 +40,10 @@ public class Blog : MonoBehaviour
     [ContextMenu("Do Test")]
     void Test()
     {
+        blogTests[0].MetacriticScoreByGame.Clear();
+        blogTests[1].MetacriticScoreByGame.Clear();
+        blogTests[2].MetacriticScoreByGame.Clear();
+
         blogTests[0].MetacriticScoreByGame.Add(Games.Ori_and_the_Will_of_the_Wisps, 8.9f);
         blogTests[0].MetacriticScoreByGame.Add(Games.OMORI, 9.2f);
         blogTests[1].MetacriticScoreByGame.Add(Games.OneShot, 8.9f);
