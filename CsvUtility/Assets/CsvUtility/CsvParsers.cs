@@ -54,8 +54,8 @@ namespace ParserCore
             else if (type == typeof(float)) return new CsvFloatParser();
             else if (type == typeof(double)) return new CsvDoubleParser();
             else if (type == typeof(bool)) return new CsvBooleanParser();
-            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
             else if (type.IsEnum) return new CsvEnumParser(type);
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
             else Debug.LogError($"Unloadable type : {type}");
             return null;
         }
