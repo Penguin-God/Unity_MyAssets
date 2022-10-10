@@ -29,8 +29,8 @@ public class MasterTest
     [SerializeField] Dictionary<int, string> numberByText = new Dictionary<int, string>();
     [SerializeField] Dictionary<float, bool> actualNumberByBoolean = new Dictionary<float, bool>();
 
-    [SerializeField] HasTestClass hasClass;
-    [SerializeField] HasTestClass[] hasClassArray;
+    [SerializeField] public HasTestClass hasClass;
+    [SerializeField] public HasTestClass[] hasClassArray;
     [SerializeField] TestType testType;
 
     public bool IsSuccess()
@@ -134,7 +134,7 @@ public enum TestType
 }
 
 [Serializable]
-public struct HasTestClass
+public class HasTestClass
 {
     [SerializeField] public int number;
     [SerializeField] public string AAA;
@@ -157,8 +157,10 @@ public class Test : MonoBehaviour
     void MasterTest()
     {
         masterTests = CsvUtility.CsvToArray<MasterTest>(loadCsv.text);
+        print(masterTests[0].hasClassArray.Length);
         if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
         else print("Bad!!");
+
     }
 
     [Header("Save Test Values")]

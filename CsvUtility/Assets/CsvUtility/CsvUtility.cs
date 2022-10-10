@@ -49,9 +49,8 @@ public static class CsvUtility
         return type == null ? GetSerializedFields(obj.GetType()) : GetSerializedFields(type);
     }
     static IEnumerable<FieldInfo> GetSerializedFields(Type type)
-    => type
-        .GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-        .Where(x => CsvSerializedCondition(x));
+        => type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+               .Where(x => CsvSerializedCondition(x));
 
     static bool CsvSerializedCondition(FieldInfo info) => info.IsPublic || info.GetCustomAttribute(typeof(SerializeField)) != null;
 
@@ -155,39 +154,55 @@ public static class CsvUtility
             return obj;
         }
 
-        string[] GetCustomFieldNames(string name, int startIndex = 0)
-        {
-            int[] indexs = fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
-            return fieldNames.Skip(indexs[startIndex] + 1).Take(indexs[startIndex + 1] - indexs[startIndex] - 1).ToArray();
-        }
-
         object GetCustomValue(FieldInfo _info, List<string> cells)
         {
             if (TypeIdentifier.IsIEnumerable(_info.FieldType))
-                return GetArray(_info, cells);
+                return GetCustomArray(_info, cells);
             else
                 return GetSingleCustomValue(_info.FieldType, cells, _info.Name);
         }
 
-        object GetSingleCustomValue(Type type, List<string> cells, string name = "", int index = 0)
+        object GetSingleCustomValue(Type type, List<string> cells, string name, int index = 0)
         {
             cells.RemoveAt(0);
-            return GetInstance(GetCoustomType(type), GetCustomFieldNames(name, index), cells);
+            if (GetFieldValues(GetSerializedFields(type).Count(), new List<string>(cells)).Where(x => string.IsNullOrEmpty(x) == false).Count() == 0)
+            {
+                GetFieldValues(GetSerializedFields(type).Count(), cells);
+                return null;
+            }
+            else
+                return GetInstance(GetCoustomType(type), GetCustomFieldNames(index), cells);
+
+            string[] GetCustomFieldNames(int startIndex)
+            {
+                int[] indexs = fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
+                return fieldNames.Skip(indexs[startIndex] + 1).Take(indexs[startIndex + 1] - indexs[startIndex] - 1).ToArray();
+            }
         }
 
-        object GetArray(FieldInfo info, List<string> cells)
+        object GetCustomArray(FieldInfo info, List<string> cells)
         {
             int length = fieldNames.Where(x => x == info.Name).Count() - 1;
             Type elementType = GetElementType(info.FieldType);
 
-            Array array = Array.CreateInstance(elementType, length);
+            List<object> objs = new List<object>();
             for (int i = 0; i < length; i++)
-                array.SetValue(GetSingleCustomValue(elementType, cells, info.Name, i), i);
+            {
+                var value = GetSingleCustomValue(elementType, cells, info.Name, i);
+                if (value != null)
+                    objs.Add(value);
+            }
+
+            if (objs.Count == 0) return null;
+
+            Array array = Array.CreateInstance(elementType, objs.Count);
+            for (int i = 0; i < objs.Count; i++)
+                array.SetValue(objs[i], i);
 
             return GetIEnumerableValue(info.FieldType, array);
         }
-
         object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
+
 
         string[] GetFieldValues(int count, List<string> cells)
         {

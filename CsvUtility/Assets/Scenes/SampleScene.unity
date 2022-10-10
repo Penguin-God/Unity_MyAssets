@@ -278,8 +278,6 @@ MonoBehaviour:
     hasClassArray:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
-    - number: 777
-      AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
   - number: 123
     text: Hello World
