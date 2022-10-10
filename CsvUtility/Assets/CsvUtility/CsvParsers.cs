@@ -192,7 +192,20 @@ namespace ParserCore
         {
             _type = type;
         }
-        public object GetParserValue(string value) => Enum.Parse(_type, value);
+
+        public object GetParserValue(string value)
+        {
+            object result = null;
+            try
+            {
+                result = Enum.Parse(_type, value);
+            }
+            catch
+            {
+                Debug.LogError($"CsvUtility Message : The requested value {value} was not found within {_type} enum.");
+            }
+            return result;
+        }
         public Type GetParserType() => _type;
     }
 
