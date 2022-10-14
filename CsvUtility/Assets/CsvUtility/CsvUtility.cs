@@ -83,20 +83,6 @@ public static class CsvUtility
         string _csv;
         string[] fieldNames;
 
-        string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
-
-        List<string> GetValueList(string line)
-        {
-            string[] tokens = line.Split(mark);
-
-            for (int i = 0; i < tokens.Length - 1; i++)
-            {
-                if (i % 2 == 1)
-                    tokens[i] = tokens[i].Replace(',', replaceMark);
-            }
-            return GetCells(string.Join("", tokens).Replace("\"", "")).ToList();
-        }
-
         [Conditional("UNITY_EDITOR")]
         void CheckFieldNames(Type type, string[] filedNames)
         {
@@ -111,6 +97,27 @@ public static class CsvUtility
             _csv = csv.Substring(0, csv.Length - 1);
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
             CheckFieldNames(typeof(T), fieldNames);
+        }
+
+        string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
+
+        List<string> GetValueList(string line)
+        {
+            string[] tokens = line.Split(mark);
+
+            for (int i = 0; i < tokens.Length - 1; i++)
+            {
+                if (i % 2 == 1)
+                    tokens[i] = tokens[i].Replace(',', replaceMark);
+            }
+            return GetCells(string.Join("", tokens).Replace("\"", "")).ToList();
+        }
+
+        bool IsValidLine(string line)
+        {
+            if (GetValueList(line)[0] == "PASS")
+                return false;
+            return !string.IsNullOrEmpty(line.Replace(",", "").Trim());
         }
 
         Dictionary<string, int> GetCountByFieldName(Type type, string[] fieldNames)
@@ -134,7 +141,11 @@ public static class CsvUtility
             }
         }
 
-        public IEnumerable<T> GetInstanceIEnumerable() => _csv.Split(lineBreak).Skip(1).Select(x => (T)GetInstance(typeof(T), fieldNames, GetValueList(x)));
+        public IEnumerable<T> GetInstanceIEnumerable() 
+            => _csv.Split(lineBreak)
+                    .Skip(1)
+                    .Where(x => IsValidLine(x))
+                    .Select(x => (T)GetInstance(typeof(T), fieldNames, GetValueList(x)));
 
         object GetInstance(Type type, string[] fieldNames, List<string> cells)
         {

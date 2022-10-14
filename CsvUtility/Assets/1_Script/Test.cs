@@ -157,8 +157,7 @@ public class Test : MonoBehaviour
     void MasterTest()
     {
         masterTests = CsvUtility.CsvToArray<MasterTest>(loadCsv.text);
-        print(masterTests[0].hasClassArray.Length);
-        if (masterTests.All(x => x.IsSuccess())) print("GOOD!!");
+        if (masterTests.All(x => x.IsSuccess()) && masterTests.Length == 6) print("GOOD!!");
         else print("Bad!!");
 
     }
