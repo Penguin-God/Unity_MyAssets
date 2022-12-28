@@ -45,15 +45,20 @@ namespace ParserCore
 
     class PrimitiveTypeParser : ICsvParser
     {
+        static Dictionary<Type, ICsvPrimitiveTypeParser> _primitiveParserByType = new Dictionary<Type, ICsvPrimitiveTypeParser>()
+        {
+            {typeof(int), new CsvIntParser() },
+            {typeof(byte), new CsvByteParser()},
+            {typeof(long), new CsvLongParser()},
+            {typeof(string), new CsvStringParser()},
+            {typeof(float), new CsvFloatParser()},
+            {typeof(double), new CsvDoubleParser()},
+            {typeof(bool), new CsvBooleanParser()},
+        };
         public static ICsvPrimitiveTypeParser GetPrimitiveParser(Type type)
         {
-            if (type == typeof(int)) return new CsvIntParser();
-            else if (type == typeof(byte)) return new CsvByteParser();
-            else if (type == typeof(long)) return new CsvLongParser();
-            else if (type == typeof(string)) return new CsvStringParser();
-            else if (type == typeof(float)) return new CsvFloatParser();
-            else if (type == typeof(double)) return new CsvDoubleParser();
-            else if (type == typeof(bool)) return new CsvBooleanParser();
+            if (_primitiveParserByType.TryGetValue(type, out var parser))
+                return parser;
             else if (type.IsEnum) return new CsvEnumParser(type);
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
             else Debug.LogError($"Unloadable type : {type}");
