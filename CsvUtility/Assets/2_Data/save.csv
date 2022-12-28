@@ -1,3 +1,7 @@
-﻿aaab,AAAb,longs,longs,doubles,doubles,keyValuePairs,keyValuePairs
-222222222222222,1.3124,"123142","123","312412","142312.134123412","1124153215124355135","12.5134141231231"
-222222222222222,1.3124,"123142","123","312412","142312.134123412","",""
+﻿number,text,actualNumber,boolean,textNumberPair,booleanActualNumberPair,numberArray,textArray,actualNumberArray,booleanArray,numberList,textList,actualNumberList,booleanList,numberByText,actualNumberByBoolean,hasClass,number,AAA,hasClass,hasClassArray,number,AAA,hasClassArray,number,AAA,hasClassArray,testType
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,,,,Devlop
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,777,안녕하세요.,,Devlop
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,777,안녕하세요.,,Devlop
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,777,안녕하세요.,,Devlop
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,777,안녕하세요.,,Devlop
+123,Hello World,23.123,True,[, 0],[False, 0],"341235,13123","고타에,안녕,라헤야","4224.12,1245.12","True,False","341235,13123","고타에,라헤야","4224.12,1245.12","True,False","","",,777,안녕하세요.,,,777,안녕하세요.,,777,안녕하세요.,,Devlop

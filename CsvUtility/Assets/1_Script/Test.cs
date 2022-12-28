@@ -112,16 +112,6 @@ public class MasterTest
     }
 }
 
-[Serializable]
-public class SaveTestCalss
-{
-    [SerializeField] public long aaab;
-    [SerializeField] public double AAAb;
-    [SerializeField] long[] longs;
-    [SerializeField] double[] doubles;
-    [SerializeField] public Dictionary<long, double> keyValuePairs = new Dictionary<long, double>();
-}
-
 public enum TestType
 {
     Happy,
@@ -140,14 +130,6 @@ public class HasTestClass
     [SerializeField] public string AAA;
 }
 
-[Serializable]
-public struct Testssss
-{
-    public int[] arr;
-    public int t;
-}
-
-
 public class Test : MonoBehaviour
 {
     [SerializeField] TextAsset loadCsv;
@@ -159,36 +141,25 @@ public class Test : MonoBehaviour
         masterTests = CsvUtility.CsvToArray<MasterTest>(loadCsv.text);
         if (masterTests.All(x => x.IsSuccess()) && masterTests.Length == 6) print("GOOD!!");
         else print("Bad!!");
-
     }
 
-    [Header("Save Test Values")]
-    [SerializeField] TextAsset saveCsv;
-    [SerializeField] SaveTestCalss[] saveTests;
+
+    [Header("Save Test")]
+    [TextArea, SerializeField] string saveResult;
 
     [ContextMenu("Save Test")]
-    void SaveTest()
+    void TestDeSerializede()
     {
-        //saveTests[0].keyValuePairs.Clear();
-        saveTests = CsvUtility.CsvToArray<SaveTestCalss>(saveCsv.text);
-        return;
-        saveTests[0].keyValuePairs.Add(1124153215124355135,  12.51341412312312);
-        string csv = CsvUtility.ArrayToCsv(saveTests, 2, 1, 2);
+        if (CsvUtility.ArrayToCsv(masterTests) == saveResult) print("GOOD!!");
+        else print("Bad!!");
+        SaveCsv(CsvUtility.ArrayToCsv(masterTests));
+    }
 
+    void SaveCsv(string csv)
+    {
         Stream fileStream = new FileStream("Assets/2_Data/save.csv", FileMode.Create, FileAccess.Write);
         StreamWriter outStream = new StreamWriter(fileStream, System.Text.Encoding.UTF8);
         outStream.Write(csv);
         outStream.Close();
-        return;
-    }
-
-    [Header("아무거나 테스트")]
-    [SerializeField] TextAsset testCsv;
-    [SerializeField] Testssss[] Tests;
-    [ContextMenu("Test")]
-    void TTTTTT()
-    {
-        Debug.LogError($"Unloadable type : a, variable name : b, class type : c");
-        //Tests = CsvUtility.GetEnumerableFromCsv<Testssss>(testCsv.text).ToArray();
     }
 }
