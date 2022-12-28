@@ -202,7 +202,7 @@ public class Test : MonoBehaviour
         var type = typeof(ICsvPrimitiveTypeParser);
         var types = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
-            .Where(p => type.IsAssignableFrom(p) && p.Name != "ICsvPrimitiveTypeParser");
+            .Where(p => type.IsAssignableFrom(p) && p.IsInterface == false);
         foreach (var item in types)
         {
             print(item.Name);
