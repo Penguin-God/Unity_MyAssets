@@ -10,7 +10,7 @@ namespace ParserCore
 {
     public class CsvParsers
     {
-        public static CsvParser GetParser(FieldInfo info)
+        public static ICsvParser GetParser(FieldInfo info)
         {
             if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 return new EnumerableTypeParser();
@@ -32,20 +32,20 @@ namespace ParserCore
         string[] GetCsvValues(object obj, FieldInfo info);
     }
 
-    public interface CsvPrimitiveTypeParser
+    public interface ICsvPrimitiveTypeParser
     {
         object GetParserValue(string value);
         Type GetParserType();
     }
 
-    public interface CsvParser
+    public interface ICsvParser
     {
         void SetValue(object obj, FieldInfo info, string[] values);
     }
 
-    class PrimitiveTypeParser : CsvParser
+    class PrimitiveTypeParser : ICsvParser
     {
-        public static CsvPrimitiveTypeParser GetPrimitiveParser(Type type)
+        public static ICsvPrimitiveTypeParser GetPrimitiveParser(Type type)
         {
             if (type == typeof(int)) return new CsvIntParser();
             else if (type == typeof(byte)) return new CsvByteParser();
@@ -64,7 +64,7 @@ namespace ParserCore
         public void SetValue(object obj, FieldInfo info, string[] value) => info.SetValue(obj, GetParserValue(info.FieldType, value[0]));
     }
 
-    class EnumerableTypeParser : CsvParser
+    class EnumerableTypeParser : ICsvParser
     {
         EnumerableType GetEnumableType(Type type)
         {
@@ -118,7 +118,7 @@ namespace ParserCore
 
     #region 기본형 파싱
 
-    class CsvByteParser : CsvPrimitiveTypeParser
+    class CsvByteParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
         {
@@ -129,7 +129,7 @@ namespace ParserCore
         public Type GetParserType() => typeof(byte);
     }
 
-    class CsvIntParser : CsvPrimitiveTypeParser
+    class CsvIntParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
         {
@@ -140,7 +140,7 @@ namespace ParserCore
         public Type GetParserType() => typeof(int);
     }
 
-    class CsvLongParser : CsvPrimitiveTypeParser
+    class CsvLongParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
         {
@@ -151,7 +151,7 @@ namespace ParserCore
         public Type GetParserType() => typeof(long);
     }
 
-    class CsvFloatParser : CsvPrimitiveTypeParser
+    class CsvFloatParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
         {
@@ -162,7 +162,7 @@ namespace ParserCore
         public Type GetParserType() => typeof(float);
     }
 
-    class CsvDoubleParser : CsvPrimitiveTypeParser
+    class CsvDoubleParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value)
         {
@@ -173,19 +173,19 @@ namespace ParserCore
         public Type GetParserType() => typeof(double);
     }
 
-    class CsvStringParser : CsvPrimitiveTypeParser
+    class CsvStringParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value) => value;
         public Type GetParserType() => typeof(string);
     }
 
-    class CsvBooleanParser : CsvPrimitiveTypeParser
+    class CsvBooleanParser : ICsvPrimitiveTypeParser
     {
         public object GetParserValue(string value) => value == "True" || value == "TRUE" || value == "true";
         public Type GetParserType() => typeof(bool);
     }
 
-    class CsvEnumParser : CsvPrimitiveTypeParser
+    class CsvEnumParser : ICsvPrimitiveTypeParser
     {
         Type _type;
         public CsvEnumParser(Type type)
@@ -293,7 +293,7 @@ namespace ParserCore
     }
     #endregion 열거형 파싱 End
 
-    public class CsvPairParser : CsvPrimitiveTypeParser
+    public class CsvPairParser : ICsvPrimitiveTypeParser
     {
         Type _type;
         public CsvPairParser(Type type)
