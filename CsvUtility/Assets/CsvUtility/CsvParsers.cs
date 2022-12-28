@@ -329,6 +329,8 @@ namespace ParserCore
         public static bool IsList(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
         public static bool IsDictionary(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
         public static bool IsIEnumerable(Type type) => type.IsArray || IsList(type) || IsDictionary(type);
+        public static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum
+            || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>));
         public static bool IsCustom(Type type)
         {
             if (type.IsEnum) return false;

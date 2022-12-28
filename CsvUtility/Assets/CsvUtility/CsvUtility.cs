@@ -70,9 +70,6 @@ public static class CsvUtility
         return restul;
     }
 
-    static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum 
-        || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>));
-
     class CsvLoder<T>
     {
         const char comma = ',';
@@ -129,7 +126,7 @@ public static class CsvUtility
 
             int GetCount(FieldInfo _info)
             {
-                if (IsPrimitive(_info.FieldType))
+                if (TypeIdentifier.IsPrimitive(_info.FieldType))
                     return 1;
                 else if (TypeIdentifier.IsCustom(_info.FieldType))
                     return fieldNames.Count(x => x == _info.Name) - 1;
@@ -336,7 +333,7 @@ public static class CsvUtility
             List<string> result = new List<string>();
             foreach (FieldInfo info in GetSerializedFields(data.GetType()))
             {
-                if (IsPrimitive(info.FieldType))
+                if (TypeIdentifier.IsPrimitive(info.FieldType))
                     result.Add(info.GetValue(data).ToString());
                 else if (TypeIdentifier.IsCustom(info.FieldType))
                     result = GetCustomConcat(data, result, info);
