@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using Debug = UnityEngine.Debug;
+using ParserCore;
 
 [Serializable]
 public class MasterTest
@@ -151,6 +152,12 @@ public class DeSerializeData
     [SerializeField] TestType testType;
 }
 
+[Serializable]
+class HasVector3
+{
+    [SerializeField] Vector3 vector;
+}
+
 public class Test : MonoBehaviour
 {
     [SerializeField] TextAsset loadCsv;
@@ -183,5 +190,33 @@ public class Test : MonoBehaviour
         StreamWriter outStream = new StreamWriter(fileStream, System.Text.Encoding.UTF8);
         outStream.Write(csv);
         outStream.Close();
+    }
+
+    [SerializeField] HasVector3[] has;
+    [ContextMenu("Test")]
+    void TestTest()
+    {
+        PrimitiveTypeParser.AddParser(typeof(Vector3), new VectorParser());
+        has = CsvUtility.CsvToArray<HasVector3>("vector\n1+2+3\n ");
+    }
+}
+
+class VectorParser : ICsvPrimitiveTypeParser
+{
+    public Type GetParserType() => typeof(Vector3);
+
+    public object GetParserValue(string value)
+    {
+        Debug.Log(value);
+        List<float> values = new List<float>() { 0, 0, 0 };
+        var texts = value.Split('+');
+        for (int i = 0; i < 3; i++)
+        {
+            if (texts.Length < i + 1 || float.TryParse(texts[i], out float inputValue) == false)
+                values[i] = 0;
+            else
+                values[i] = inputValue;
+        }
+        return new Vector3(values[0], values[1], values[2]);
     }
 }

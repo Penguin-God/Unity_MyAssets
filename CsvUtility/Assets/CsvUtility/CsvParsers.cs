@@ -38,6 +38,7 @@ namespace ParserCore
         Type GetParserType();
     }
 
+
     public interface ICsvParser
     {
         void SetValue(object obj, FieldInfo info, string[] values);
@@ -47,7 +48,7 @@ namespace ParserCore
     {
         static Dictionary<Type, ICsvPrimitiveTypeParser> _primitiveParserByType = new Dictionary<Type, ICsvPrimitiveTypeParser>()
         {
-            {typeof(int), new CsvIntParser() },
+            {typeof(int), new CsvIntParser()},
             {typeof(byte), new CsvByteParser()},
             {typeof(long), new CsvLongParser()},
             {typeof(string), new CsvStringParser()},
@@ -55,6 +56,15 @@ namespace ParserCore
             {typeof(double), new CsvDoubleParser()},
             {typeof(bool), new CsvBooleanParser()},
         };
+
+        public static bool ContainsTypeParser(Type type) => _primitiveParserByType.ContainsKey(type);
+
+        public static void AddParser(Type type, ICsvPrimitiveTypeParser parser)
+        {
+            if (_primitiveParserByType.ContainsKey(type) == false)
+                _primitiveParserByType.Add(type, parser);
+        }
+
         public static ICsvPrimitiveTypeParser GetPrimitiveParser(Type type)
         {
             if (_primitiveParserByType.TryGetValue(type, out var parser))
@@ -335,7 +345,8 @@ namespace ParserCore
         public static bool IsDictionary(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
         public static bool IsIEnumerable(Type type) => type.IsArray || IsList(type) || IsDictionary(type);
         public static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type.IsEnum
-            || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>));
+            || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+            || PrimitiveTypeParser.ContainsTypeParser(type);
         public static bool IsCustom(Type type)
         {
             if (type.IsEnum) return false;

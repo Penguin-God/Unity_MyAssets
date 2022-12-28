@@ -151,7 +151,7 @@ public static class CsvUtility
 
             foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
-                if (TypeIdentifier.IsCustom(info.FieldType))
+                if (TypeIdentifier.IsCustom(info.FieldType) && TypeIdentifier.IsPrimitive(info.FieldType) == false)
                 {
                     info.SetValue(obj, GetCustomValue(info, cells));
                     cells.RemoveAt(0);
