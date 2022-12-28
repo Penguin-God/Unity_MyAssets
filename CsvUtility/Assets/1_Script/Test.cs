@@ -130,6 +130,27 @@ public class HasTestClass
     [SerializeField] public string AAA;
 }
 
+[Serializable]
+public class DeSerializeData
+{
+    [SerializeField] int number;
+    [SerializeField] string text;
+    [SerializeField] float actualNumber;
+    [SerializeField] bool boolean;
+    
+    [SerializeField] int[] intArray;
+    [SerializeField] List<int> numberList;
+
+    public Dictionary<int, string> numberByText = new Dictionary<int, string>()
+    {
+        {123, "πÈ¿ÃΩ ªÔ" }, {456, "ªÁπÈø¿Ω ¿∞"}
+    };
+
+    [SerializeField] public HasTestClass hasClass;
+    [SerializeField] public HasTestClass[] hasClassArray;
+    [SerializeField] TestType testType;
+}
+
 public class Test : MonoBehaviour
 {
     [SerializeField] TextAsset loadCsv;
@@ -146,13 +167,14 @@ public class Test : MonoBehaviour
 
     [Header("Save Test")]
     [TextArea, SerializeField] string saveResult;
+    [SerializeField] DeSerializeData[] _deSerializeDatas;
 
     [ContextMenu("Save Test")]
     void TestDeSerializede()
     {
-        if (CsvUtility.ArrayToCsv(masterTests) == saveResult) print("GOOD!!");
+        if (CsvUtility.ArrayToCsv(_deSerializeDatas) == saveResult) print("GOOD!!");
         else print("Bad!!");
-        SaveCsv(CsvUtility.ArrayToCsv(masterTests));
+        SaveCsv(CsvUtility.ArrayToCsv(_deSerializeDatas));
     }
 
     void SaveCsv(string csv)

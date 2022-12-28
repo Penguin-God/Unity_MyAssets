@@ -380,7 +380,7 @@ public static class CsvUtility
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("\"");
-            stringBuilder.Append(string.Join(",", values));
+            stringBuilder.Append(string.Join(", ", values));
             stringBuilder.Append("\"");
             return stringBuilder.ToString();
         }

@@ -429,28 +429,33 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
-  saveResult: "number,text,actualNumber,boolean,textNumberPair,booleanActualNumberPair,numberArray,textArray,actualNumberArray,booleanArray,numberList,numberList,textList,actualNumberList,actualNumberList,booleanList,booleanList,numberByText,numberByText,numberByText,actualNumberByBoolean,actualNumberByBoolean,actualNumberByBoolean,actualNumberByBoolean,hasClass,number,AAA,hasClass,hasClassArray,number,AAA,hasClassArray,number,AAA,hasClassArray,testType\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,,,,Devlop\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,777,\uC548\uB155\uD558\uC138\uC694.,,Devlop\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,777,\uC548\uB155\uD558\uC138\uC694.,,Devlop\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,777,\uC548\uB155\uD558\uC138\uC694.,,Devlop\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,777,\uC548\uB155\uD558\uC138\uC694.,,Devlop\r\n123,Hello
-    World,23.123,TRUE,\"\uC0AC\uBB34\uB77C\uC774 \uD558\uD2B8, 243\",\"FALSE, 22.411\",\"341235,
-    13123\",\"\uACE0\uD0C0\uC5D0, \uC548\uB155, \uB77C\uD5E4\uC57C\",\"4224.12, 1245.12\",\"TRUE,
-    FALSE\",341235,13123,\"\uACE0\uD0C0\uC5D0, \uB77C\uD5E4\uC57C\",4224.12,1245.12,TRUE,FALSE,\"2,  
-    \uC870\uCC2C\uC790\",12432,\uC544 \uB8E8\uC988 \uB9C8\uC774\uC140\uD504,2134.22,TRUE,11.11,FALSE,,777,\uC548\uB155\uD558\uC138\uC694.,,,777,\uC548\uB155\uD558\uC138\uC694.,,777,\uC548\uB155\uD558\uC138\uC694.,,Devlop\r\n"
+  saveResult: "number,text,actualNumber,boolean,booleanArray,numberList,numberByText,hasClass,number,AAA,hasClass,hasClassArray,number,AAA,hasClassArray,number,AAA,hasClassArray,testType\r\n1,\uD558\uB098,1.1,False,\"True,False\",\"1,11\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,111,?,,,1111,??,,11111,???,,Happy\r\n2,\uB458,2.2,True,\"False,True\",\"22,1\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,22,\u3141\u3141\u3141,,,3,AAA,,,,,Fun\r"
+  _deSerializeDatas:
+  - number: 1
+    text: "\uD558\uB098"
+    actualNumber: 1.1
+    boolean: 0
+    intArray: 
+    numberList: 010000000b000000
+    hasClass:
+      number: 111
+      AAA: '?'
+    hasClassArray:
+    - number: 1111
+      AAA: ??
+    - number: 11111
+      AAA: ???
+    testType: 0
+  - number: 2
+    text: "\uB458"
+    actualNumber: 2.2
+    boolean: 1
+    intArray: 160000008e155301
+    numberList: 160000008ee82100
+    hasClass:
+      number: 22
+      AAA: "\u3141\u3141\u3141"
+    hasClassArray:
+    - number: 3
+      AAA: AAA
+    testType: 1
