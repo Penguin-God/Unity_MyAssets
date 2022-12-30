@@ -73,8 +73,6 @@ public static class CsvUtility
     class CsvLoder<T>
     {
         const char comma = ',';
-        const char mark = '\"';
-        const char replaceMark = '+';
         const char lineBreak = '\n';
 
         string _csv;
@@ -93,12 +91,46 @@ public static class CsvUtility
         {
             _csv = csv.Substring(0, csv.Length - 1);
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
+            _converter = new CustomObjectConverter(fieldNames, GetInstance);
             CheckFieldNames(typeof(T), fieldNames);
         }
 
         string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
-        List<string> GetValueList(string line)
+        Liner liner = new Liner();
+        public IEnumerable<T> GetInstanceIEnumerable()
+        => _csv.Split(lineBreak)
+            .Skip(1)
+            .Where(x => liner.IsValidLine(x))
+            .Select(x => (T)GetInstance(typeof(T), fieldNames, liner.GetValueList(x)));
+
+        CustomObjectConverter _converter;
+        object GetInstance(Type type, string[] fieldNames, List<string> cells)
+        {
+            object obj = Activator.CreateInstance(type);
+            Dictionary<string, int> countByKey = new FieldNameMaker().GetCountByFieldName(type, fieldNames);
+
+            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            {
+                if (TypeIdentifier.IsCustom(info.FieldType) && TypeIdentifier.IsPrimitive(info.FieldType) == false)
+                {
+                    info.SetValue(obj, _converter.GetCustomValue(info, cells));
+                    cells.RemoveAt(0);
+                }
+                else
+                    CsvParsers.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
+            }
+            return obj;
+        }
+    }
+
+    class Liner
+    {
+        const char mark = '\"';
+        const char replaceMark = '+';
+        const char comma = ',';
+
+        public List<string> GetValueList(string line)
         {
             string[] tokens = line.Split(mark);
 
@@ -109,15 +141,20 @@ public static class CsvUtility
             }
             return GetCells(string.Join("", tokens).Replace("\"", "")).ToList();
         }
+        string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
-        bool IsValidLine(string line)
+        public bool IsValidLine(string line)
         {
             if (GetValueList(line)[0] == "PASS")
                 return false;
             return !string.IsNullOrEmpty(line.Replace(",", "").Trim());
         }
+    }
 
-        Dictionary<string, int> GetCountByFieldName(Type type, string[] fieldNames)
+    class FieldNameMaker
+    {
+        // 이걸 팩터리로 바꾸고 interface주고 로직을 거기에 숨겨야 됨
+        public Dictionary<string, int> GetCountByFieldName(Type type, string[] fieldNames)
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
             foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
@@ -138,31 +175,40 @@ public static class CsvUtility
             }
         }
 
-        public IEnumerable<T> GetInstanceIEnumerable() 
-            => _csv.Split(lineBreak)
-                    .Skip(1)
-                    .Where(x => IsValidLine(x))
-                    .Select(x => (T)GetInstance(typeof(T), fieldNames, GetValueList(x)));
+    }
 
-        object GetInstance(Type type, string[] fieldNames, List<string> cells)
+    class FiledValueGetter
+    {
+        public string[] GetFieldValues(int count, List<string> cells)
         {
-            object obj = Activator.CreateInstance(type);
-            Dictionary<string, int> countByKey = GetCountByFieldName(type, fieldNames);
+            List<string> result = new List<string>();
 
-            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+            for (int i = 0; i < count; i++)
             {
-                if (TypeIdentifier.IsCustom(info.FieldType) && TypeIdentifier.IsPrimitive(info.FieldType) == false)
-                {
-                    info.SetValue(obj, GetCustomValue(info, cells));
-                    cells.RemoveAt(0);
-                }
-                else
-                    CsvParsers.GetParser(info).SetValue(obj, info, GetFieldValues(countByKey[info.Name], cells));
+                string value = cells[0];
+                if (string.IsNullOrEmpty(value) == false)
+                    result.Add(value);
+                cells.RemoveAt(0);
             }
-            return obj;
+
+            if (result.Count == 0) result.Add("");
+            return result.ToArray();
+        }
+    }
+
+
+    class CustomObjectConverter
+    {
+        string[] _fieldNames;
+        Func<Type, string[], List<string>, object> GetInstance;
+        FiledValueGetter _filedValueGetter = new FiledValueGetter();
+        public CustomObjectConverter(string[] fieldNames, Func<Type, string[], List<string>, object> instanceMaker)
+        {
+            _fieldNames = fieldNames;
+            GetInstance = instanceMaker;
         }
 
-        object GetCustomValue(FieldInfo _info, List<string> cells)
+        public object GetCustomValue(FieldInfo _info, List<string> cells)
         {
             if (TypeIdentifier.IsIEnumerable(_info.FieldType))
                 return GetCustomArray(_info, cells);
@@ -173,9 +219,10 @@ public static class CsvUtility
         object GetSingleCustomValue(Type type, List<string> cells, string name, int index = 0)
         {
             cells.RemoveAt(0);
-            if (GetFieldValues(GetSerializedFields(type).Count(), new List<string>(cells)).Where(x => string.IsNullOrEmpty(x) == false).Count() == 0)
+            if (_filedValueGetter.GetFieldValues(GetSerializedFields(type).Count(), 
+                new List<string>(cells)).Where(x => string.IsNullOrEmpty(x) == false).Count() == 0)
             {
-                GetFieldValues(GetSerializedFields(type).Count(), cells);
+                _filedValueGetter.GetFieldValues(GetSerializedFields(type).Count(), cells);
                 return null;
             }
             else
@@ -183,14 +230,14 @@ public static class CsvUtility
 
             string[] GetCustomFieldNames(int startIndex)
             {
-                int[] indexs = fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
-                return fieldNames.Skip(indexs[startIndex] + 1).Take(indexs[startIndex + 1] - indexs[startIndex] - 1).ToArray();
+                int[] indexs = _fieldNames.Select((value, index) => new { value, index }).Where(x => x.value == name).Select(x => x.index).ToArray();
+                return _fieldNames.Skip(indexs[startIndex] + 1).Take(indexs[startIndex + 1] - indexs[startIndex] - 1).ToArray();
             }
         }
 
         object GetCustomArray(FieldInfo info, List<string> cells)
         {
-            int length = fieldNames.Where(x => x == info.Name).Count() - 1;
+            int length = _fieldNames.Where(x => x == info.Name).Count() - 1;
             Type elementType = GetElementType(info.FieldType);
 
             List<object> objs = new List<object>();
@@ -210,23 +257,6 @@ public static class CsvUtility
             return GetIEnumerableValue(info.FieldType, array);
         }
         object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
-
-
-        string[] GetFieldValues(int count, List<string> cells)
-        {
-            List<string> result = new List<string>();
-
-            for (int i = 0; i < count; i++)
-            {
-                string value = cells[0];
-                if (string.IsNullOrEmpty(value) == false)
-                    result.Add(value);
-                cells.RemoveAt(0);
-            }
-
-            if (result.Count == 0) result.Add("");
-            return result.ToArray();
-        }
     }
 
     class CsvSaver<T>
