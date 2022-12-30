@@ -197,18 +197,18 @@ public class Test : MonoBehaviour
     void TestTest()
     {
         PrimitiveTypeParser.AddParser(typeof(Vector3), new VectorParser());
-        has = CsvUtility.CsvToArray<HasVector3>("vector\n1+2+3\n ");
+        has = CsvUtility.CsvToArray<HasVector3>("vector\n1,2,3\n ");
 
-        var type = typeof(ICsvPrimitiveTypeParser);
-        var types = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(p => type.IsAssignableFrom(p) && p.IsInterface == false);
-        foreach (var item in types)
-        {
-            print(item.Name);
-            ICsvPrimitiveTypeParser parser = Activator.CreateInstance(item) as ICsvPrimitiveTypeParser;
-            print(parser.GetType().Name);
-        }
+        //var type = typeof(ICsvPrimitiveTypeParser);
+        //var types = AppDomain.CurrentDomain.GetAssemblies()
+        //    .SelectMany(s => s.GetTypes())
+        //    .Where(p => type.IsAssignableFrom(p) && p.IsInterface == false);
+        //foreach (var item in types)
+        //{
+        //    print(item.Name);
+        //    ICsvPrimitiveTypeParser parser = Activator.CreateInstance(item) as ICsvPrimitiveTypeParser;
+        //    print(parser.GetType().Name);
+        //}
     }
 }
 
