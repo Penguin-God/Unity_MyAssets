@@ -189,9 +189,6 @@ public class CSVSerializer
                 }
                 if (line.Count > 0)
                 {
-                    Debug.Log($"Start : {i}");
-                    line.ForEach(x => Debug.Log(x));
-                    Debug.Log($"End : {i}");
                     lines.Add(line.ToArray());
                     line.Clear();
                 }
@@ -217,11 +214,10 @@ public class CSVSerializer
         }
         if (line.Count > 0)
         {
-            Debug.Log("Start : Last");
-            line.ForEach(x => Debug.Log(x));
-            Debug.Log($"End : Last");
+            //line.ForEach(x => Debug.Log(x));
             lines.Add(line.ToArray());
         }
+        lines.ForEach(x => x.ToList().ForEach(text => Debug.Log(text)));
         return lines;
     }
 }
