@@ -11,7 +11,7 @@ public class ConvertTester : MonoBehaviour
     {
         Log("ÄÁ¹öÅÍ ÆÑÅÍ¸® Å×½ºÆ®!!");
         Assert(new ConvertorFactory().GetCsvConvertor(typeof(int)) is PrimitiveConvertor);
-        Assert(new ConvertorFactory().GetCsvConvertor(typeof(List<>)) is ListConvertor);
+        //Assert(new ConvertorFactory().GetCsvConvertor(typeof(List<>)) is ListConvertor);
     }
 
     [ContextMenu("Test Primitive Convertor")]
@@ -24,5 +24,18 @@ public class ConvertTester : MonoBehaviour
         Assert((long)convertor.TextToObject("7223372036854775807", typeof(long)) == 7223372036854775807);
         Assert((float)convertor.TextToObject("1.52", typeof(float)) == 1.52f);
         Assert((bool)convertor.TextToObject("True", typeof(bool)) == true);
+    }
+
+    [ContextMenu("Test Enum Convertor")]
+    void EnumTest()
+    {
+
+    }
+
+    [ContextMenu("Test IEnumerable Convertor")]
+    void IEnumerableTest()
+    {
+        Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
+        Assert(new DictionaryConvertor().TextToObject("¾È³ç, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "¾È³ç", true } });
     }
 }

@@ -16,7 +16,7 @@ namespace CsvConvertors
         public ICsvConvertor GetCsvConvertor(Type type)
         {
             if (type == typeof(int)) return new PrimitiveConvertor();
-            else if (TypeIdentifier.IsList(type)) return new ListConvertor();
+            //else if (TypeIdentifier.IsList(type)) return new ListConvertor();
             return null;
         }
     }
@@ -29,7 +29,20 @@ namespace CsvConvertors
         }
     }
 
-    class ListConvertor : ICsvConvertor
+    class EnumConvertor : ICsvConvertor
+    {
+        public object TextToObject(string text, Type type)
+        {
+            return Enum.Parse(type, text);
+        }
+    }
+
+    class ArrayConvertor : ICsvConvertor
+    {
+        public object TextToObject(string text, Type type) => null;
+    }
+
+    class DictionaryConvertor : ICsvConvertor
     {
         public object TextToObject(string text, Type type) => null;
     }
