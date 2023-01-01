@@ -5,6 +5,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 using System.Text;
+using CsvConvertors;
 
 namespace ParserCore
 {
@@ -75,7 +76,12 @@ namespace ParserCore
             return null;
         }
 
-        object GetParserValue(Type type, string value) => GetPrimitiveParser(type).GetParserValue(value);
+        object GetParserValue(Type type, string value)
+        {
+            if (type.IsPrimitive)
+                return new PrimitiveConvertor().TextToObject(value, type);
+            return GetPrimitiveParser(type).GetParserValue(value);
+        }
         public void SetValue(object obj, FieldInfo info, string[] value) => info.SetValue(obj, GetParserValue(info.FieldType, value[0]));
     }
 

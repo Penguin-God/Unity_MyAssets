@@ -249,3 +249,258 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2050888768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2050888770}
+  - component: {fileID: 2050888769}
+  m_Layer: 0
+  m_Name: MainTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2050888769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050888768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6de255b65784c0043a108ad4694162a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loadCsv: {fileID: 4900000, guid: 33380155e49e9984a8033ba8f0580e9a, type: 3}
+  masterTests:
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  - number: 123
+    text: Hello World
+    actualNumber: 23.123
+    boolean: 1
+    numberArray: f334050043330000
+    textArray:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uC548\uB155"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberArray:
+    - 4224.12
+    - 1245.12
+    booleanArray: 0100
+    numberList: f334050043330000
+    textList:
+    - "\uACE0\uD0C0\uC5D0"
+    - "\uB77C\uD5E4\uC57C"
+    actualNumberList:
+    - 4224.12
+    - 1245.12
+    booleanList: 0100
+    hasClass:
+      number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    hasClassArray:
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    - number: 777
+      AAA: "\uC548\uB155\uD558\uC138\uC694."
+    testType: 6
+  saveResult: "number,text,actualNumber,boolean,booleanArray,numberList,numberByText,hasClass,number,AAA,hasClass,hasClassArray,number,AAA,hasClassArray,number,AAA,hasClassArray,testType\r\n1,\uD558\uB098,1.1,False,\"True,False\",\"1,11\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,111,?,,,1111,??,,11111,???,,Happy\r\n2,\uB458,2.2,True,\"False,True\",\"22,1\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,22,\u3141\u3141\u3141,,,3,AAA,,,,,Fun\r"
+  _deSerializeDatas:
+  - number: 1
+    text: "\uD558\uB098"
+    actualNumber: 1.1
+    boolean: 0
+    intArray: 
+    numberList: 010000000b000000
+    hasClass:
+      number: 111
+      AAA: '?'
+    hasClassArray:
+    - number: 1111
+      AAA: ??
+    - number: 11111
+      AAA: ???
+    testType: 0
+  - number: 2
+    text: "\uB458"
+    actualNumber: 2.2
+    boolean: 1
+    intArray: 160000008e155301
+    numberList: 160000008ee82100
+    hasClass:
+      number: 22
+      AAA: "\u3141\u3141\u3141"
+    hasClassArray:
+    - number: 3
+      AAA: AAA
+    testType: 1
+  has:
+  - vector: {x: 1, y: 2, z: 3}
+--- !u!4 &2050888770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050888768}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

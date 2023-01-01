@@ -13,7 +13,7 @@ namespace CsvConvertors
 
     class ConvertorFactory
     {
-        public ICsvConvertor GetCsvConvertor(Type type)
+        public static ICsvConvertor GetCsvConvertor(Type type)
         {
             if (type == typeof(int)) return new PrimitiveConvertor();
             //else if (TypeIdentifier.IsList(type)) return new ListConvertor();

@@ -32,9 +32,31 @@ public class ConvertTester : MonoBehaviour
 
     }
 
-    [ContextMenu("Test IEnumerable Convertor")]
-    void IEnumerableTest()
+    
+    [ContextMenu("Test IEnumerables Convertor")]
+    void TestIEnumerableConvertor()
     {
+        TestArrayConvert();
+    }
+
+
+    void TestArrayConvert()
+    {
+        Log("배열 변환 테스트!!");
+        Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
+        Assert(new ArrayConvertor().TextToObject("내,이름은,박준", typeof(int[])) == new string[] { "내", "이름은", "박준" });
+    }
+
+    void TestListConvert()
+    {
+        Log("리스트 변환 테스트!!");
+        Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
+        Assert(new DictionaryConvertor().TextToObject("안녕, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "안녕", true } });
+    }
+
+    void TestDictionaryConvert()
+    {
+        Log("딕셔너리 변환 테스트!!");
         Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
         Assert(new DictionaryConvertor().TextToObject("안녕, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "안녕", true } });
     }

@@ -118,7 +118,10 @@ public static class CsvUtility
                     cells.RemoveAt(0);
                 }
                 else
+                {
                     CsvParsers.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
+                    // CsvConvertors.ConvertorFactory.GetCsvConvertor(info.FieldType).TextToObject()
+                }
             }
             return obj;
         }
