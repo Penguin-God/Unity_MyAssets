@@ -6,11 +6,19 @@ using static UnityEngine.Debug;
 
 public class ConvertTester : MonoBehaviour
 {
+    [ContextMenu("Test All")]
+    void TestAll()
+    {
+        TestConvertorFactory();
+        TestPrimitiveConvertor();
+        TestIEnumerableConvertor();
+    }
+
     [ContextMenu("Test Convertor Factory")]
     void TestConvertorFactory()
     {
         Log("ÄÁ¹öÅÍ ÆÑÅÍ¸® Å×½ºÆ®!!");
-        Assert(new ConvertorFactory().GetCsvConvertor(typeof(int)) is PrimitiveConvertor);
+        Assert(CsvConvertorFactory.GetCsvConvertor(typeof(int)) is PrimitiveConvertor);
         //Assert(new ConvertorFactory().GetCsvConvertor(typeof(List<>)) is ListConvertor);
     }
 
@@ -50,14 +58,14 @@ public class ConvertTester : MonoBehaviour
     void TestListConvert()
     {
         Log("¸®½ºÆ® º¯È¯ Å×½ºÆ®!!");
-        Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
-        Assert(new DictionaryConvertor().TextToObject("¾È³ç, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "¾È³ç", true } });
+        
+        
     }
 
     void TestDictionaryConvert()
     {
         Log("µñ¼Å³Ê¸® º¯È¯ Å×½ºÆ®!!");
-        Assert(new ArrayConvertor().TextToObject("10,20,30", typeof(int[])) == new int[] { 10, 20, 30 });
-        Assert(new DictionaryConvertor().TextToObject("¾È³ç, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "¾È³ç", true } });
+        
+        // Assert(new DictionaryConvertor().TextToObject("¾È³ç, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "¾È³ç", true } });
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Diagnostics;
-using ParserCore;
+using CsvConvertors;
 using Debug = UnityEngine.Debug;
 
 public static class CsvUtility
@@ -119,7 +119,7 @@ public static class CsvUtility
                 }
                 else
                 {
-                    CsvParsers.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
+                    CsvConvertorFactory.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
                     // CsvConvertors.ConvertorFactory.GetCsvConvertor(info.FieldType).TextToObject()
                 }
             }
