@@ -25,8 +25,15 @@ namespace CsvConvertors
 
         public static ICsvConvertor GetCsvConvertor(Type type)
         {
-            if (type == typeof(int)) return new PrimitiveConvertor();
+            if (type.IsPrimitive) return new PrimitiveConvertor();
             //else if (TypeIdentifier.IsList(type)) return new ListConvertor();
+            return null;
+        }
+
+        public static object TextToObject(string text, Type type)
+        {
+            if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
+            else if (type == typeof(string)) return text;
             return null;
         }
     }
@@ -35,7 +42,17 @@ namespace CsvConvertors
     {
         public object TextToObject(string text, Type type)
         {
-            return Convert.ChangeType(text, type);
+            object result = null;
+            try
+            {
+                result = Convert.ChangeType(text, type);
+            }
+            catch (Exception)
+            {
+                Debug.LogError($"CsvUtility Message FormatException  : Input string was not in a correct format. \n input strint value : {text}    try convert type : {type}");
+            }
+
+            return result;
         }
     }
 
@@ -273,6 +290,12 @@ namespace CsvConvertors
             foreach (var item in list) result.Add(item.ToString());
             return result.ToArray();
         }
+
+        public object TextToObject(string text, Type type)
+        {
+            // Array거 재사용하기
+            return null;
+        }
     }
 
     public class ArrayConvertor : ICsvIEnumeralbeParser, ICsvConvertor
@@ -298,7 +321,11 @@ namespace CsvConvertors
 
         public object TextToObject(string text, Type type)
         {
-            throw new NotImplementedException();
+            var values = text.Split(',');
+            Array array = Array.CreateInstance(type.GetElementType(), values.Length);
+            for (int i = 0; i < array.Length; i++)
+                array.SetValue(CsvConvertorFactory.TextToObject(values[i], type.GetElementType()), i);
+            return array;
         }
     }
 
