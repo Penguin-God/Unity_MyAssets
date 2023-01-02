@@ -11,7 +11,9 @@ public class ConvertTester : MonoBehaviour
     void TestAll()
     {
         TestPrimitiveConvertor();
+        EnumTest();
         TestIEnumerableConvertor();
+        TestUserCustomConvertor();
     }
 
     [ContextMenu("Test Primitive Convertor")]

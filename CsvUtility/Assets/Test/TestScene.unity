@@ -123,6 +123,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &734657573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 734657575}
+  - component: {fileID: 734657574}
+  m_Layer: 0
+  m_Name: Parsing Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &734657574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734657573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1be4aa19e9d40be4d9777666c43820f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inheritanceData: {fileID: 4900000, guid: eee7a4571b0de5d428b07bdae015a687, type: 3}
+--- !u!4 &734657575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734657573}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.61008, y: -0.70829487, z: -22.47552}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1010287292
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,7 +261,7 @@ GameObject:
   - component: {fileID: 1376364106}
   - component: {fileID: 1376364105}
   m_Layer: 0
-  m_Name: Main Test
+  m_Name: Converte Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -308,6 +352,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -338,6 +383,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -368,6 +414,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -398,6 +445,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -428,6 +476,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   - number: 123
     text: Hello World
     actualNumber: 23.123
@@ -458,6 +507,7 @@ MonoBehaviour:
     - number: 777
       AAA: "\uC548\uB155\uD558\uC138\uC694."
     testType: 6
+    vector: {x: 6, y: 12, z: 77}
   saveResult: "number,text,actualNumber,boolean,booleanArray,numberList,numberByText,hasClass,number,AAA,hasClass,hasClassArray,number,AAA,hasClassArray,number,AAA,hasClassArray,testType\r\n1,\uD558\uB098,1.1,False,\"True,False\",\"1,11\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,111,?,,,1111,??,,11111,???,,Happy\r\n2,\uB458,2.2,True,\"False,True\",\"22,1\",\"123,\uBC31\uC774\uC2ED\uC0BC,456,\uC0AC\uBC31\uC624\uC2ED\uC721\",,22,\u3141\u3141\u3141,,,3,AAA,,,,,Fun\r"
   _deSerializeDatas:
   - number: 1
@@ -488,8 +538,6 @@ MonoBehaviour:
     - number: 3
       AAA: AAA
     testType: 1
-  has:
-  - vector: {x: 1, y: 2, z: 3}
 --- !u!4 &2050888770
 Transform:
   m_ObjectHideFlags: 0
@@ -502,5 +550,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

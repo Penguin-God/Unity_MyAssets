@@ -23,6 +23,7 @@ namespace CsvConvertors
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
             else if (type == typeof(string)) return text;
             else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new PairConvertor().TextToObject(text, type);
             else if (TypeIdentifier.IsIEnumerable(type)) return new IEnumerableConvertor().TextToObject(text, type);
             else if (_customConvertorManager.IsUserCustomConvertor(type)) return _customConvertorManager.TextToObject(text, type);
             return null;
@@ -81,6 +82,42 @@ namespace CsvConvertors
         string[] GetCsvValues(object obj, FieldInfo info);
     }
 
+    class EnumConvertor
+    {
+        public object TextToObject(string text, Type type)
+        {
+            object result = null;
+            try
+            {
+                result = Enum.Parse(type, text);
+            }
+            catch
+            {
+                Debug.LogError($"CsvUtility Message : The requested value {text} was not found within {type} enum.");
+            }
+            return result;
+        }
+    }
+
+    public class PairConvertor
+    {
+        public object TextToObject(string text, Type type)
+        {
+            string[] values = text.Split('+');
+            if (values.Length != 2) Debug.LogError($"{type} : The input is incorrect.Please make sure you entered the Key Value pair correctly.");
+            Type[] elementTypes = type.GetGenericArguments();
+            ConstructorInfo constructor = type.GetConstructors()[0];
+            return constructor.Invoke(new object[]
+            {
+                CsvConvertUtility.TextToObject(values[0], elementTypes[0]),
+                CsvConvertUtility.TextToObject(values[1], elementTypes[1]),
+            });
+        }
+    }
+
+
+    #region 열거형
+
     class IEnumerableConvertor
     {
         ICsvIEnumeralbeParser GetIEnumerableParser(Type type)
@@ -111,25 +148,6 @@ namespace CsvConvertors
     }
 
 
-    class EnumConvertor
-    {
-        public object TextToObject(string text, Type type)
-        {
-            object result = null;
-            try
-            {
-                result = Enum.Parse(type, text);
-            }
-            catch
-            {
-                Debug.LogError($"CsvUtility Message : The requested value {text} was not found within {type} enum.");
-            }
-            return result;
-        }
-    }
-
-
-    #region 열거형 파싱
 
     public class CsvArrayConvertUtility
     {
@@ -209,24 +227,6 @@ namespace CsvConvertors
         }
     }
     #endregion 열거형 파싱 End
-
-    public class CsvPairParser
-    {
-        public object TextToObject(string value, Type type)
-        {
-            string[] values = value.Split('+');
-            if (values.Length != 2) Debug.LogError($"{type} : The input is incorrect.Please make sure you entered the Key Value pair correctly.");
-            Type[] elementTypes = type.GetGenericArguments();
-            ConstructorInfo constructor = type.GetConstructors()[0];
-            return constructor.Invoke(new object[]
-            {
-                CsvConvertUtility.TextToObject(values[0], elementTypes[0]),
-                CsvConvertUtility.TextToObject(values[1], elementTypes[1]),
-            });
-        }
-    }
-
-
 
     public static class TypeIdentifier
     {

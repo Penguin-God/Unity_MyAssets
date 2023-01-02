@@ -112,7 +112,7 @@ public static class CsvUtility
 
             foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
             {
-                if (TypeIdentifier.IsCustom(info.FieldType) && TypeIdentifier.IsPrimitive(info.FieldType) == false)
+                if (TypeIdentifier.IsCustom(info.FieldType))
                 {
                     info.SetValue(obj, _converter.GetCustomValue(info, cells));
                     cells.RemoveAt(0);
@@ -120,6 +120,7 @@ public static class CsvUtility
                 else
                 {
                     var values = new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells).Select(x => x.Trim());
+                    // 여기서 try문 걸기
                     info.SetValue(obj, CsvConvertUtility.TextToObject(string.Join("+", values), info.FieldType));
                 }
             }
