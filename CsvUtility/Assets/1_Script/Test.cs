@@ -199,30 +199,29 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void TestTest()
     {
-        has = CsvUtility.CsvToArray<HasVector3>("vector\n1,2,3\n ");
+        // has = CsvUtility.CsvToArray<HasVector3>("vector\n1,2,3\n ");
 
-        //var type = typeof(ICsvPrimitiveTypeParser);
-        //var types = AppDomain.CurrentDomain.GetAssemblies()
-        //    .SelectMany(s => s.GetTypes())
-        //    .Where(p => type.IsAssignableFrom(p) && p.IsInterface == false);
-        //foreach (var item in types)
-        //{
-        //    print(item.Name);
-        //    ICsvPrimitiveTypeParser parser = Activator.CreateInstance(item) as ICsvPrimitiveTypeParser;
-        //    print(parser.GetType().Name);
-        //}
+        var interfaceType = typeof(ICsvConvertor);
+        var types = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(p => interfaceType.IsAssignableFrom(p) && p.IsInterface == false);
+        foreach (var type in types)
+        {
+            var parser = Activator.CreateInstance(type) as ICsvConvertor;
+            type.GetMethod("TextToObject").Invoke(parser, new object[] { "1,2,3", type });
+        }
     }
 }
 
 class VectorParser : ICsvConvertor
 {
-    public Type GetParserType() => typeof(Vector3);
+    public Type ConverteType => typeof(Vector3);
 
-    public object GetParserValue(string value)
+    public object TextToObject(string text, Type type)
     {
-        Debug.Log(value);
+        Debug.Log(text);
         List<float> values = new List<float>() { 0, 0, 0 };
-        var texts = value.Split('+');
+        var texts = text.Split(',');
         for (int i = 0; i < 3; i++)
         {
             if (texts.Length < i + 1 || float.TryParse(texts[i], out float inputValue) == false)

@@ -10,19 +10,50 @@ namespace CsvConvertors
     // 커스텀 확장용으로 필요
     interface ICsvConvertor
     {
-
+        Type ConverteType { get; }
+        object TextToObject(string text, Type type);
     }
 
-    class CsvConvertUtility
+    static class CsvConvertUtility
     {
+        static UserCustomConvertorManager _customConvertorManager = new UserCustomConvertorManager();
         public static object TextToObject(string text, Type type)
         {
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
             else if (type == typeof(string)) return text;
             else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
             else if (TypeIdentifier.IsIEnumerable(type)) return new IEnumerableConvertor().TextToObject(text, type);
+            else if (_customConvertorManager.IsUserCustomConvertor(type)) return _customConvertorManager.TextToObject(text, type);
             return null;
         }
+    }
+
+    class UserCustomConvertorManager
+    {
+        Dictionary<Type, object> _objByType = new Dictionary<Type, object>();
+        public UserCustomConvertorManager() => Init();
+
+        void Init()
+        {
+            var interfaceType = typeof(ICsvConvertor);
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => interfaceType.IsAssignableFrom(p) && p.IsInterface == false);
+            foreach (var type in types)
+            {
+                object obj = Activator.CreateInstance(type) as ICsvConvertor;
+                _objByType.Add(type.GetProperty("ConverteType").GetValue(obj) as Type, obj);
+            }
+        }
+
+        public object TextToObject(string text, Type type)
+        {
+            if (_objByType.TryGetValue(type, out object obj) == false)
+                return null;
+            return obj.GetType().GetMethod("TextToObject").Invoke(obj, new object[] { text, type });
+        }
+
+        public bool IsUserCustomConvertor(Type type) => _objByType.ContainsKey(type);
     }
 
     class PrimitiveConvertor

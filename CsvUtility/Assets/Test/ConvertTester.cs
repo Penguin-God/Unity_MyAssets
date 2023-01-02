@@ -43,6 +43,7 @@ public class ConvertTester : MonoBehaviour
         TestArrayConvert();
         TestListConvert();
         TestDictionaryConvert();
+        TestUserCustomConvertor();
     }
 
     void TestArrayConvert()
@@ -65,5 +66,14 @@ public class ConvertTester : MonoBehaviour
         Log("딕셔너리 변환 테스트!!");
         Assert((new DictionaryConvertor().TextToObject(new string[] { "안녕","True","잘 가","False" }, typeof(Dictionary<string, bool>)) as Dictionary<string, bool>)
             .Except(new Dictionary<string, bool> { { "안녕", true }, { "잘 가", false } }).Count() == 0);
+    }
+
+    [ContextMenu("Test User Custom Convertor")]
+    void TestUserCustomConvertor()
+    {
+        Log("유저 커스텀 변환 테스트!!");
+        var convertor = new UserCustomConvertorManager();
+        Assert(convertor.IsUserCustomConvertor(typeof(Vector3)));
+        Assert((Vector3)convertor.TextToObject("1,2,3", typeof(Vector3))== new Vector3(1,2,3));
     }
 }
