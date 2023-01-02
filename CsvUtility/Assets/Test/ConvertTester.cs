@@ -24,6 +24,7 @@ public class ConvertTester : MonoBehaviour
         Assert((long)convertor.TextToObject("7223372036854775807", typeof(long)) == 7223372036854775807);
         Assert((float)convertor.TextToObject("1.52", typeof(float)) == 1.52f);
         Assert((bool)convertor.TextToObject("True", typeof(bool)) == true);
+        Assert((bool)convertor.TextToObject("False", typeof(bool)) == false);
     }
 
     [ContextMenu("Test Enum Convertor")]
@@ -41,6 +42,7 @@ public class ConvertTester : MonoBehaviour
     {
         TestArrayConvert();
         TestListConvert();
+        TestDictionaryConvert();
     }
 
     void TestArrayConvert()
@@ -61,7 +63,7 @@ public class ConvertTester : MonoBehaviour
     void TestDictionaryConvert()
     {
         Log("µñ¼Å³Ê¸® º¯È¯ Å×½ºÆ®!!");
-        
-        // Assert(new DictionaryConvertor().TextToObject("¾È³ç, True", typeof(Dictionary<string, bool>)) == new Dictionary<string, bool> { { "¾È³ç", true } });
+        Assert((new DictionaryConvertor().TextToObject("¾È³ç,True,Àß °¡,False", typeof(Dictionary<string, bool>)) as Dictionary<string, bool>)
+            .Except(new Dictionary<string, bool> { { "¾È³ç", true }, { "Àß °¡", false } }).Count() == 0);
     }
 }

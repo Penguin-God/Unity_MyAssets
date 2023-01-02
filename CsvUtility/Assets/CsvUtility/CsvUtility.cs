@@ -119,7 +119,7 @@ public static class CsvUtility
                 }
                 else
                 {
-                    CsvConvertorFactory.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
+                    ConvertUtility.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
                     // CsvConvertors.ConvertorFactory.GetCsvConvertor(info.FieldType).TextToObject()
                 }
             }

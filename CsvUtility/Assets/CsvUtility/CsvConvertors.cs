@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CsvConvertors
 {
-    class CsvConvertorFactory
+    class ConvertUtility
     {
         public static ICsvParser GetParser(FieldInfo info)
         {
@@ -24,6 +24,11 @@ namespace CsvConvertors
             else if (type == typeof(string)) return text;
             else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
             return null;
+        }
+
+        void GetConvertor()
+        {
+
         }
     }
 
@@ -334,7 +339,7 @@ namespace CsvConvertors
             var values = text.Split(',');
             Array array = Array.CreateInstance(elementType, values.Length);
             for (int i = 0; i < array.Length; i++)
-                array.SetValue(CsvConvertorFactory.TextToObject(values[i], elementType), i);
+                array.SetValue(ConvertUtility.TextToObject(values[i], elementType), i);
             return array;
         }
     }
@@ -371,6 +376,24 @@ namespace CsvConvertors
             }
 
             return result.ToArray();
+        }
+
+        public object TextToObject(string text, Type type)
+        {
+            var values = text.Split(',');
+            if (values.Length % 2 != 0) Debug.LogError("CsvUtility Message : The input is incorrect. Please make sure you entered the Dictionary correctly.");
+            var result = Activator.CreateInstance(type);
+            Type[] elementTypes = type.GetGenericArguments();
+            MethodInfo methodInfo = type.GetMethod("Add");
+            for (int i = 0; i < values.Length; i += 2)
+            {
+                methodInfo.Invoke(result, new object[]
+                {
+                    ConvertUtility.TextToObject(values[i],elementTypes[0]),
+                    ConvertUtility.TextToObject(values[i+1], elementTypes[1])
+                });
+            }
+            return result;
         }
     }
     #endregion 열거형 파싱 End
