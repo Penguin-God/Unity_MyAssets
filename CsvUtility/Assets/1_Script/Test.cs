@@ -199,7 +199,6 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void TestTest()
     {
-        PrimitiveTypeParser.AddParser(typeof(Vector3), new VectorParser());
         has = CsvUtility.CsvToArray<HasVector3>("vector\n1,2,3\n ");
 
         //var type = typeof(ICsvPrimitiveTypeParser);
@@ -215,7 +214,7 @@ public class Test : MonoBehaviour
     }
 }
 
-class VectorParser : ICsvPrimitiveTypeParser
+class VectorParser : ICsvConvertor
 {
     public Type GetParserType() => typeof(Vector3);
 

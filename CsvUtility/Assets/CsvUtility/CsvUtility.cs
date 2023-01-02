@@ -120,10 +120,6 @@ public static class CsvUtility
                 else
                 {
                     var values = new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells).Select(x => x.Trim());
-                    // CsvConvertUtility.GetParser(info).SetValue(obj, info, values);
-
-                    //if (values.Length > 1)
-                    //    Debug.Log(string.Join(" ", values));
                     info.SetValue(obj, CsvConvertUtility.TextToObject(string.Join("+", values), info.FieldType));
                 }
             }
