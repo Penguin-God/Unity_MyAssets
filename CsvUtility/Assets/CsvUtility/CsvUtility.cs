@@ -373,7 +373,7 @@ public static class CsvUtility
                 else if (TypeIdentifier.IsIEnumerable(info.FieldType))
                 {
                     result = 
-                        GetConcatList(result, GetIEnumerableValue(GetOptionCount(info.FieldType), new EnumerableTypeParser().GetIEnumerableValues(data, info)));
+                        GetConcatList(result, GetIEnumerableValue(GetOptionCount(info.FieldType), new IEnumerableConvertor().GetIEnumerableValues(data, info)));
                 }
             }
             return result;

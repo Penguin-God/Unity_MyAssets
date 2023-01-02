@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 using System;
+using System.Linq;
 
 namespace CsvConvertors
 {
-    // 커스텀 확장용으로 필용
+    // 커스텀 확장용으로 필요
     interface ICsvConvertor
     {
 
@@ -19,9 +20,7 @@ namespace CsvConvertors
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
             else if (type == typeof(string)) return text;
             else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
-            else if(type.IsArray) return new ArrayConvertor().TextToObject(text, type);
-            else if(TypeIdentifier.IsList(type)) return new ListConvertor().TextToObject(text, type);
-            else if(TypeIdentifier.IsDictionary(type)) return new DictionaryConvertor().TextToObject(text, type);
+            else if (TypeIdentifier.IsIEnumerable(type)) return new IEnumerableConvertor().TextToObject(text, type);
             return null;
         }
     }
@@ -49,7 +48,7 @@ namespace CsvConvertors
         string[] GetCsvValues(object obj, FieldInfo info);
     }
 
-    class EnumerableTypeParser
+    class IEnumerableConvertor
     {
         ICsvIEnumeralbeParser GetIEnumerableParser(Type type)
         {
@@ -66,6 +65,15 @@ namespace CsvConvertors
                 return parser.GetCsvValues(obj, info);
             else
                 return null;
+        }
+
+        public object TextToObject(string text, Type type)
+        {
+            var texts = text.Split('+').Select(x => x.Trim()).ToArray();
+            if (type.IsArray) return new ArrayConvertor().TextToObject(texts, type);
+            else if (TypeIdentifier.IsList(type)) return new ListConvertor().TextToObject(texts, type);
+            else if (TypeIdentifier.IsDictionary(type)) return new DictionaryConvertor().TextToObject(texts, type);
+            return null;
         }
     }
 
@@ -89,18 +97,16 @@ namespace CsvConvertors
 
 
     #region 열거형 파싱
-    public class ListConvertor : ICsvIEnumeralbeParser
+
+    public class CsvArrayConvertUtility
     {
-        public string[] GetCsvValues(object obj, FieldInfo info)
+        public static Array TextToArray(string[] texts, Type elementType)
         {
-            IList list = info.GetValue(obj) as IList;
-            List<string> result = new List<string>();
-            foreach (var item in list) result.Add(item.ToString());
-            return result.ToArray();
+            Array array = Array.CreateInstance(elementType, texts.Length);
+            for (int i = 0; i < array.Length; i++)
+                array.SetValue(CsvConvertUtility.TextToObject(texts[i], elementType), i);
+            return array;
         }
-        
-        public object TextToObject(string text, Type type)
-            => type.GetConstructors()[2].Invoke(new object[] { CsvArrayConvertUtility.TextToArray(text, type.GetGenericArguments()[0]) });
     }
 
     public class ArrayConvertor : ICsvIEnumeralbeParser
@@ -113,21 +119,23 @@ namespace CsvConvertors
             return result.ToArray();
         }
 
-        public object TextToObject(string text, Type type) => CsvArrayConvertUtility.TextToArray(text, type.GetElementType());
+        public object TextToObject(string[] texts, Type type) => CsvArrayConvertUtility.TextToArray(texts, type.GetElementType());
     }
 
-    public class CsvArrayConvertUtility
+    public class ListConvertor : ICsvIEnumeralbeParser
     {
-        // .Trim() 중복 없애기. +를 ,로 바꾸기
-        public static Array TextToArray(string text, Type elementType)
+        public string[] GetCsvValues(object obj, FieldInfo info)
         {
-            var values = text.Split('+');
-            Array array = Array.CreateInstance(elementType, values.Length);
-            for (int i = 0; i < array.Length; i++)
-                array.SetValue(CsvConvertUtility.TextToObject(values[i], elementType), i);
-            return array;
+            IList list = info.GetValue(obj) as IList;
+            List<string> result = new List<string>();
+            foreach (var item in list) result.Add(item.ToString());
+            return result.ToArray();
         }
+        
+        public object TextToObject(string[] texts, Type type)
+            => type.GetConstructors()[2].Invoke(new object[] { CsvArrayConvertUtility.TextToArray(texts, type.GetGenericArguments()[0]) });
     }
+
 
     public class DictionaryConvertor : ICsvIEnumeralbeParser
     {
@@ -150,19 +158,18 @@ namespace CsvConvertors
             return result.ToArray();
         }
 
-        public object TextToObject(string text, Type type)
+        public object TextToObject(string[] texts, Type type)
         {
-            var values = text.Split('+');
-            if (values.Length % 2 != 0) Debug.LogError("CsvUtility Message : The input is incorrect. Please make sure you entered the Dictionary correctly.");
+            if (texts.Length % 2 != 0) Debug.LogError("CsvUtility Message : The input is incorrect. Please make sure you entered the Dictionary correctly.");
             var result = Activator.CreateInstance(type);
             Type[] elementTypes = type.GetGenericArguments();
             MethodInfo methodInfo = type.GetMethod("Add");
-            for (int i = 0; i < values.Length; i += 2)
+            for (int i = 0; i < texts.Length; i += 2)
             {
                 methodInfo.Invoke(result, new object[]
                 {
-                    CsvConvertUtility.TextToObject(values[i].Trim(),elementTypes[0]),
-                    CsvConvertUtility.TextToObject(values[i+1].Trim(), elementTypes[1])
+                    CsvConvertUtility.TextToObject(texts[i],elementTypes[0]),
+                    CsvConvertUtility.TextToObject(texts[i+1], elementTypes[1])
                 });
             }
             return result;
