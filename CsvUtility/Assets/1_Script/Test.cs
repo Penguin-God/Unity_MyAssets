@@ -32,7 +32,7 @@ public class MasterTest
 
     [SerializeField] public HasTestClass hasClass;
     [SerializeField] public HasTestClass[] hasClassArray;
-    [SerializeField] TestType testType;
+    [SerializeField] TestEnumType testType;
 
     public bool IsSuccess()
     {
@@ -47,7 +47,7 @@ public class MasterTest
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
             && HasClassIsSame(hasClass) && HasClassEnumerableIsSame(hasClassArray)
-            && CheckSame(testType, TestType.Devlop);
+            && CheckSame(testType, TestEnumType.Devlop);
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -113,7 +113,7 @@ public class MasterTest
     }
 }
 
-public enum TestType
+public enum TestEnumType
 {
     Happy,
     Fun,
@@ -149,7 +149,7 @@ public class DeSerializeData
 
     [SerializeField] public HasTestClass hasClass;
     [SerializeField] public HasTestClass[] hasClassArray;
-    [SerializeField] TestType testType;
+    [SerializeField] TestEnumType testType;
 }
 
 [Serializable]

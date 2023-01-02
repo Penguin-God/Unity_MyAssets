@@ -10,24 +10,15 @@ public class ConvertTester : MonoBehaviour
     [ContextMenu("Test All")]
     void TestAll()
     {
-        TestConvertorFactory();
         TestPrimitiveConvertor();
         TestIEnumerableConvertor();
-    }
-
-    [ContextMenu("Test Convertor Factory")]
-    void TestConvertorFactory()
-    {
-        Log("컨버터 팩터리 테스트!!");
-        Assert(CsvConvertorFactory.GetCsvConvertor(typeof(int)) is PrimitiveConvertor);
-        //Assert(new ConvertorFactory().GetCsvConvertor(typeof(List<>)) is ListConvertor);
     }
 
     [ContextMenu("Test Primitive Convertor")]
     void TestPrimitiveConvertor()
     {
         Log("기본형 컨버터 테스트!!");
-        ICsvConvertor convertor = new PrimitiveConvertor();
+        var convertor = new PrimitiveConvertor();
         Assert((byte)convertor.TextToObject("25", typeof(byte)) == 25);
         Assert((int)convertor.TextToObject("25", typeof(int)) == 25);
         Assert((long)convertor.TextToObject("7223372036854775807", typeof(long)) == 7223372036854775807);
@@ -38,7 +29,10 @@ public class ConvertTester : MonoBehaviour
     [ContextMenu("Test Enum Convertor")]
     void EnumTest()
     {
-
+        Log("Enum 변환 테스트!!");
+        var convertor = new EnumConvertor();
+        Assert( (TestEnumType)convertor.TextToObject("Happy", typeof(TestEnumType)) == TestEnumType.Happy);
+        Assert((TestEnumType)convertor.TextToObject("Patten", typeof(TestEnumType)) == TestEnumType.Patten);
     }
 
     

@@ -8,11 +8,6 @@ using System.Text;
 
 namespace CsvConvertors
 {
-    interface ICsvConvertor
-    {
-        object TextToObject(string text, Type type);
-    }
-
     class CsvConvertorFactory
     {
         public static ICsvParser GetParser(FieldInfo info)
@@ -23,22 +18,16 @@ namespace CsvConvertors
                 return new PrimitiveTypeParser();
         }
 
-        public static ICsvConvertor GetCsvConvertor(Type type)
-        {
-            if (type.IsPrimitive) return new PrimitiveConvertor();
-            //else if (TypeIdentifier.IsList(type)) return new ListConvertor();
-            return null;
-        }
-
         public static object TextToObject(string text, Type type)
         {
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
             else if (type == typeof(string)) return text;
+            else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
             return null;
         }
     }
 
-    class PrimitiveConvertor : ICsvConvertor
+    class PrimitiveConvertor
     {
         public object TextToObject(string text, Type type)
         {
@@ -106,7 +95,7 @@ namespace CsvConvertors
         {
             if (_primitiveParserByType.TryGetValue(type, out var parser))
                 return parser;
-            else if (type.IsEnum) return new CsvEnumParser(type);
+            else if (type.IsEnum) return new EnumConvertor(type);
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) return new CsvPairParser(type);
             else Debug.LogError($"Unloadable type : {type}");
             return null;
@@ -242,12 +231,17 @@ namespace CsvConvertors
         public Type GetParserType() => typeof(bool);
     }
 
-    class CsvEnumParser : ICsvPrimitiveTypeParser
+    class EnumConvertor : ICsvPrimitiveTypeParser
     {
         Type _type;
-        public CsvEnumParser(Type type)
+        public EnumConvertor(Type type)
         {
             _type = type;
+        }
+
+        public EnumConvertor()
+        {
+
         }
 
         public object GetParserValue(string value)
@@ -264,6 +258,20 @@ namespace CsvConvertors
             return result;
         }
         public Type GetParserType() => _type;
+
+        public object TextToObject(string text, Type type)
+        {
+            object result = null;
+            try
+            {
+                result = Enum.Parse(type, text);
+            }
+            catch
+            {
+                Debug.LogError($"CsvUtility Message : The requested value {text} was not found within {type} enum.");
+            }
+            return result;
+        }
     }
 
     #endregion 기본형 파싱 End
@@ -291,11 +299,11 @@ namespace CsvConvertors
             return result.ToArray();
         }
         
-        public object TextToObject(string text, Type type) 
+        public object TextToObject(string text, Type type)
             => type.GetConstructors()[2].Invoke(new object[] { CsvArrayConvertUtility.TextToArray(text, type.GetGenericArguments()[0]) });
     }
 
-    public class ArrayConvertor : ICsvIEnumeralbeParser, ICsvConvertor
+    public class ArrayConvertor : ICsvIEnumeralbeParser
     {
         public void SetValue(object obj, FieldInfo info, string[] values)
             => info.SetValue(obj, GetValue(info.FieldType.GetElementType(), values));
