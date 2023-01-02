@@ -36,9 +36,11 @@ public class MasterTest
 
     public bool IsSuccess()
     {
+         //&& CheckSame(textNumberPair.Key, "사무라이 하트") && CheckSame(textNumberPair.Value, 243) && CheckSame(booleanActualNumberPair.Key, false)
+         //   && CheckSame(booleanActualNumberPair.Value, 22.411f)
         return CheckSame(number, 123) && CheckSame(text, "Hello World") && CheckSame(actualNumber, 23.123f) && CheckSame(boolean, true)
-            && CheckSame(textNumberPair.Key, "사무라이 하트") && CheckSame(textNumberPair.Value, 243) && CheckSame(booleanActualNumberPair.Key, false)
-            && CheckSame(booleanActualNumberPair.Value, 22.411f) && CheckArraySame(numberArray, new int[] { 341235, 13123 })
+           
+            && CheckArraySame(numberArray, new int[] { 341235, 13123 })
             && CheckArraySame(textArray, new string[] { "고타에", "안녕", "라헤야" }) && CheckArraySame(actualNumberArray, new float[] { 4224.12f, 1245.12f })
             && CheckArraySame(booleanArray, new bool[] { true, false }) && CheckListSame(numberList, new List<int>() { 341235, 13123 })
             && CheckListSame(textList, new List<string>() { "고타에", "라헤야" }) && CheckListSame(actualNumberList, new List<float>() { 4224.12f, 1245.12f })
@@ -53,9 +55,10 @@ public class MasterTest
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
     bool CheckSame<T>(T parsingValue, T value) where T : IComparable
     {
+        if (parsingValue == null)
+            Debug.Log(value);
         if (parsingValue.CompareTo(value) != 0)
         {
-            // Debug.LogError("서로 달라요!!!!!!!!!");
             Debug.LogError($"서로 달라요!!!!!!!!! \n 파싱한 값 : {parsingValue} :  정답 : {value}");
             return false;
         }

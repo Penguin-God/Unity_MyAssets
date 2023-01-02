@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CsvConvertors
 {
-    class ConvertUtility
+    class CsvConvertUtility
     {
         public static ICsvParser GetParser(FieldInfo info)
         {
@@ -23,12 +23,10 @@ namespace CsvConvertors
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
             else if (type == typeof(string)) return text;
             else if (type.IsEnum) return new EnumConvertor().TextToObject(text, type);
+            else if(type.IsArray) return new ArrayConvertor().TextToObject(text, type);
+            else if(TypeIdentifier.IsList(type)) return new ListConvertor().TextToObject(text, type);
+            else if(TypeIdentifier.IsDictionary(type)) return new DictionaryConvertor().TextToObject(text, type);
             return null;
-        }
-
-        void GetConvertor()
-        {
-
         }
     }
 
@@ -336,10 +334,10 @@ namespace CsvConvertors
     {
         public static Array TextToArray(string text, Type elementType)
         {
-            var values = text.Split(',');
+            var values = text.Split('+');
             Array array = Array.CreateInstance(elementType, values.Length);
             for (int i = 0; i < array.Length; i++)
-                array.SetValue(ConvertUtility.TextToObject(values[i], elementType), i);
+                array.SetValue(CsvConvertUtility.TextToObject(values[i].Trim(), elementType), i);
             return array;
         }
     }
@@ -380,7 +378,7 @@ namespace CsvConvertors
 
         public object TextToObject(string text, Type type)
         {
-            var values = text.Split(',');
+            var values = text.Split('+');
             if (values.Length % 2 != 0) Debug.LogError("CsvUtility Message : The input is incorrect. Please make sure you entered the Dictionary correctly.");
             var result = Activator.CreateInstance(type);
             Type[] elementTypes = type.GetGenericArguments();
@@ -389,8 +387,8 @@ namespace CsvConvertors
             {
                 methodInfo.Invoke(result, new object[]
                 {
-                    ConvertUtility.TextToObject(values[i],elementTypes[0]),
-                    ConvertUtility.TextToObject(values[i+1], elementTypes[1])
+                    CsvConvertUtility.TextToObject(values[i].Trim(),elementTypes[0]),
+                    CsvConvertUtility.TextToObject(values[i+1].Trim(), elementTypes[1])
                 });
             }
             return result;

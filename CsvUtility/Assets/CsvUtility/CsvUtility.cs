@@ -119,8 +119,12 @@ public static class CsvUtility
                 }
                 else
                 {
-                    ConvertUtility.GetParser(info).SetValue(obj, info, new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells));
-                    // CsvConvertors.ConvertorFactory.GetCsvConvertor(info.FieldType).TextToObject()
+                    var values = new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells).Select(x => x.Trim());
+                    // CsvConvertUtility.GetParser(info).SetValue(obj, info, values);
+
+                    //if (values.Length > 1)
+                    //    Debug.Log(string.Join(" ", values));
+                    info.SetValue(obj, CsvConvertUtility.TextToObject(string.Join("+", values), info.FieldType));
                 }
             }
             return obj;
