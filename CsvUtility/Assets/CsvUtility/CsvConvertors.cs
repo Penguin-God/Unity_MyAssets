@@ -118,12 +118,13 @@ namespace CsvConvertors
 
     public class CsvArrayConvertUtility
     {
+        // .Trim() 중복 없애기. +를 ,로 바꾸기
         public static Array TextToArray(string text, Type elementType)
         {
             var values = text.Split('+');
             Array array = Array.CreateInstance(elementType, values.Length);
             for (int i = 0; i < array.Length; i++)
-                array.SetValue(CsvConvertUtility.TextToObject(values[i].Trim(), elementType), i);
+                array.SetValue(CsvConvertUtility.TextToObject(values[i], elementType), i);
             return array;
         }
     }
