@@ -172,6 +172,8 @@ public static class CsvUtility
                     return fieldNames.Count(x => x == _info.Name) - 1;
                 else if (TypeIdentifier.IsIEnumerable(_info.FieldType))
                     return fieldNames.Count(x => x == _info.Name);
+                else if (CsvConvertUtility._customConvertorManager.IsUserCustomConvertor(_info.FieldType)) // 임시
+                    return 1;
 
                 Debug.LogError($"Unloadable type : {_info.FieldType}, variable name : {_info.Name}, class type : {type}");
                 return 1;

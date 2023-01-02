@@ -16,7 +16,8 @@ namespace CsvConvertors
 
     static class CsvConvertUtility
     {
-        static UserCustomConvertorManager _customConvertorManager = new UserCustomConvertorManager();
+        // public은 TypeIdentifier에서 class 가져가는 거 때문에 임시로 설정함.
+        public static UserCustomConvertorManager _customConvertorManager = new UserCustomConvertorManager();
         public static object TextToObject(string text, Type type)
         {
             if (type.IsPrimitive) return new PrimitiveConvertor().TextToObject(text, type);
@@ -50,6 +51,7 @@ namespace CsvConvertors
         {
             if (_objByType.TryGetValue(type, out object obj) == false)
                 return null;
+            text = text.Replace('+', ','); // 일단 돌아만 가게 하자
             return obj.GetType().GetMethod("TextToObject").Invoke(obj, new object[] { text, type });
         }
 
@@ -239,6 +241,7 @@ namespace CsvConvertors
             else if (type.ToString().StartsWith("System.")) return false;
             else if (type.IsArray) return IsCustom(type.GetElementType());
             else if (IsList(type) && type.GetGenericArguments()[0] != null) return IsCustom(type.GetGenericArguments()[0]);
+            else if (CsvConvertUtility._customConvertorManager.IsUserCustomConvertor(type)) return false; // 이건 임시임
             else return true;
         }
     }

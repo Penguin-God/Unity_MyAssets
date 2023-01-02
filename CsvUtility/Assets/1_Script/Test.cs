@@ -33,6 +33,7 @@ public class MasterTest
     [SerializeField] public HasTestClass hasClass;
     [SerializeField] public HasTestClass[] hasClassArray;
     [SerializeField] TestEnumType testType;
+    [SerializeField] Vector3 vector;
 
     public bool IsSuccess()
     {
@@ -49,7 +50,7 @@ public class MasterTest
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(2134.22f, true))
             && CheckDictionarySame(actualNumberByBoolean, new KeyValuePair<float, bool>(11.11f, false))
             && HasClassIsSame(hasClass) && HasClassEnumerableIsSame(hasClassArray)
-            && CheckSame(testType, TestEnumType.Devlop);
+            && CheckSame(testType, TestEnumType.Devlop) && vector == new Vector3(6, 12, 77);
     }
 
     // TODO : 틀렸을 때 정보도 LogError에 띄우기
@@ -155,12 +156,6 @@ public class DeSerializeData
     [SerializeField] TestEnumType testType;
 }
 
-[Serializable]
-class HasVector3
-{
-    [SerializeField] Vector3 vector;
-}
-
 public class Test : MonoBehaviour
 {
     [SerializeField] TextAsset loadCsv;
@@ -194,23 +189,6 @@ public class Test : MonoBehaviour
         outStream.Write(csv);
         outStream.Close();
     }
-
-    [SerializeField] HasVector3[] has;
-    [ContextMenu("Test")]
-    void TestTest()
-    {
-        // has = CsvUtility.CsvToArray<HasVector3>("vector\n1,2,3\n ");
-
-        var interfaceType = typeof(ICsvConvertor);
-        var types = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(p => interfaceType.IsAssignableFrom(p) && p.IsInterface == false);
-        foreach (var type in types)
-        {
-            var parser = Activator.CreateInstance(type) as ICsvConvertor;
-            type.GetMethod("TextToObject").Invoke(parser, new object[] { "1,2,3", type });
-        }
-    }
 }
 
 class VectorParser : ICsvConvertor
@@ -219,7 +197,6 @@ class VectorParser : ICsvConvertor
 
     public object TextToObject(string text, Type type)
     {
-        Debug.Log(text);
         List<float> values = new List<float>() { 0, 0, 0 };
         var texts = text.Split(',');
         for (int i = 0; i < 3; i++)
