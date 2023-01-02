@@ -290,12 +290,9 @@ namespace CsvConvertors
             foreach (var item in list) result.Add(item.ToString());
             return result.ToArray();
         }
-
-        public object TextToObject(string text, Type type)
-        {
-            // Array거 재사용하기
-            return null;
-        }
+        
+        public object TextToObject(string text, Type type) 
+            => type.GetConstructors()[2].Invoke(new object[] { CsvArrayConvertUtility.TextToArray(text, type.GetGenericArguments()[0]) });
     }
 
     public class ArrayConvertor : ICsvIEnumeralbeParser, ICsvConvertor
@@ -319,12 +316,17 @@ namespace CsvConvertors
             return result.ToArray();
         }
 
-        public object TextToObject(string text, Type type)
+        public object TextToObject(string text, Type type) => CsvArrayConvertUtility.TextToArray(text, type.GetElementType());
+    }
+
+    public class CsvArrayConvertUtility
+    {
+        public static Array TextToArray(string text, Type elementType)
         {
             var values = text.Split(',');
-            Array array = Array.CreateInstance(type.GetElementType(), values.Length);
+            Array array = Array.CreateInstance(elementType, values.Length);
             for (int i = 0; i < array.Length; i++)
-                array.SetValue(CsvConvertorFactory.TextToObject(values[i], type.GetElementType()), i);
+                array.SetValue(CsvConvertorFactory.TextToObject(values[i], elementType), i);
             return array;
         }
     }
