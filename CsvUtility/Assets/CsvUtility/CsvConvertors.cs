@@ -14,7 +14,7 @@ namespace CsvConvertors
         object TextToObject(string text, Type type);
     }
 
-    static class CsvConvertUtility
+    static class CsvConverter
     {
         // public은 TypeIdentifier에서 class 가져가는 거 때문에 임시로 설정함.
         public static UserCustomConvertorManager _customConvertorManager = new UserCustomConvertorManager();
@@ -109,8 +109,8 @@ namespace CsvConvertors
             ConstructorInfo constructor = type.GetConstructors()[0];
             return constructor.Invoke(new object[]
             {
-                CsvConvertUtility.TextToObject(values[0], elementTypes[0]),
-                CsvConvertUtility.TextToObject(values[1], elementTypes[1]),
+                CsvConverter.TextToObject(values[0], elementTypes[0]),
+                CsvConverter.TextToObject(values[1], elementTypes[1]),
             });
         }
     }
@@ -155,7 +155,7 @@ namespace CsvConvertors
         {
             Array array = Array.CreateInstance(elementType, texts.Length);
             for (int i = 0; i < array.Length; i++)
-                array.SetValue(CsvConvertUtility.TextToObject(texts[i], elementType), i);
+                array.SetValue(CsvConverter.TextToObject(texts[i], elementType), i);
             return array;
         }
     }
@@ -219,8 +219,8 @@ namespace CsvConvertors
             {
                 methodInfo.Invoke(result, new object[]
                 {
-                    CsvConvertUtility.TextToObject(texts[i],elementTypes[0]),
-                    CsvConvertUtility.TextToObject(texts[i+1], elementTypes[1])
+                    CsvConverter.TextToObject(texts[i],elementTypes[0]),
+                    CsvConverter.TextToObject(texts[i+1], elementTypes[1])
                 });
             }
             return result;
@@ -241,7 +241,7 @@ namespace CsvConvertors
             else if (type.ToString().StartsWith("System.")) return false;
             else if (type.IsArray) return IsCustom(type.GetElementType());
             else if (IsList(type) && type.GetGenericArguments()[0] != null) return IsCustom(type.GetGenericArguments()[0]);
-            else if (CsvConvertUtility._customConvertorManager.IsUserCustomConvertor(type)) return false; // 이건 임시임
+            else if (CsvConverter._customConvertorManager.IsUserCustomConvertor(type)) return false; // 이건 임시임
             else return true;
         }
     }

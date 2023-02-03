@@ -32,7 +32,7 @@ public static class CsvUtility
     
     public static List<T> CsvToList<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToList();
     public static T[] CsvToArray<T>(string csv) => GetEnumerableFromCsv<T>(csv).ToArray();
-    static IEnumerable<T> GetEnumerableFromCsv<T>(string csv) => new CsvLoder<T>(csv).GetInstanceIEnumerable();
+    static IEnumerable<T> GetEnumerableFromCsv<T>(string csv) => new CsvSerializer<T>().CsvToIEnumerable(csv);
 
 
     public static string ListToCsv<T>(List<T> list, int arrayLength = 1, int listLength = 1, int dictionaryLength = 1)
@@ -70,14 +70,11 @@ public static class CsvUtility
         return restul;
     }
 
-    class CsvLoder<T>
+    class CsvSerializer<T>
     {
         const char comma = ',';
         const char lineBreak = '\n';
-
-        string _csv;
-        string[] fieldNames;
-
+        
         [Conditional("UNITY_EDITOR")]
         void CheckFieldNames(Type type, string[] filedNames)
         {
@@ -87,48 +84,66 @@ public static class CsvUtility
                 Debug.Assert(realFieldNames.Contains(filedNames[i]), $"Unable to find {i + 1}th column name: {filedNames[i]}");
         }
 
-        public CsvLoder(string csv)
+
+        string _csv;
+        string[] fieldNames;
+        void Init(string csv)
         {
             _csv = csv.Substring(0, csv.Length - 1);
             fieldNames = GetCells(_csv.Split(lineBreak)[0]);
-            _converter = new CustomObjectConverter(fieldNames, GetInstance);
+            _converter = new CustomObjectConverter(fieldNames, CsvLineToObject);
             CheckFieldNames(typeof(T), fieldNames);
         }
 
         string[] GetCells(string line) => line.Split(comma).Select(x => x.Trim()).ToArray();
 
-        Liner liner = new Liner();
-        public IEnumerable<T> GetInstanceIEnumerable()
-        => _csv.Split(lineBreak)
-            .Skip(1)
-            .Where(x => liner.IsValidLine(x))
-            .Select(x => (T)GetInstance(typeof(T), fieldNames, liner.GetValueList(x)));
+        public IEnumerable<T> CsvToIEnumerable(string csv)
+        {
+            Init(csv);
+            CsvLineProcecessor lineProcessor = new CsvLineProcecessor();
+            return _csv.Split(lineBreak)
+                .Skip(1)
+                .Where(x => lineProcessor.IsValidLine(x))
+                .Select(x => (T)CsvLineToObject(typeof(T), fieldNames, lineProcessor.GetValueList(x)));
+        }
 
-        CustomObjectConverter _converter;
-        object GetInstance(Type type, string[] fieldNames, List<string> cells)
+        object CsvLineToObject(Type type, string[] fieldNames, List<string> cells)
         {
             object obj = Activator.CreateInstance(type);
-            Dictionary<string, int> countByKey = new FieldNameMaker().GetCountByFieldName(type, fieldNames);
-
-            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
-            {
-                if (TypeIdentifier.IsCustom(info.FieldType))
-                {
-                    info.SetValue(obj, _converter.GetCustomValue(info, cells));
-                    cells.RemoveAt(0);
-                }
-                else
-                {
-                    var values = new FiledValueGetter().GetFieldValues(countByKey[info.Name], cells).Select(x => x.Trim());
-                    // 여기서 try문 걸기
-                    info.SetValue(obj, CsvConvertUtility.TextToObject(string.Join("+", values), info.FieldType));
-                }
-            }
+            SetObjInfo(type, fieldNames, cells, obj);
             return obj;
+        }
+
+        void SetObjInfo(Type type, string[] fieldNames, List<string> cells, object obj)
+        {
+            Dictionary<string, int> countByFieldName = new FieldNameMaker().GetCountByFieldName(type, fieldNames);
+
+            // 유효한 멤버들 채움
+            foreach (FieldInfo info in GetSerializedFields(type).Where(x => fieldNames.Contains(x.Name)))
+                info.SetValue(obj, GetFiledValue(cells, countByFieldName[info.Name], info));
+        }
+
+        object GetFiledValue(List<string> cells, int filedCount, FieldInfo info)
+            => TypeIdentifier.IsCustom(info.FieldType) ? GetCustomFiledValue(cells, info) : GetFieldValue(cells, filedCount, info.FieldType);
+
+        CustomObjectConverter _converter;
+        object GetCustomFiledValue(List<string> cells, FieldInfo info)
+        {
+            object result = _converter.GetCustomValue(info, cells);
+            cells.RemoveAt(0);
+            return result;
+        }
+
+        object GetFieldValue(List<string> cells, int fieldCount, Type filedType)
+        {
+            var values = new FiledValueGetter().GetFieldValues(fieldCount, cells).Select(x => x.Trim());
+
+            // 여기서 try문 걸기
+            return CsvConverter.TextToObject(string.Join("+", values), filedType);
         }
     }
 
-    class Liner
+    class CsvLineProcecessor
     {
         const char mark = '\"';
         const char replaceMark = '+';
@@ -173,14 +188,13 @@ public static class CsvUtility
                     return fieldNames.Count(x => x == _info.Name) - 1;
                 else if (TypeIdentifier.IsIEnumerable(_info.FieldType))
                     return fieldNames.Count(x => x == _info.Name);
-                else if (CsvConvertUtility._customConvertorManager.IsUserCustomConvertor(_info.FieldType)) // 임시
+                else if (CsvConverter._customConvertorManager.IsUserCustomConvertor(_info.FieldType)) // 임시
                     return 1;
 
                 Debug.LogError($"Unloadable type : {_info.FieldType}, variable name : {_info.Name}, class type : {type}");
                 return 1;
             }
         }
-
     }
 
     class FiledValueGetter
@@ -197,7 +211,7 @@ public static class CsvUtility
                 cells.RemoveAt(0);
             }
 
-            if (result.Count == 0) result.Add("");
+            // if (result.Count == 0) result.Add("");
             return result.ToArray();
         }
     }
@@ -264,6 +278,8 @@ public static class CsvUtility
         }
         object GetIEnumerableValue(Type type, Array array) => (type.IsArray) ? array : type.GetConstructors()[2].Invoke(new object[] { array });
     }
+
+
 
     class CsvSaver<T>
     {
