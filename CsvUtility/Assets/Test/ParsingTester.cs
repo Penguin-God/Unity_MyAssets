@@ -25,4 +25,12 @@ public class ParsingTester : MonoBehaviour
         _chileDatas = CsvUtility.CsvToArray<ChileData>(_inheritanceData.text);
         Assert(_chileDatas[0].parentNum == 1 && _chileDatas[1].childNum == 2 && _chileDatas[1].parentNum == 3 && _chileDatas[1].parentNum == 4);
     }
+
+    public void TestValueGetter()
+    {
+        var testCsv = _inheritanceData.text;
+        var getter = new CellValueGetter(testCsv);
+        foreach (Dictionary<string, IEnumerable<string>> valuesByName in getter.ValuesByNames)
+            Assert("1" == valuesByName["parentNum"].FirstOrDefault());
+    }
 }

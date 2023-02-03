@@ -468,3 +468,13 @@ public static class CsvUtility
         }
     }
 }
+
+public class CellValueGetter
+{
+    List<Dictionary<string, IEnumerable<string>>> _valuesByNames = new List<Dictionary<string, IEnumerable<string>>>();
+    public List<Dictionary<string, IEnumerable<string>>> ValuesByNames => _valuesByNames;
+    public CellValueGetter(string csv)
+    {
+        
+    }
+}
