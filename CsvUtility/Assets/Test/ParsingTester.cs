@@ -41,11 +41,11 @@ public class ParsingTester : MonoBehaviour
         string testData = parsingTestData.text;
         var parser = new CsvParser(testData);
         Assert(parser.ValuesByNameList.Count == 2);
-        Assert(parser.GetCell("first").First() == "1" && parser.GetCell("second").First() == "2");
+        Assert(parser.GetCell("first") == "1" && parser.GetCell("second") == "2");
         Assert(parser.Moveable);
         parser.MoveNextLine();
         Assert(parser.CurrentIndex == 1);
-        Assert(parser.GetCell("first").First() == "3" && parser.GetCell("second").First() == "4");
+        Assert(parser.GetCell("first") == "3" && parser.GetCell("second") == "4");
         Assert(parser.Moveable == false);
     }
 }
