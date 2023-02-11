@@ -469,12 +469,30 @@ public static class CsvUtility
     }
 }
 
-public class CellValueGetter
+public class CsvParser
 {
-    List<Dictionary<string, IEnumerable<string>>> _valuesByNames = new List<Dictionary<string, IEnumerable<string>>>();
-    public List<Dictionary<string, IEnumerable<string>>> ValuesByNames => _valuesByNames;
-    public CellValueGetter(string csv)
+    List<Dictionary<string, IEnumerable<string>>> _valuesByNameList = new List<Dictionary<string, IEnumerable<string>>>();
+    public List<Dictionary<string, IEnumerable<string>>> ValuesByNameList => _valuesByNameList;
+    int _currentIndex = 0;
+    public int CurrentIndex => _currentIndex;
+    public bool Moveable => _valuesByNameList.Count > _currentIndex + 1;
+    public void MoveNextLine() => _currentIndex++;
+    public CsvParser(string csv)
     {
-        
+        _valuesByNameList = new List<Dictionary<string, IEnumerable<string>>>()
+        {
+            new Dictionary<string, IEnumerable<string>>()
+            {
+                {"first", new string[]{ "1" } },
+                {"second", new string[]{ "2" } },
+            },
+            new Dictionary<string, IEnumerable<string>>()
+            {
+                {"first", new string[]{ "3" } },
+                {"second", new string[]{ "4" } },
+            },
+        };
     }
+
+    public IEnumerable<string> GetCell(string fieldName) => _valuesByNameList[_currentIndex][fieldName];
 }

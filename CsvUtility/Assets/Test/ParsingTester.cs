@@ -26,11 +26,26 @@ public class ParsingTester : MonoBehaviour
         Assert(_chileDatas[0].parentNum == 1 && _chileDatas[1].childNum == 2 && _chileDatas[1].parentNum == 3 && _chileDatas[1].parentNum == 4);
     }
 
-    public void TestValueGetter()
+
+    [SerializeField] TextAsset parsingTestData;
+    // 이런 형태의 csv파일
+    /*
+    first, second
+    1, 2
+    3, 4
+    */
+    [ContextMenu("csv생성 테스트")]
+    public void TestCsvParsin()
     {
-        var testCsv = _inheritanceData.text;
-        var getter = new CellValueGetter(testCsv);
-        foreach (Dictionary<string, IEnumerable<string>> valuesByName in getter.ValuesByNames)
-            Assert("1" == valuesByName["parentNum"].FirstOrDefault());
+        Log("csv생성 테스트");
+        string testData = parsingTestData.text;
+        var parser = new CsvParser(testData);
+        Assert(parser.ValuesByNameList.Count == 2);
+        Assert(parser.GetCell("first").First() == "1" && parser.GetCell("second").First() == "2");
+        Assert(parser.Moveable);
+        parser.MoveNextLine();
+        Assert(parser.CurrentIndex == 1);
+        Assert(parser.GetCell("first").First() == "3" && parser.GetCell("second").First() == "4");
+        Assert(parser.Moveable == false);
     }
 }
