@@ -475,30 +475,31 @@ public class CsvParser
     public Dictionary<string, string[]> ValuesByName => _valuesByName;
     int _currentIndex = 0;
     public int CurrentIndex => _currentIndex;
-    public bool Moveable => _lineCount > _currentIndex + 1;
+    public bool Moveable => _valuesByName.Count > _currentIndex + 1;
     public void MoveNextLine() => _currentIndex++;
-    readonly int _lineCount;
+    
+    readonly char COMMA = ',';
     public CsvParser(string csv)
     {
         char lineBreak = '\n';
-        char comma = ','; // n개 값들은 무지성 ,로 나누면 안됨
 
         csv = csv.Substring(0, csv.Length - 1);
         string[] lines = csv.Split(lineBreak);
-        _lineCount = lines.Count() - 1;
-        string[] fieldNames = lines[0].Split(comma);
+        string[] fieldNames = lines[0].Split(COMMA);
 
         for (int i = 0; i < fieldNames.Length; i++)
         {
-            var dictionary = new Dictionary<string, List<string>>();
-            dictionary.Add(fieldNames[i], new List<string>());
-            for (int j = 1; j < lines.Length; j++)
-            {
-                string[] cells = lines[j].Split(comma);
-                dictionary[fieldNames[i]].Add(cells[i]);
-            }
-            _valuesByName.Add(dictionary.First().Key.Trim(), dictionary.First().Value.Select(x => x.Trim()).ToArray());
+            KeyValuePair<string, string[]> pair = CreateValuesNamePair(lines, fieldNames, i);
+            _valuesByName.Add(pair.Key, pair.Value);
         }
+    }
+
+    KeyValuePair<string, string[]> CreateValuesNamePair(string[] lines, string[] fieldNames, int fieldNameIndex)
+    {
+        var pair = new KeyValuePair<string, List<string>>(fieldNames[fieldNameIndex], new List<string>());
+        for (int i = 1; i < lines.Length; i++)
+            pair.Value.Add(lines[i].Split(COMMA)[fieldNameIndex]);  // n개 값들은 무지성 ,로 나누면 안됨
+        return new KeyValuePair<string, string[]>(pair.Key.Trim(), pair.Value.Select(x => x.Trim()).ToArray());
     }
 
     public string GetCell(string fieldName) => _valuesByName[fieldName][_currentIndex];
