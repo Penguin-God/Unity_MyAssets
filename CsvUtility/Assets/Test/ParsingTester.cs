@@ -26,6 +26,19 @@ public class ParsingTester : MonoBehaviour
         Assert(_chileDatas[0].parentNum == 1 && _chileDatas[1].childNum == 2 && _chileDatas[1].parentNum == 3 && _chileDatas[1].parentNum == 4);
     }
 
+    void TestCsvParse(TextAsset csvFile, string testMessage = "csv parsing Text", params string[] values)
+    {
+        Log(testMessage);
+        string testData = csvFile.text;
+        var parser = new CsvParser(testData);
+        Assert(parser.ValuesByName.Count == 2);
+        Assert(parser.GetCell("first") == values[0] && parser.GetCell("second") == values[1]);
+        Assert(parser.Moveable);
+        parser.MoveNextLine();
+        Assert(parser.CurrentIndex == 1);
+        Assert(parser.GetCell("first") == values[2] && parser.GetCell("second") == values[3]);
+        Assert(parser.Moveable == false);
+    }
 
     [SerializeField] TextAsset basicTypeParseTestData;
     // 이런 형태의 csv파일
@@ -35,19 +48,8 @@ public class ParsingTester : MonoBehaviour
     3, 4
     */
     [ContextMenu("csv 기본형 parsing 테스트")]
-    public void TestCsvParseToBasicType()
-    {
-        Log("csv 기본형 parsing 테스트");
-        string testData = basicTypeParseTestData.text;
-        var parser = new CsvParser(testData);
-        Assert(parser.ValuesByName.Count == 2);
-        Assert(parser.GetCell("first") == "1" && parser.GetCell("second") == "2");
-        Assert(parser.Moveable);
-        parser.MoveNextLine();
-        Assert(parser.CurrentIndex == 1);
-        Assert(parser.GetCell("first") == "3" && parser.GetCell("second") == "4");
-        Assert(parser.Moveable == false);
-    }
+    void TestCsvParseToBasicType() => TestCsvParse(basicTypeParseTestData, "csv 기본형 parsing 테스트", "1", "2", "3", "4");
+
 
     [SerializeField] TextAsset IEnumerableTypeParseTestData;
     // 이런 형태의 csv파일
@@ -57,19 +59,8 @@ public class ParsingTester : MonoBehaviour
     "Hello,World", "You, Shold, Know, Me", h, i
     */
     [ContextMenu("csv 열거형 parsing 테스트")]
-    public void TestCsvParseToIEnumerable()
-    {
-        Log("csv 열거형 parsing 테스트");
-        string testData = IEnumerableTypeParseTestData.text;
-        var parser = new CsvParser(testData);
-        Assert(parser.ValuesByName.Count == 2);
-        Assert(parser.GetCell("first") == "1,23,4" && parser.GetCell("second") == "2,41,2");
-        Assert(parser.Moveable);
-        parser.MoveNextLine();
-        Assert(parser.CurrentIndex == 1);
-        Assert(parser.GetCell("first") == "Hello,World" && parser.GetCell("second") == "You,Shold,Know,Me");
-        Assert(parser.Moveable == false);
-    }
+    void TestCsvParseToIEnumerable() => TestCsvParse(IEnumerableTypeParseTestData, "csv 열거형 parsing 테스트"
+        , "1,23,4", "2,41,2", "Hello,World", "You,Shold,Know,Me");
 
 
     [SerializeField] TextAsset BasicAndIEnumerableTypeParseTestData;
@@ -80,17 +71,7 @@ public class ParsingTester : MonoBehaviour
     "Hello,World",With,Unity,You,Should,Know,Me
     */
     [ContextMenu("csv 기본형, 열거형 parsing 테스트")]
-    public void TestCsvParseToIEnumerableAndBasic()
-    {
-        Log("csv 기본형, 열거형 parsing 테스트");
-        string testData = BasicAndIEnumerableTypeParseTestData.text;
-        var parser = new CsvParser(testData);
-        Assert(parser.ValuesByName.Count == 2);
-        Assert(parser.GetCell("first") == "1,23,4" && parser.GetCell("second") == "2,41,2,3,44,55");
-        Assert(parser.Moveable);
-        parser.MoveNextLine();
-        Assert(parser.CurrentIndex == 1);
-        Assert(parser.GetCell("first") == "Hello,World,With,Unity" && parser.GetCell("second") == "You,Shold,Know,Me");
-        Assert(parser.Moveable == false);
-    }
+    // TODO : 나중에 third까지 추가해서 기본형이랑 열거형 같이 테스트하기
+    void TestCsvParseToIEnumerableAndBasic() => TestCsvParse(BasicAndIEnumerableTypeParseTestData, "csv 기본형, 열거형 parsing 테스트"
+        , "1,23,4", "2,41,2,3,44,55", "Hello,World,With,Unity", "You,Shold,Know,Me");
 }
