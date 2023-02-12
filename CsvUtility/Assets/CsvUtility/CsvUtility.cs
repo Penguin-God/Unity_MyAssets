@@ -494,28 +494,32 @@ public class CsvParser
         return string.Join("", tokens).Replace("\"", "");
     }
 
-    public CsvParser(string csv)
+    string[] CsvToVaildLines(string csv)
     {
         char lineBreak = '\n';
 
-        csv = csv.Substring(0, csv.Length - 1);
-        string[] lines = csv.Split(lineBreak);
+        List<string> result = new List<string>();
+        var allCells = csv.Substring(0, csv.Length - 1).Split(lineBreak).Select(line => line.Split(COMMA).Select(cell => cell.Trim()));
+        foreach (var lineCells in allCells)
+            result.Add(string.Join(COMMA.ToString(), lineCells));
+        return result.ToArray();
+    }
+
+    public CsvParser(string csv)
+    {
+        string[] lines = CsvToVaildLines(csv);
         string[] fieldNames = lines[0].Split(COMMA);
 
         for (int i = 0; i < fieldNames.Length; i++)
-        {
-            KeyValuePair<string, string[]> pair = CreateValuesNamePair(lines, fieldNames, i);
-            _valuesByName.Add(pair.Key, pair.Value);
-        }
+            _valuesByName.Add(fieldNames[i], GetFiledValues(lines, i));
     }
 
-    KeyValuePair<string, string[]> CreateValuesNamePair(string[] lines, string[] fieldNames, int fieldNameIndex)
+    string[] GetFiledValues(string[] lines, int fieldIndex)
     {
-        var pair = new KeyValuePair<string, List<string>>(fieldNames[fieldNameIndex], new List<string>());
+        List<string> values = new List<string>();
         foreach (var currentLine in lines.Skip(1).Select(line => GetLine(line)))
-            pair.Value.Add(currentLine.Split(COMMA)[fieldNameIndex].Replace(REPLACE_MARK, COMMA.ToString()));
-
-        return new KeyValuePair<string, string[]>(pair.Key.Trim(), pair.Value.Select(x => x.Trim()).ToArray());
+            values.Add(currentLine.Split(COMMA)[fieldIndex].Replace(REPLACE_MARK, COMMA.ToString()));
+        return values.ToArray();
     }
 
     public string GetCell(string fieldName) => _valuesByName[fieldName][_currentIndex];

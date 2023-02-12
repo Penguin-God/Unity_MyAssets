@@ -67,7 +67,7 @@ public class ParsingTester : MonoBehaviour
         Assert(parser.Moveable);
         parser.MoveNextLine();
         Assert(parser.CurrentIndex == 1);
-        Assert(parser.GetCell("first") == "Hello,World" && parser.GetCell("second") == "You, Shold, Know, Me"); // && parser.GetCell("third") == "h,i"
+        Assert(parser.GetCell("first") == "Hello,World" && parser.GetCell("second") == "You,Shold,Know,Me"); // && parser.GetCell("third") == "h,i"
         Assert(parser.Moveable == false);
     }
 }
