@@ -40,7 +40,7 @@ public class ParsingTester : MonoBehaviour
         Log("csv생성 테스트");
         string testData = parsingTestData.text;
         var parser = new CsvParser(testData);
-        Assert(parser.ValuesByNameList.Count == 2);
+        Assert(parser.ValuesByName.Count == 2);
         Assert(parser.GetCell("first") == "1" && parser.GetCell("second") == "2");
         Assert(parser.Moveable);
         parser.MoveNextLine();

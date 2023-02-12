@@ -472,7 +472,7 @@ public static class CsvUtility
 public class CsvParser
 {
     Dictionary<string, string[]> _valuesByName = new Dictionary<string, string[]>();
-    public Dictionary<string, string[]> ValuesByNameList => _valuesByName;
+    public Dictionary<string, string[]> ValuesByName => _valuesByName;
     int _currentIndex = 0;
     public int CurrentIndex => _currentIndex;
     public bool Moveable => _lineCount > _currentIndex + 1;
@@ -488,24 +488,17 @@ public class CsvParser
         _lineCount = lines.Count() - 1;
         string[] fieldNames = lines[0].Split(comma);
 
-        //for (int i = 1; i < lines.Length; i++)
-        //{
-        //    string[] cells = lines[i].Split(comma);
-        //    var dictionary = new Dictionary<string, List<string>>();
-        //    for (int j = 0; j < fieldNames.Length; j++)
-        //    {
-        //        if (!dictionary.ContainsKey(fieldNames[j]))
-        //            dictionary[fieldNames[j]] = new List<string>();
-        //        dictionary[fieldNames[j]].Add(cells[j]);
-        //    }
-        //    _valuesByName.Add(dictionary.First().Key, dictionary.First().Value.ToArray());
-        //}
-
-        _valuesByName = new Dictionary<string, string[]>()
+        for (int i = 0; i < fieldNames.Length; i++)
         {
-            {"first", new string[] { "1", "3" } },
-            {"second", new string[] { "2", "4" } },
-        };
+            var dictionary = new Dictionary<string, List<string>>();
+            dictionary.Add(fieldNames[i], new List<string>());
+            for (int j = 1; j < lines.Length; j++)
+            {
+                string[] cells = lines[j].Split(comma);
+                dictionary[fieldNames[i]].Add(cells[i]);
+            }
+            _valuesByName.Add(dictionary.First().Key.Trim(), dictionary.First().Value.Select(x => x.Trim()).ToArray());
+        }
     }
 
     public string GetCell(string fieldName) => _valuesByName[fieldName][_currentIndex];
