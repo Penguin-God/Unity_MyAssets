@@ -499,7 +499,12 @@ public class CsvParser
         string[] fieldNames = lines[0].Split(COMMA);
 
         for (int i = 0; i < fieldNames.Length; i++)
-            _valuesByName.Add(fieldNames[i], GetFiledValues(lines, i));
+        {
+            if(_valuesByName.TryGetValue(fieldNames[i], out var values))
+                _valuesByName[fieldNames[i]] = values.Concat(GetFiledValues(lines, i)).ToArray();
+            else
+                _valuesByName.Add(fieldNames[i], GetFiledValues(lines, i));
+        }
     }
 
     string[] GetFiledValues(string[] lines, int fieldIndex)

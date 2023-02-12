@@ -32,10 +32,14 @@ public class ParsingTester : MonoBehaviour
         string testData = csvFile.text;
         var parser = new CsvParser(testData);
         Assert(parser.ValuesByName.Count == 2);
+        Log(parser.GetCell("first"));
+        Log(parser.GetCell("second"));
         Assert(parser.GetCell("first") == values[0] && parser.GetCell("second") == values[1]);
         Assert(parser.Moveable);
         parser.MoveNextLine();
         Assert(parser.CurrentIndex == 1);
+        Log(parser.GetCell("first"));
+        Log(parser.GetCell("second"));
         Assert(parser.GetCell("first") == values[2] && parser.GetCell("second") == values[3]);
         Assert(parser.Moveable == false);
     }
