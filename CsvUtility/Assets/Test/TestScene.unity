@@ -153,7 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inheritanceData: {fileID: 4900000, guid: eee7a4571b0de5d428b07bdae015a687, type: 3}
-  parsingTestData: {fileID: 4900000, guid: 4d523d05628e8984ab0eb92fa96a69f9, type: 3}
+  basicTypeParseTestData: {fileID: 4900000, guid: a5468e4748610f64188a0fd61a4a4076, type: 3}
+  IEnumerableTypeParseTestData: {fileID: 4900000, guid: e10d87241d42f0248a07393c07c2f448, type: 3}
 --- !u!4 &734657575
 Transform:
   m_ObjectHideFlags: 0

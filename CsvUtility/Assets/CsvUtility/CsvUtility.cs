@@ -103,8 +103,8 @@ public static class CsvUtility
             CsvLineProcecessor lineProcessor = new CsvLineProcecessor();
             return _csv.Split(lineBreak)
                 .Skip(1)
-                .Where(x => lineProcessor.IsValidLine(x))
-                .Select(x => (T)CsvLineToObject(typeof(T), fieldNames, lineProcessor.GetValueList(x)));
+                .Where(line => lineProcessor.IsValidLine(line))
+                .Select(line => (T)CsvLineToObject(typeof(T), fieldNames, lineProcessor.GetValueList(line)));
         }
 
         object CsvLineToObject(Type type, string[] fieldNames, List<string> cells)
@@ -479,6 +479,21 @@ public class CsvParser
     public void MoveNextLine() => _currentIndex++;
     
     readonly char COMMA = ',';
+    readonly char IENUMERABLE_MARK = '\"';
+    readonly string REPLACE_MARK = "$%^";
+
+    string GetLine(string line)
+    {
+        string[] tokens = line.Split(IENUMERABLE_MARK);
+
+        for (int i = 0; i < tokens.Length - 1; i++)
+        {
+            if (i % 2 == 1)
+                tokens[i] = tokens[i].Replace(COMMA.ToString(), REPLACE_MARK);
+        }
+        return string.Join("", tokens).Replace("\"", "");
+    }
+
     public CsvParser(string csv)
     {
         char lineBreak = '\n';
@@ -497,8 +512,9 @@ public class CsvParser
     KeyValuePair<string, string[]> CreateValuesNamePair(string[] lines, string[] fieldNames, int fieldNameIndex)
     {
         var pair = new KeyValuePair<string, List<string>>(fieldNames[fieldNameIndex], new List<string>());
-        for (int i = 1; i < lines.Length; i++)
-            pair.Value.Add(lines[i].Split(COMMA)[fieldNameIndex]);  // n개 값들은 무지성 ,로 나누면 안됨
+        foreach (var currentLine in lines.Skip(1).Select(line => GetLine(line)))
+            pair.Value.Add(currentLine.Split(COMMA)[fieldNameIndex].Replace(REPLACE_MARK, COMMA.ToString()));
+
         return new KeyValuePair<string, string[]>(pair.Key.Trim(), pair.Value.Select(x => x.Trim()).ToArray());
     }
 
