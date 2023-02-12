@@ -482,18 +482,6 @@ public class CsvParser
     readonly char IENUMERABLE_MARK = '\"';
     readonly string REPLACE_MARK = "$%^";
 
-    string GetLine(string line)
-    {
-        string[] tokens = line.Split(IENUMERABLE_MARK);
-
-        for (int i = 0; i < tokens.Length - 1; i++)
-        {
-            if (i % 2 == 1)
-                tokens[i] = tokens[i].Replace(COMMA.ToString(), REPLACE_MARK);
-        }
-        return string.Join("", tokens).Replace("\"", "");
-    }
-
     string[] CsvToVaildLines(string csv)
     {
         char lineBreak = '\n';
@@ -520,6 +508,18 @@ public class CsvParser
         foreach (var currentLine in lines.Skip(1).Select(line => GetLine(line)))
             values.Add(currentLine.Split(COMMA)[fieldIndex].Replace(REPLACE_MARK, COMMA.ToString()));
         return values.ToArray();
+    }
+
+    string GetLine(string line)
+    {
+        string[] tokens = line.Split(IENUMERABLE_MARK);
+
+        for (int i = 0; i < tokens.Length - 1; i++)
+        {
+            if (i % 2 == 1)
+                tokens[i] = tokens[i].Replace(COMMA.ToString(), REPLACE_MARK);
+        }
+        return string.Join("", tokens).Replace("\"", "");
     }
 
     public string GetCell(string fieldName) => _valuesByName[fieldName][_currentIndex];
